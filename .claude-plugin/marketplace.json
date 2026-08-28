@@ -1,0 +1,9 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-plugins",
+  "description": "Skills, agents and commands packaged as installable Claude Code plugins.",
+  "owner": {
+    "name": "Vitalii Holubinka"
+  },
+  "plugins": []
+}
