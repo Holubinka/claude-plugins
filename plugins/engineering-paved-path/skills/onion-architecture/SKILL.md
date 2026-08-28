@@ -10,9 +10,7 @@ metadata:
 
 Placement and dependency direction for backend code.
 
-**One rule generates the rest: dependencies point inward, never outward**. Every
-rule below is that rule applied to a specific arrow. When a rule and the direction seem to
-disagree, the direction wins and the rule is wrong.
+**One rule generates the rest: dependencies point inward, never outward**. Every rule below is that rule applied to a specific arrow. When a rule and the direction seem to disagree, the direction wins and the rule is wrong.
 
 ## Navigation
 
@@ -25,21 +23,13 @@ disagree, the direction wins and the rule is wrong.
 
 ## 0. Read the repository first
 
-This skill names the rings; **it does not know your folder names.** Before applying it, spend
-one pass establishing three things, and say in your output what you found:
+This skill names the rings; **it does not know your folder names.** Before applying it, spend one pass establishing three things, and say in your output what you found:
 
-1. **Does a boundary gate already exist?** Look for `.dependency-cruiser.cjs`/`.js`,
-   `eslint-plugin-boundaries`, `import/no-restricted-paths`, an Nx or Turbo project graph
-   constraint, an ArchUnit-style test. **If one exists, it is the authority and this file is
-   commentary.** Its rules carry their own reasons; read those instead of guessing.
-2. **Which directories hold which kind of code.** Map the five rings in §1 onto the names this
-   repository actually uses. Write the mapping down once; every later answer refers to it.
-3. **Where the composition root is** — the single file that names concrete types and wires them
-   together. If there is none, that is itself the most valuable finding.
+1. **Does a boundary gate already exist?** Look for `.dependency-cruiser.cjs`/`.js`, `eslint-plugin-boundaries`, `import/no-restricted-paths`, an Nx or Turbo project graph constraint, an ArchUnit-style test. **If one exists, it is the authority and this file is commentary.** Its rules carry their own reasons; read those instead of guessing.
+2. **Which directories hold which kind of code.** Map the five rings in §1 onto the names this repository actually uses. Write the mapping down once; every later answer refers to it.
+3. **Where the composition root is** — the single file that names concrete types and wires them together. If there is none, that is itself the most valuable finding.
 
-Where no gate and no convention exist, say so plainly and apply §1–§3 as a proposal, not as a
-finding. **An architecture rule invented on the spot and reported as the repository's own is
-worse than no rule**: the next reader obeys it believing someone decided it.
+Where no gate and no convention exist, say so plainly and apply §1–§3 as a proposal, not as a finding. **An architecture rule invented on the spot and reported as the repository's own is worse than no rule**: the next reader obeys it believing someone decided it.
 
 ---
 
@@ -55,28 +45,19 @@ Naming, not moving. The rings are a lens over the folders that already exist.
 | **Infrastructure** — edges | Driving adapters (HTTP, CLI, queue consumers) and driven adapters (database, LLM, git, third-party APIs). | route/controller files, an `adapters/` tree, the DB layer |
 | **Composition root** | Wiring. Outside the rings on purpose — the one place allowed to name every concrete type. | a container or bootstrap file, the app entry point, a module index |
 
-**The composition root importing everything is not a violation to fix.** A composition root is
-*defined* as the single place that knows the concrete graph.
+**The composition root importing everything is not a violation to fix.** A composition root is *defined* as the single place that knows the concrete graph.
 
-Everywhere else the container is a **port factory, and only that**. Asking it for a port —
-`container.git`, `await container.llm(provider)` — is not merely allowed; §3.3 requires it,
-because the container is what resolves overrides and secrets. Reaching into it for a
-collaborator that could have arrived as a parameter — a repository above all — is the Service
-Locator anti-pattern, and it is the move that removes the seam a test needs.
+Everywhere else the container is a **port factory, and only that**. Asking it for a port — `container.git`, `await container.llm(provider)` — is not merely allowed; §3.3 requires it, because the container is what resolves overrides and secrets. Reaching into it for a collaborator that could have arrived as a parameter — a repository above all — is the Service Locator anti-pattern, and it is the move that removes the seam a test needs.
 
-So a service *holding* a container is not the violation. `this.repo = new
-Repository(container.db)` inside that service is.
+So a service *holding* a container is not the violation. `this.repo = new Repository(container.db)` inside that service is.
 
-**Vertical slices and rings compose.** If the repository is organised by feature rather than by
-layer, the rings live *inside* each slice. That hybrid is a design, not a half-finished
-migration — see §6.
+**Vertical slices and rings compose.** If the repository is organised by feature rather than by layer, the rings live *inside* each slice. That hybrid is a design, not a half-finished migration — see §6.
 
 ## 2. The four-step procedure
 
 Run in order for any "where does this go" question. Stop when the answer is determined.
 
-**1 — Name the kind of code.** HTTP shape · use case · persistence · pure transform · external
-call · wiring · constant. If you cannot name it, it is not ready to be placed.
+**1 — Name the kind of code.** HTTP shape · use case · persistence · pure transform · external call · wiring · constant. If you cannot name it, it is not ready to be placed.
 
 **2 — Find its ring.**
 
@@ -92,51 +73,28 @@ call · wiring · constant. If you cannot name it, it is not ready to be placed.
 | decides which implementation is used | Composition root |
 | must run without the web server present — a CLI, a worker, a CI runner | Core |
 
-**3 — Check the arrow points inward.** Outer may call any inner, directly, without a proxy
-method. Inner may never name outer. If your import goes the wrong way, the thing you
-need is in the wrong ring — move the thing, do not add the import.
+**3 — Check the arrow points inward.** Outer may call any inner, directly, without a proxy method. Inner may never name outer. If your import goes the wrong way, the thing you need is in the wrong ring — move the thing, do not add the import.
 
-**4 — Run the gate**, if §0 found one. It is faster than reasoning about it. If the repository
-has no gate, say so in your output rather than implying a check happened.
+**4 — Run the gate**, if §0 found one. It is faster than reasoning about it. If the repository has no gate, say so in your output rather than implying a check happened.
 
 **When it fails, escalate in this order — stop at the first that works:**
 
-1. **Move the code.** Nine times in ten the rule is right and the file is in the wrong ring.
-   Check the frozen baseline first, if the gate keeps one: if the same edge is already frozen
-   from another file, the thing you are importing has no home, and giving it one clears both.
-2. **Narrow the rule**, with the reason recorded beside it. Only when a whole category is
-   legitimately exempt — the bar is "the rule is wrong", not "the rule is inconvenient".
-3. **Baseline it**, deliberately, only for something you intend to fix and only with a note
-   saying what would fix it.
+1. **Move the code.** Nine times in ten the rule is right and the file is in the wrong ring. Check the frozen baseline first, if the gate keeps one: if the same edge is already frozen from another file, the thing you are importing has no home, and giving it one clears both.
+2. **Narrow the rule**, with the reason recorded beside it. Only when a whole category is legitimately exempt — the bar is "the rule is wrong", not "the rule is inconvenient".
+3. **Baseline it**, deliberately, only for something you intend to fix and only with a note saying what would fix it.
 
-Prefer a gate with no inline-ignore comment. A regenerated baseline re-freezes the **whole**
-file, so regenerate only when a refactor has *removed* entries: confirm the strict count fell,
-then read the diff to check nothing was added. Regenerating to silence a new violation is the
-one thing a boundary gate cannot survive.
+Prefer a gate with no inline-ignore comment. A regenerated baseline re-freezes the **whole** file, so regenerate only when a refactor has *removed* entries: confirm the strict count fell, then read the diff to check nothing was added. Regenerating to silence a new violation is the one thing a boundary gate cannot survive.
 
 ## 3. The rules
 
-1. **A route validates, resolves tenancy, delegates, and maps "not found" to its HTTP shape.**
-   Nothing else. Declare the request schema declaratively where the framework supports it
-   rather than parsing the body by hand inside the handler.
-2. **A repository takes a database handle, returns rows, and holds nothing else.** Never the
-   container. Past roughly 200 lines, split by aggregate into free functions behind the class.
-3. **A service depends on ports, and gets its repository as a parameter.**
-   `constructor(container: Container, repo = new XRepository(container.db))` — the default
-   keeps call sites unchanged, and the parameter is what makes the service testable.
-   Keeping the container is right: that is how ports are reached (§1). Taking the repository
-   out of it, or building one inside the constructor, is what this rule forbids.
-4. **Every external call goes behind a port**. A port is not finished until the mock
-   implementation of it exists beside the real one.
-5. **Data crossing a ring boundary is a plain structure**. A persistence row type never
-   leaves its module; map it to a DTO in the module's pure-transform file. Mapping inline in a
-   route is a violation.
-6. **Parse once, at the edge** `[PK]`. The contract layer is the boundary. Inside a service the
-   value is already the parsed type — do not re-validate it.
-7. **Secrets reach code only through a secrets port.** Never through the config object, never
-   through `process.env` at the point of use.
-8. **The pure core stays dependency-light** `[FC]`. Anything it needs beyond its two or three
-   declared runtime dependencies arrives as a parameter or a callback.
+1. **A route validates, resolves tenancy, delegates, and maps "not found" to its HTTP shape.** Nothing else. Declare the request schema declaratively where the framework supports it rather than parsing the body by hand inside the handler.
+2. **A repository takes a database handle, returns rows, and holds nothing else.** Never the container. Past roughly 200 lines, split by aggregate into free functions behind the class.
+3. **A service depends on ports, and gets its repository as a parameter.** `constructor(container: Container, repo = new XRepository(container.db))` — the default keeps call sites unchanged, and the parameter is what makes the service testable. Keeping the container is right: that is how ports are reached (§1). Taking the repository out of it, or building one inside the constructor, is what this rule forbids.
+4. **Every external call goes behind a port**. A port is not finished until the mock implementation of it exists beside the real one.
+5. **Data crossing a ring boundary is a plain structure**. A persistence row type never leaves its module; map it to a DTO in the module's pure-transform file. Mapping inline in a route is a violation.
+6. **Parse once, at the edge** `[PK]`. The contract layer is the boundary. Inside a service the value is already the parsed type — do not re-validate it.
+7. **Secrets reach code only through a secrets port.** Never through the config object, never through `process.env` at the point of use.
+8. **The pure core stays dependency-light** `[FC]`. Anything it needs beyond its two or three declared runtime dependencies arrives as a parameter or a callback.
 
 ## 4. Boundary with the sibling skills
 
@@ -149,8 +107,7 @@ Split by **question asked**, not by technology.
 | `engineering-paved-path:postgresql-table-design` | *How should the table look — types, indexes, constraints?* |
 | `engineering-paved-path:security` | *What untrusted input does this touch, and what is the check?* |
 
-Do not load this skill for "why is this query slow", "how do I add a framework hook", or "write
-this migration". Framework-specific and ORM-specific skills answer those; this one does not.
+Do not load this skill for "why is this query slow", "how do I add a framework hook", or "write this migration". Framework-specific and ORM-specific skills answer those; this one does not.
 
 ## 5. Red flags
 
@@ -171,16 +128,9 @@ Stop when you catch yourself writing any of these.
 
 ## 6. What this costs, honestly
 
-Onion is not free and this skill does not pretend otherwise. Bogard moved his team off it
-because services grow into a big ball of mud regardless of how many layers guard them.
-Domain-Driven Hexagon warns that most projects never swap databases, so a repository justified
-by swappability is dead weight.
+Onion is not free and this skill does not pretend otherwise. Bogard moved his team off it because services grow into a big ball of mud regardless of how many layers guard them. Domain-Driven Hexagon warns that most projects never swap databases, so a repository justified by swappability is dead weight.
 
-The position taken here: **the repository earns its place by isolating persistence and giving
-tests a seam**, not by promising portability. Where a repository is organised as vertical slices
-with rings inside each slice, that hybrid is the design, not a compromise on the way to
-something purer. Do not introduce `domain/`, `application/` and `infrastructure/` folders on top
-of a structure that works; name the rings where the code already sits.
+The position taken here: **the repository earns its place by isolating persistence and giving tests a seam**, not by promising portability. Where a repository is organised as vertical slices with rings inside each slice, that hybrid is the design, not a compromise on the way to something purer. Do not introduce `domain/`, `application/` and `infrastructure/` folders on top of a structure that works; name the rings where the code already sits.
 
 ## 7. Review checklist
 

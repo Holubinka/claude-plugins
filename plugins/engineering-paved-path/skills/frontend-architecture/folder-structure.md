@@ -1,7 +1,6 @@
 # Folder structure
 
-Which folder a file goes in, and what it is named. Applies principles 1, 2 and 6 from
-[SKILL.md](SKILL.md).
+Which folder a file goes in, and what it is named. Applies principles 1, 2 and 6 from [SKILL.md](SKILL.md).
 
 ## Contents
 
@@ -28,33 +27,19 @@ Which folder a file goes in, and what it is named. Applies principles 1, 2 and 6
 | **By feature** | `features/<name>/{api,components,hooks,types,utils}` + `shared → features → app` | needs lint zones or cross-feature imports creep back | `import/no-restricted-paths`, `eslint-plugin-boundaries` |
 | **FSD** | layers `app → pages → widgets → features → entities → shared`, segments `ui/api/model/lib/config`, public API per slice | high entry cost; needs a whole team on board | `steiger`, `dependency-cruiser` |
 
-**In an App Router project, prefer route-colocation** — a fifth option the App Router makes
-possible and Next.js explicitly sanctions as "split project files by feature or route". Feature
-code lives under the route that owns it; only genuinely shared code moves up. Where a repository
-already committed to one of the four above, keep it: mixing two strategies is worse than either.
+**In an App Router project, prefer route-colocation** — a fifth option the App Router makes possible and Next.js explicitly sanctions as "split project files by feature or route". Feature code lives under the route that owns it; only genuinely shared code moves up. Where a repository already committed to one of the four above, keep it: mixing two strategies is worse than either.
 
-It also settles a real disagreement in the sources: A1, A4, A6 and A8 argue for feature
-folders, while A7 argues features blur over time and grouping by type stays predictable.
-Route-colocation satisfies both — files are grouped by the route that owns them, with
-type-named files (`constants.ts`, `helpers.ts`, `styles.ts`) *inside* the folder.
+It also settles a real disagreement in the sources: A1, A4, A6 and A8 argue for feature folders, while A7 argues features blur over time and grouping by type stays predictable. Route-colocation satisfies both — files are grouped by the route that owns them, with type-named files (`constants.ts`, `helpers.ts`, `styles.ts`) *inside* the folder.
 
-**When an alternative would win:** move to `features/` once the same domain code is consumed
-by many routes and cross-feature imports need policing. Move to FSD at multi-team scale.
-Either decays without enforcement — and none of the tools above is installed here, so do not
-cite a rule the build does not check.
+**When an alternative would win:** move to `features/` once the same domain code is consumed by many routes and cross-feature imports need policing. Move to FSD at multi-team scale. Either decays without enforcement — and none of the tools above is installed here, so do not cite a rule the build does not check.
 
 ## Colocation
 
-Place code as close to where it is used as possible. Dodds's three benefits:
-maintainability (related files stay in sync), applicability (you find what exists), and ease
-of use (no context switch).
+Place code as close to where it is used as possible. Dodds's three benefits: maintainability (related files stay in sync), applicability (you find what exists), and ease of use (no context switch).
 
-In the App Router this is safe by construction: a folder is **not routable** until it contains
-`page` or `route`, so project files sit inside route segments without becoming URLs.
+In the App Router this is safe by construction: a folder is **not routable** until it contains `page` or `route`, so project files sit inside route segments without becoming URLs.
 
-Tests colocate too — `FindingCard.test.tsx` beside `FindingCard.tsx`, never a mirrored
-`__tests__/` tree. End-to-end tests are the standard exception: they exercise the app from
-outside, so they live at the project root rather than beside any one component.
+Tests colocate too — `FindingCard.test.tsx` beside `FindingCard.tsx`, never a mirrored `__tests__/` tree. End-to-end tests are the standard exception: they exercise the app from outside, so they live at the project root rather than beside any one component.
 
 ## The promotion rule
 
@@ -66,11 +51,7 @@ outside, so they live at the project root rather than beside any one component.
 
 This is the only thing that stops `utils/` and `hooks/` becoming dumping grounds.
 
-**Worked example.** A `SeverityLegend` used only by the PR detail page lives at
-`app/repos/[repoId]/pulls/[number]/_components/SeverityLegend/`. When the PR list page needs
-it too, the folder moves to `src/components/severity-legend/` and both routes import
-`@/components/severity-legend`. It does **not** go to `pulls/_components/` — that folder is
-the list route's own, not a shared parent.
+**Worked example.** A `SeverityLegend` used only by the PR detail page lives at `app/repos/[repoId]/pulls/[number]/_components/SeverityLegend/`. When the PR list page needs it too, the folder moves to `src/components/severity-legend/` and both routes import `@/components/severity-legend`. It does **not** go to `pulls/_components/` — that folder is the list route's own, not a shared parent.
 
 **Bad:** creating `src/components/severity-legend/` on day one. One consumer means one home.
 
@@ -88,11 +69,9 @@ FindingCard/
 └── index.ts               one re-export
 ```
 
-Add a file only when it earns its place — a component with no constants has no `constants.ts`.
-Sub-components used only by this one nest as `_components/` inside it.
+Add a file only when it earns its place — a component with no constants has no `constants.ts`. Sub-components used only by this one nest as `_components/` inside it.
 
-**Never in the component file:** a second exported component, a helper that takes no props, a
-magic value, an API call.
+**Never in the component file:** a second exported component, a helper that takes no props, a magic value, an API call.
 
 **Bad** — the same code as one file:
 
@@ -115,8 +94,7 @@ export function lineLabel(f: Pick<FindingRecord, "start_line" | "end_line">): st
 
 ## Constants
 
-**Check for an existing token first** (principle 6). A mature design-token module usually
-exports the whole set for a concept — colour, background, icon *and* label — in one record:
+**Check for an existing token first** (principle 6). A mature design-token module usually exports the whole set for a concept — colour, background, icon *and* label — in one record:
 
 ```ts
 // the design-token module
@@ -126,18 +104,11 @@ export const SEV: Record<Severity, { c: string; bg: string; icon: IconName; labe
 };
 ```
 
-The standard failure is a component restating one field of that record locally, then a second
-component copying the first. **When you find an existing local copy, that is drift, not
-precedent** — a third copy is the red flag, and the honest move is to say the drift exists
-rather than to add to it. Consume the token; and where the token module is a vendored copy, do
-not edit it to extend it — change the source of truth and re-vendor.
+The standard failure is a component restating one field of that record locally, then a second component copying the first. **When you find an existing local copy, that is drift, not precedent** — a third copy is the red flag, and the honest move is to say the drift exists rather than to add to it. Consume the token; and where the token module is a vendored copy, do not edit it to extend it — change the source of truth and re-vendor.
 
-**Do not use a token's `label` field as display text.** Labels inside a token record are
-hardcoded in one language. User-facing strings go through the translation catalogue.
+**Do not use a token's `label` field as display text.** Labels inside a token record are hardcoded in one language. User-facing strings go through the translation catalogue.
 
-Otherwise: `constants.ts` beside the component, `SCREAMING_SNAKE`, `as const`; promote
-by the rule above. **No magic value in JSX** — an unnamed number or string in a template is a
-constant that has not been named yet.
+Otherwise: `constants.ts` beside the component, `SCREAMING_SNAKE`, `as const`; promote by the rule above. **No magic value in JSX** — an unnamed number or string in a template is a constant that has not been named yet.
 
 ```tsx
 // ✗ Bad
@@ -153,19 +124,13 @@ export const FINDINGS_PAGE_SIZE = 50;
 export const PANEL_MAX_HEIGHT = 420;
 ```
 
-`50` and `420` mean nothing at the call site, and the next person changing one has no way to
-find the other place it was pasted.
+`50` and `420` mean nothing at the call site, and the next person changing one has no way to find the other place it was pasted.
 
 ## Types and styles
 
-**Types follow their consumer.** Component props stay in the component file. Types shared
-across the app go to the app's shared types module. Contract types shared with the server are
-**re-exported**, never redefined — the shared types module re-exports the inferred output types,
-not the schemas themselves.
+**Types follow their consumer.** Component props stay in the component file. Types shared across the app go to the app's shared types module. Contract types shared with the server are **re-exported**, never redefined — the shared types module re-exports the inferred output types, not the schemas themselves.
 
-**Styles stay in the component folder**. Here that is a typed `CSSProperties` object in
-`styles.ts`; Tailwind supplies the theme tokens and CSS variables. Follow whichever the
-surrounding component already uses rather than mixing both in one folder.
+**Styles stay in the component folder**. Here that is a typed `CSSProperties` object in `styles.ts`; Tailwind supplies the theme tokens and CSS variables. Follow whichever the surrounding component already uses rather than mixing both in one folder.
 
 ## utils vs helpers vs lib
 
@@ -178,8 +143,7 @@ A real distinction, worth holding:
 | **util** | would drop into an unrelated project unchanged | `clamp(n, lo, hi)` | `src/lib/` |
 | **lib** | a preconfigured integration, not a function | the API client, the query client | `src/lib/` |
 
-If you cannot say which of the three a new file is, it is not ready to be extracted — leave it
-in the component that uses it.
+If you cannot say which of the three a new file is, it is not ready to be extracted — leave it in the component that uses it.
 
 ## Barrels
 
@@ -196,14 +160,9 @@ export { DiffViewer } from "./DiffViewer";
 export type { DiffCommentApi } from "./comments";
 ```
 
-**Not allowed:** new aggregating barrels. Importing one symbol from an `export *` barrel pulls
-the whole module graph — circular imports, slower dev builds (one measured case went 11k → 3.5k
-modules after removal), and `optimizePackageImports` cannot rescue a barrel containing any
-non-re-export line.
+**Not allowed:** new aggregating barrels. Importing one symbol from an `export *` barrel pulls the whole module graph — circular imports, slower dev builds (one measured case went 11k → 3.5k modules after removal), and `optimizePackageImports` cannot rescue a barrel containing any non-re-export line.
 
-Where barrels already exist, leave them and do not add another. Removing one is a separate,
-deliberate change with its own verification — the import rewrite it forces touches every
-consumer, so it does not belong inside an unrelated task.
+Where barrels already exist, leave them and do not add another. Removing one is a separate, deliberate change with its own verification — the import rewrite it forces touches every consumer, so it does not belong inside an unrelated task.
 
 ```ts
 import { usePrActiveRuns } from "@/lib/hooks/reviews";   // ✓ one module
@@ -212,9 +171,7 @@ import { usePrActiveRuns } from "@/lib/hooks";           // ✗ pulls every othe
 
 ## Import paths
 
-Configure a path alias — `@/*` → `./src/*` in `tsconfig.json` is the usual form — and use it
-for anything outside the current folder; relative paths only for same-folder siblings
-(`./constants`, `./helpers`).
+Configure a path alias — `@/*` → `./src/*` in `tsconfig.json` is the usual form — and use it for anything outside the current folder; relative paths only for same-folder siblings (`./constants`, `./helpers`).
 
 ```ts
 // ✗ Bad
@@ -226,9 +183,7 @@ import { useTestConnection, useSecretsStatus } from "@/lib/hooks/core";
 import { ApiError } from "@/lib/api";
 ```
 
-Seven levels of `../` break the moment a folder moves and hide which layer is being crossed.
-In a codebase where both forms are already present, do not add more — fix the ones you touch,
-and leave the rest to a deliberate pass.
+Seven levels of `../` break the moment a folder moves and hide which layer is being crossed. In a codebase where both forms are already present, do not add more — fix the ones you touch, and leave the rest to a deliberate pass.
 
 ## Naming
 
@@ -259,6 +214,4 @@ src/
 └── vendor/{shared,ui}/                    # vendored — do not edit here
 ```
 
-Where a `vendor/` tree mirrors another package, that other package is the source of truth:
-change it first, then mirror deliberately. Type-checking cannot see the drift, because each
-package compiles against its own copy.
+Where a `vendor/` tree mirrors another package, that other package is the source of truth: change it first, then mirror deliberately. Type-checking cannot see the drift, because each package compiles against its own copy.
