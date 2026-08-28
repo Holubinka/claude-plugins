@@ -12,10 +12,9 @@ on:
       - 'README.md'
       - 'CONTRIBUTING.md'
       - '.github/workflows/pages.yml'
+  # No path filter. The docs are the search corpus, so a docs-only change can move the
+  # ranking — which is exactly how a regression reached main once already.
   pull_request:
-    paths:
-      - 'site/**'
-      - 'scripts/build-index.py'
   workflow_dispatch:
 
 permissions:

@@ -1,0 +1,43 @@
+#!/bin/sh
+# Runs the checks CI runs, before anything leaves the machine.
+#
+# Enable once per clone:   git config core.hooksPath .githooks
+# Skip deliberately:       git push --no-verify
+#
+# Kept to the fast checks — under a second in total — so there is never a reason to
+# reach for --no-verify out of impatience. The full site build stays in CI.
+
+set -e
+root=$(git rev-parse --show-toplevel)
+cd "$root"
+
+fail=0
+run() {
+  printf '  %-34s' "$1"
+  shift
+  if out=$("$@" 2>&1); then
+    printf 'ok\n'
+  else
+    printf 'FAILED\n\n'
+    printf '%s\n\n' "$out"
+    fail=1
+  fi
+}
+
+echo "pre-push checks"
+run "lint-structure.py"        python3 scripts/lint-structure.py
+run "build-index.py --check"   python3 scripts/build-index.py --check
+
+# The probe suite needs the site's dependencies; a fresh clone has not installed them.
+if [ -d site/node_modules ]; then
+  run "search probes"          sh -c 'cd site && node tests/search.test.mjs'
+else
+  printf '  %-34sskipped (run npm install in site/)\n' "search probes"
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo
+  echo "push aborted. Fix the above, or use --no-verify if you know better."
+  exit 1
+fi
+echo "all good"
