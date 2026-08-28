@@ -2,28 +2,26 @@
 import Base from '../layouts/Base.astro';
 import { graph, plugins } from '../lib/catalog';
 import { href } from '../lib/url';
+import { graph as s } from '../lib/strings';
 
 const byId = new Map(graph.nodes.map((node) => [node.id, node]));
 const problems = graph.edges.filter((edge) => !edge.constrained || !edge.resolvable);
 ---
 
-<Base title="Dependency graph" description="Which plugins depend on which, and which of those dependencies cannot resolve.">
+<Base title={s.title} description={s.description}>
   <header class="head">
-    <p class="eyebrow">Graph</p>
-    <h1>What depends on what</h1>
-    <p class="lede">
-      Edges carry the declared version range. Layout is computed by the indexer and drawn
-      as static SVG — no graph library ships to your browser.
-    </p>
+    <p class="eyebrow">{s.eyebrow}</p>
+    <h1>{s.heading}</h1>
+    <p class="lede">{s.lede}</p>
   </header>
 
   {graph.nodes.length === 0 ? (
-    <div class="note"><p>No plugins yet, so there is nothing to draw.</p></div>
+    <div class="note"><p>{s.empty}</p></div>
   ) : (
     <>
       <div class="scroll figure">
         <svg viewBox={`0 0 ${graph.width} ${graph.height}`} role="img"
-             aria-label={`Dependency graph of ${plugins.length} plugins`}>
+             aria-label={s.figureLabel(plugins.length)}>
           <defs>
             <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
               <path d="M0 0 L8 4 L0 8 z" fill="currentColor" />
@@ -45,7 +43,7 @@ const problems = graph.edges.filter((edge) => !edge.constrained || !edge.resolva
                   <path d={`M${x1} ${y1} C${mid} ${y1}, ${mid} ${y2}, ${x2 + 8} ${y2}`}
                         marker-end="url(#arrow)" />
                   <text x={mid} y={(y1 + y2) / 2 - 6} text-anchor="middle">
-                    {edge.range ?? 'latest'}
+                    {edge.range ?? s.latest}
                   </text>
                 </g>
               );
@@ -57,7 +55,7 @@ const problems = graph.edges.filter((edge) => !edge.constrained || !edge.resolva
                 <rect x={node.x} y={node.y} width={node.width} height={node.height} rx="3" />
                 <text x={node.x + 12} y={node.y + 22}>{node.label}</text>
                 <text x={node.x + 12} y={node.y + 38} class="sub">
-                  {node.version ? `v${node.version}` : 'unversioned'} · {node.artifacts} artifacts
+                  {node.version ? `v${node.version}` : s.unversioned} · {node.artifacts} {s.artifacts}
                 </text>
               </g>
             ))}
@@ -66,13 +64,13 @@ const problems = graph.edges.filter((edge) => !edge.constrained || !edge.resolva
       </div>
 
       <section class="block">
-        <h2>Edges worth looking at</h2>
+        <h2>{s.problems}</h2>
         {problems.length === 0 ? (
-          <p class="chip chip--ok">every dependency is constrained and resolves</p>
+          <p class="chip chip--ok">{s.allClean}</p>
         ) : (
           <div class="scroll">
             <table>
-              <thead><tr><th>From</th><th>To</th><th>Range</th><th>Problem</th></tr></thead>
+              <thead><tr><th>{s.colFrom}</th><th>{s.colTo}</th><th>{s.colRange}</th><th>{s.colProblem}</th></tr></thead>
               <tbody>
                 {problems.map((edge) => (
                   <tr>
@@ -81,8 +79,8 @@ const problems = graph.edges.filter((edge) => !edge.constrained || !edge.resolva
                     <td>{edge.range ?? '—'}</td>
                     <td>
                       {!edge.constrained
-                        ? <span class="chip chip--warn">tracks latest — an upstream release can change behaviour</span>
-                        : <span class="chip chip--err">no-matching-tag — this install fails</span>}
+                        ? <span class="chip chip--warn">{s.tracksLatest}</span>
+                        : <span class="chip chip--err">{s.noMatchingTag}</span>}
                     </td>
                   </tr>
                 ))}

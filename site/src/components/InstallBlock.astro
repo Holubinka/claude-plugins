@@ -1,5 +1,6 @@
 ---
 import { marketplace } from '../lib/catalog';
+import { install as s, chrome } from '../lib/strings';
 
 interface Props { plugin: string }
 const { plugin } = Astro.props;
@@ -10,17 +11,17 @@ const dev = marketplace.install.dev.replace('{plugin}', plugin);
 const both = [add, install].filter(Boolean).join('\n');
 ---
 
-<section class="panel install" aria-label="Install">
+<section class="panel install" aria-label={s.ariaLabel}>
   <p class="panel__label">
-    <span>Install</span>
-    <button class="button" type="button" data-copy={both}>Copy</button>
+    <span>{s.label}</span>
+    <button class="button" type="button" data-copy={both}>{chrome.copy}</button>
   </p>
   <div class="panel__body">
     <pre>{both}</pre>
     <details>
-      <summary>Load it from a working tree instead</summary>
+      <summary>{s.devSummary}</summary>
       <pre>{dev}</pre>
-      <p>Run <code>/reload-plugins</code> after each edit.</p>
+      <p>{s.devNote}</p>
     </details>
   </div>
 </section>

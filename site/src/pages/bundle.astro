@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { plugins, marketplace } from '../lib/catalog';
+import { bundle as s, tokens, chrome } from '../lib/strings';
 
 const install = marketplace.install;
 
@@ -13,22 +14,19 @@ const picks = plugins.map((plugin) => ({
 }));
 ---
 
-<Base title="Bundle builder" description="Pick several plugins and get one install block, with their combined context cost and capabilities.">
+<Base title={s.title} description={s.description}>
   <header class="head">
-    <p class="eyebrow">Bundle</p>
-    <h1>Set someone up in one paste</h1>
-    <p class="lede">
-      Choose what a machine should have, then copy a single block. The selection lives in
-      the URL, so the link itself is the onboarding instruction.
-    </p>
+    <p class="eyebrow">{s.eyebrow}</p>
+    <h1>{s.heading}</h1>
+    <p class="lede">{s.lede}</p>
   </header>
 
   {plugins.length === 0 ? (
-    <div class="note"><p>Nothing to bundle yet — the catalogue is empty.</p></div>
+    <div class="note"><p>{s.empty}</p></div>
   ) : (
     <div class="builder">
       <section class="block">
-        <h2>Pick</h2>
+        <h2>{s.pick}</h2>
         <ul class="picks">
           {plugins.map((plugin) => (
             <li>
@@ -36,7 +34,7 @@ const picks = plugins.map((plugin) => ({
                 <input type="checkbox" value={plugin.name} data-pick />
                 <span class="pick__name">{plugin.name}</span>
                 <span class="pick__desc">{plugin.description}</span>
-                <span class="tokens"><span>always <b>≈{plugin.tokens.always}</b></span></span>
+                <span class="tokens"><span>{tokens.inlineAlways} <b>≈{plugin.tokens.always}</b></span></span>
               </label>
             </li>
           ))}
@@ -44,24 +42,24 @@ const picks = plugins.map((plugin) => ({
       </section>
 
       <section class="block sticky">
-        <h2>Take it away</h2>
+        <h2>{s.takeItAway}</h2>
         <div class="panel">
           <p class="panel__label">
-            <span>Install block</span>
-            <button class="button" type="button" id="copy" data-copy="">Copy</button>
+            <span>{s.installBlock}</span>
+            <button class="button" type="button" id="copy" data-copy="">{chrome.copy}</button>
           </p>
-          <div class="panel__body"><pre id="block">Pick at least one plugin.</pre></div>
+          <div class="panel__body"><pre id="block">{s.placeholder}</pre></div>
         </div>
         <dl class="totals">
-          <div><dt>Selected</dt><dd class="num" id="count">0</dd></div>
-          <div><dt>Always-on tokens</dt><dd class="num" id="cost">≈0</dd></div>
+          <div><dt>{s.selected}</dt><dd class="num" id="count">0</dd></div>
+          <div><dt>{s.alwaysTokens}</dt><dd class="num" id="cost">≈0</dd></div>
         </dl>
         <div id="warnings"></div>
       </section>
     </div>
   )}
 
-  <script is:inline define:vars={{ picks, install }}>
+  <script is:inline define:vars={{ picks, install, copy: s }}>
     const byName = new Map(picks.map((p) => [p.name, p]));
     const boxes = [...document.querySelectorAll('[data-pick]')];
     const block = document.getElementById('block');
@@ -91,7 +89,14 @@ const picks = plugins.map((plugin) => ({
           if (!dep.range) continue;
           const previous = seen.get(dep.name);
           if (previous && previous.range !== dep.range) {
-            found.push(`${dep.name}: ${previous.from} wants ${previous.range}, ${name} wants ${dep.range}`);
+            found.push(
+              copy.conflictDetail
+                .replace('{dep}', dep.name)
+                .replace('{firstFrom}', previous.from)
+                .replace('{firstRange}', previous.range)
+                .replace('{secondFrom}', name)
+                .replace('{secondRange}', dep.range),
+            );
           } else if (!previous) {
             seen.set(dep.name, { range: dep.range, from: name });
           }
@@ -111,7 +116,7 @@ const picks = plugins.map((plugin) => ({
       const lines = picked.length
         ? [install.add, ...all.map((name) => install.install.replace('{plugin}', name))].filter(Boolean)
         : [];
-      block.textContent = lines.length ? lines.join('\n') : 'Pick at least one plugin.';
+      block.textContent = lines.length ? lines.join('\n') : copy.placeholder;
       copy.dataset.copy = lines.join('\n');
       count.textContent = String(picked.length);
       cost.textContent = `≈${all.reduce((sum, name) => sum + (byName.get(name)?.always ?? 0), 0)}`;
@@ -121,13 +126,13 @@ const picks = plugins.map((plugin) => ({
       if (pulled.length) {
         const p = document.createElement('p');
         p.className = 'hint';
-        p.textContent = `Pulled in as dependencies: ${pulled.join(', ')}`;
+        p.textContent = copy.pulledIn.replace('{names}', pulled.join(', '));
         warnings.append(p);
       }
       for (const conflict of conflicts(all)) {
         const p = document.createElement('p');
         p.className = 'chip chip--err';
-        p.textContent = `range-conflict — ${conflict}`;
+        p.textContent = copy.conflict.replace('{detail}', conflict);
         warnings.append(p);
       }
     }

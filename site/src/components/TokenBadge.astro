@@ -1,5 +1,6 @@
 ---
 import type { TokenCost } from '../lib/catalog';
+import { tokens as s } from '../lib/strings';
 
 interface Props { tokens: TokenCost | null; verbose?: boolean }
 const { tokens, verbose = false } = Astro.props;
@@ -8,20 +9,20 @@ const { tokens, verbose = false } = Astro.props;
   verbose ? (
     <dl class="cost">
       <div>
-        <dt>Always</dt>
+        <dt>{s.always}</dt>
         <dd class="num">≈{tokens.always}</dd>
-        <p>Carried in every turn while the plugin is enabled.</p>
+        <p>{s.alwaysNote}</p>
       </div>
       <div>
-        <dt>On load</dt>
+        <dt>{s.onLoad}</dt>
         <dd class="num">≈{tokens.onLoad}</dd>
-        <p>Paid only when it fires.</p>
+        <p>{s.onLoadNote}</p>
       </div>
     </dl>
   ) : (
-    <span class="tokens" title="Always in context / paid on load">
-      <span>always <b>≈{tokens.always}</b></span>
-      <span>· on load <b>≈{tokens.onLoad}</b></span>
+    <span class="tokens" title={s.inlineTitle}>
+      <span>{s.inlineAlways} <b>≈{tokens.always}</b></span>
+      <span>{s.inlineOnLoad} <b>≈{tokens.onLoad}</b></span>
     </span>
   )
 )}

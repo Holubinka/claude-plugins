@@ -1,5 +1,6 @@
 ---
 import type { Capabilities } from '../lib/catalog';
+import { capabilities as s } from '../lib/strings';
 
 interface Props { capabilities: Capabilities }
 const { capabilities: c } = Astro.props;
@@ -11,38 +12,37 @@ const declared =
 
 <section class="panel" aria-labelledby="caps">
   <p class="panel__label" id="caps">
-    <span>What it does to your machine</span>
-    <span>{declared === 0 ? 'nothing declared' : 'facts, not a score'}</span>
+    <span>{s.heading}</span>
+    <span>{declared === 0 ? s.nothingDeclared : s.factsNotScore}</span>
   </p>
   <div class="panel__body caps">
     {declared === 0 ? (
-      <p class="empty">This plugin declares no hooks, no servers and no bundled scripts. It
-        adds instructions to the conversation and nothing else.</p>
+      <p class="empty">{s.empty}</p>
     ) : (
       <>
         {c.interceptsEvents.length > 0 && (
           <div class="row">
-            <h3>Intercepts</h3>
+            <h3>{s.intercepts}</h3>
             <p class="chips">{c.interceptsEvents.map((e) => <span class="chip">{e}</span>)}</p>
           </div>
         )}
         {c.hookCommands.length > 0 && (
           <div class="row">
-            <h3>Runs</h3>
+            <h3>{s.runs}</h3>
             <ul>{c.hookCommands.map((cmd) => <li><code>{cmd}</code></li>)}</ul>
           </div>
         )}
         {c.mcpServers.length > 0 && (
           <div class="row">
-            <h3>MCP servers</h3>
+            <h3>{s.mcpServers}</h3>
             <ul>
-              {c.mcpServers.map((s) => (
+              {c.mcpServers.map((server) => (
                 <li>
-                  <code>{s.name}</code> over {s.transport}
-                  {s.command && <> as <code>{[s.command, ...s.args].join(' ')}</code></>}
-                  {s.host && <> to <code>{s.host}</code></>}
-                  {s.envKeys.length > 0 && (
-                    <> · reads {s.envKeys.map((k) => <code>{k}</code>)}</>
+                  <code>{server.name}</code> {s.over} {server.transport}
+                  {server.command && <> {s.as} <code>{[server.command, ...server.args].join(' ')}</code></>}
+                  {server.host && <> {s.to} <code>{server.host}</code></>}
+                  {server.envKeys.length > 0 && (
+                    <> · {s.reads} {server.envKeys.map((k) => <code>{k}</code>)}</>
                   )}
                 </li>
               ))}
@@ -51,29 +51,29 @@ const declared =
         )}
         {c.lspServers.length > 0 && (
           <div class="row">
-            <h3>LSP servers</h3>
-            <ul>{c.lspServers.map((s) => <li><code>{s.name}</code>{s.command && <> as <code>{s.command}</code></>}</li>)}</ul>
+            <h3>{s.lspServers}</h3>
+            <ul>{c.lspServers.map((server) => <li><code>{server.name}</code>{server.command && <> {s.as} <code>{server.command}</code></>}</li>)}</ul>
           </div>
         )}
         {c.networkHosts.length > 0 && (
           <div class="row">
-            <h3>Network</h3>
+            <h3>{s.network}</h3>
             <p class="chips">{c.networkHosts.map((h) => <span class="chip">{h}</span>)}</p>
           </div>
         )}
         {c.bundledScripts.length > 0 && (
           <div class="row">
-            <h3>Bundled scripts</h3>
-            <p class="chips">{c.bundledScripts.map((s) => <span class="chip">{s}</span>)}</p>
+            <h3>{s.bundledScripts}</h3>
+            <p class="chips">{c.bundledScripts.map((script) => <span class="chip">{script}</span>)}</p>
           </div>
         )}
         {c.allowedTools.length > 0 && (
           <div class="row">
-            <h3>Tools its skills declare</h3>
+            <h3>{s.declaredTools}</h3>
             <p class="chips">{c.allowedTools.map((t) => <span class="chip">{t}</span>)}</p>
           </div>
         )}
-        <p class="footnote">Environment variables are listed by name. Nothing here reads a value.</p>
+        <p class="footnote">{s.footnote}</p>
       </>
     )}
   </div>
