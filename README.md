@@ -7,6 +7,18 @@ project to the next.
 The marketplace is named `dev-workbench` — that name is the `@suffix` you install with,
 and it is independent of the repository name.
 
+## Browse it
+
+**<https://holubinka.github.io/claude-plugins/>**
+
+Search every skill, agent, command, hook and doc in one box, in the words you would use
+to ask for it — "a skill that reviews migrations" finds the skill. Each result says why
+it matched, what it triggers on, what it costs in context, and what it does to your
+machine. `⌘K` jumps anywhere from any page.
+
+The site is generated from this repository on every push, so it cannot describe a plugin
+that is not here or miss one that is.
+
 ## Use it
 
 ```sh
@@ -88,4 +100,6 @@ omit `version` so the two can never drift apart.
 ```
 .claude-plugin/marketplace.json   the catalogue — a plugin does not exist until it is listed here
 plugins/<name>/                   one folder per plugin
+scripts/                          the two checks and the site's indexer
+site/                             the catalogue site, deployed to GitHub Pages on every push
 ```
