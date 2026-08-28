@@ -1,0 +1,59 @@
+---
+import Base from '../layouts/Base.astro';
+import { timeline, marketplace } from '../lib/catalog';
+import { href } from '../lib/url';
+import { date } from '../lib/format';
+
+const entries = timeline();
+---
+
+<Base title="Releases" description="Every tagged release across the catalogue, newest first.">
+  <header class="head">
+    <p class="eyebrow">Releases</p>
+    <h1>What changed, and when</h1>
+    <p class="lede">
+      Built from <code>&lt;plugin&gt;--v&lt;version&gt;</code> tags. Nothing reaches an
+      installed plugin until its version changes, so this list is also the list of what
+      users actually received.
+    </p>
+    <p><a href={href('/feed.xml')}>Atom feed →</a></p>
+  </header>
+
+  {entries.length === 0 ? (
+    <div class="note">
+      <p>No tagged releases yet. Tags are what dependency constraints resolve against —
+        see <a href={href('/docs/releasing/')}>releasing</a>.</p>
+    </div>
+  ) : (
+    <ol class="feed">
+      {entries.map(({ plugin, release }) => (
+        <li class="entry">
+          <div class="entry__head">
+            <a class="entry__name" href={href(`/p/${plugin}/`)}>{plugin}</a>
+            <span class="chip chip--quiet">v{release.version}</span>
+            <time datetime={release.date}>{date(release.date)}</time>
+          </div>
+          {release.changes.length > 0 && (
+            <ul class="changes">{release.changes.map((line) => <li>{line}</li>)}</ul>
+          )}
+          {marketplace.repo && (
+            <p class="entry__tag">
+              <a href={`https://github.com/${marketplace.repo}/releases/tag/${release.tag}`}>{release.tag}</a>
+            </p>
+          )}
+        </li>
+      ))}
+    </ol>
+  )}
+</Base>
+
+<style>
+  .head { display: flex; flex-direction: column; gap: .6rem; }
+  .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .7rem; }
+  .entry { display: flex; flex-direction: column; gap: .5rem; padding: 1rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+  .entry__head { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+  .entry__name { font-family: var(--mono); font-size: .95rem; }
+  .entry time { font-family: var(--mono); font-size: .76rem; color: var(--muted); margin-inline-start: auto; }
+  .changes { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: .2rem; font-size: .88rem; }
+  .entry__tag { font-family: var(--mono); font-size: .74rem; }
+</style>

@@ -1,0 +1,172 @@
+---
+import Base from '../layouts/Base.astro';
+import { plugins, marketplace } from '../lib/catalog';
+
+const install = marketplace.install;
+
+// Only what the script reads — passing the plugin records whole would serialise every
+// README into the page.
+const picks = plugins.map((plugin) => ({
+  name: plugin.name,
+  always: plugin.tokens.always,
+  dependencies: plugin.dependencies.map((dep) => ({ name: dep.name, range: dep.range })),
+}));
+---
+
+<Base title="Bundle builder" description="Pick several plugins and get one install block, with their combined context cost and capabilities.">
+  <header class="head">
+    <p class="eyebrow">Bundle</p>
+    <h1>Set someone up in one paste</h1>
+    <p class="lede">
+      Choose what a machine should have, then copy a single block. The selection lives in
+      the URL, so the link itself is the onboarding instruction.
+    </p>
+  </header>
+
+  {plugins.length === 0 ? (
+    <div class="note"><p>Nothing to bundle yet — the catalogue is empty.</p></div>
+  ) : (
+    <div class="builder">
+      <section class="block">
+        <h2>Pick</h2>
+        <ul class="picks">
+          {plugins.map((plugin) => (
+            <li>
+              <label class="pick">
+                <input type="checkbox" value={plugin.name} data-pick />
+                <span class="pick__name">{plugin.name}</span>
+                <span class="pick__desc">{plugin.description}</span>
+                <span class="tokens"><span>always <b>≈{plugin.tokens.always}</b></span></span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="block sticky">
+        <h2>Take it away</h2>
+        <div class="panel">
+          <p class="panel__label">
+            <span>Install block</span>
+            <button class="button" type="button" id="copy" data-copy="">Copy</button>
+          </p>
+          <div class="panel__body"><pre id="block">Pick at least one plugin.</pre></div>
+        </div>
+        <dl class="totals">
+          <div><dt>Selected</dt><dd class="num" id="count">0</dd></div>
+          <div><dt>Always-on tokens</dt><dd class="num" id="cost">≈0</dd></div>
+        </dl>
+        <div id="warnings"></div>
+      </section>
+    </div>
+  )}
+
+  <script is:inline define:vars={{ picks, install }}>
+    const byName = new Map(picks.map((p) => [p.name, p]));
+    const boxes = [...document.querySelectorAll('[data-pick]')];
+    const block = document.getElementById('block');
+    const copy = document.getElementById('copy');
+    const count = document.getElementById('count');
+    const cost = document.getElementById('cost');
+    const warnings = document.getElementById('warnings');
+
+    function closure(names) {
+      const out = new Set();
+      const walk = (name) => {
+        if (out.has(name)) return;
+        out.add(name);
+        for (const dep of byName.get(name)?.dependencies ?? []) walk(dep.name);
+      };
+      names.forEach(walk);
+      return [...out];
+    }
+
+    // Two plugins can constrain the same dependency incompatibly; the second install
+    // then fails with range-conflict and leaves the first untouched.
+    function conflicts(names) {
+      const seen = new Map();
+      const found = [];
+      for (const name of names) {
+        for (const dep of byName.get(name)?.dependencies ?? []) {
+          if (!dep.range) continue;
+          const previous = seen.get(dep.name);
+          if (previous && previous.range !== dep.range) {
+            found.push(`${dep.name}: ${previous.from} wants ${previous.range}, ${name} wants ${dep.range}`);
+          } else if (!previous) {
+            seen.set(dep.name, { range: dep.range, from: name });
+          }
+        }
+      }
+      return found;
+    }
+
+    function render() {
+      const picked = boxes.filter((box) => box.checked).map((box) => box.value);
+      const url = new URL(location.href);
+      if (picked.length) url.searchParams.set('plugins', picked.join(','));
+      else url.searchParams.delete('plugins');
+      history.replaceState(null, '', url);
+
+      const all = closure(picked);
+      const lines = picked.length
+        ? [install.add, ...all.map((name) => install.install.replace('{plugin}', name))].filter(Boolean)
+        : [];
+      block.textContent = lines.length ? lines.join('\n') : 'Pick at least one plugin.';
+      copy.dataset.copy = lines.join('\n');
+      count.textContent = String(picked.length);
+      cost.textContent = `≈${all.reduce((sum, name) => sum + (byName.get(name)?.always ?? 0), 0)}`;
+
+      warnings.replaceChildren();
+      const pulled = all.filter((name) => !picked.includes(name));
+      if (pulled.length) {
+        const p = document.createElement('p');
+        p.className = 'hint';
+        p.textContent = `Pulled in as dependencies: ${pulled.join(', ')}`;
+        warnings.append(p);
+      }
+      for (const conflict of conflicts(all)) {
+        const p = document.createElement('p');
+        p.className = 'chip chip--err';
+        p.textContent = `range-conflict — ${conflict}`;
+        warnings.append(p);
+      }
+    }
+
+    const preset = new URLSearchParams(location.search).get('plugins');
+    if (preset) {
+      const wanted = new Set(preset.split(','));
+      boxes.forEach((box) => { box.checked = wanted.has(box.value); });
+    }
+    boxes.forEach((box) => box.addEventListener('change', render));
+    render();
+  </script>
+</Base>
+
+<style>
+  .head { display: flex; flex-direction: column; gap: .6rem; }
+  .builder { display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: 2.5rem; align-items: start; }
+  .block { display: flex; flex-direction: column; gap: .9rem; }
+  .sticky { position: sticky; top: 2rem; }
+  .picks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
+  .pick {
+    display: grid; grid-template-columns: auto 1fr auto; gap: .3rem .7rem; align-items: center;
+    padding: .7rem .9rem; border: 1px solid var(--rule); border-radius: var(--radius);
+    background: var(--surface); cursor: pointer;
+  }
+  .pick:hover { border-color: var(--rule-2); }
+  .pick input { accent-color: var(--accent); }
+  .pick__name { font-family: var(--mono); font-size: .9rem; }
+  .pick__desc { grid-column: 2 / -1; font-size: .84rem; color: var(--ink-2); }
+  .totals { display: flex; gap: 2rem; margin: 0; }
+  .totals div { display: flex; flex-direction: column; gap: .1rem; }
+  .totals dt { font-family: var(--mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .totals dd { margin: 0; font-family: var(--mono); font-size: 1.2rem; }
+  @media (max-width: 900px) {
+    .builder { grid-template-columns: minmax(0, 1fr); gap: 1.75rem; }
+    .sticky { position: static; }
+  }
+</style>
+<style is:global>
+  #warnings { display: flex; flex-direction: column; gap: .4rem; align-items: flex-start; }
+  #warnings .hint { font-size: .8rem; color: var(--muted); }
+</style>

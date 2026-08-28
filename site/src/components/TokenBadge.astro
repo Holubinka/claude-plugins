@@ -1,0 +1,35 @@
+---
+import type { TokenCost } from '../lib/catalog';
+
+interface Props { tokens: TokenCost | null; verbose?: boolean }
+const { tokens, verbose = false } = Astro.props;
+---
+{tokens && (
+  verbose ? (
+    <dl class="cost">
+      <div>
+        <dt>Always</dt>
+        <dd class="num">≈{tokens.always}</dd>
+        <p>Carried in every turn while the plugin is enabled.</p>
+      </div>
+      <div>
+        <dt>On load</dt>
+        <dd class="num">≈{tokens.onLoad}</dd>
+        <p>Paid only when it fires.</p>
+      </div>
+    </dl>
+  ) : (
+    <span class="tokens" title="Always in context / paid on load">
+      <span>always <b>≈{tokens.always}</b></span>
+      <span>· on load <b>≈{tokens.onLoad}</b></span>
+    </span>
+  )
+)}
+
+<style>
+  .cost { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem 2rem; margin: 0; }
+  .cost > div { display: flex; flex-direction: column; gap: .15rem; }
+  .cost dt { font-family: var(--mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .cost dd { margin: 0; font-family: var(--mono); font-size: 1.35rem; color: var(--ink); }
+  .cost p { font-size: .82rem; color: var(--muted); }
+</style>

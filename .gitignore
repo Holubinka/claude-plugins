@@ -1,2 +1,12 @@
 node_modules/
 .DS_Store
+.idea/
+
+# Astro build output and its type cache.
+site/dist/
+site/.astro/
+
+# Written by scripts/build-index.py on every build. Committing it would let the
+# catalogue drift from plugins/.
+site/src/data/
+site/public/data/

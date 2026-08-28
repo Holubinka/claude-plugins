@@ -1,9 +1,14 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "claude-plugins",
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "dev-workbench",
   "description": "Skills, agents and commands packaged as installable Claude Code plugins.",
   "owner": {
-    "name": "Vitalii Holubinka"
+    "name": "Vitalii Holubinka",
+    "url": "https://github.com/Holubinka"
   },
-  "plugins": []
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [],
+  "renames": {}
 }

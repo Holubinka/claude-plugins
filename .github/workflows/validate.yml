@@ -1,0 +1,55 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # `claude plugin validate` runs entirely locally and needs no credentials,
+      # so this job requires no API key.
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Validate manifests
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          plugins=(plugins/*/)
+
+          if [ ${#plugins[@]} -eq 0 ]; then
+            # An empty catalogue is a warning, which --strict would turn into a
+            # failure. Validate loosely until the first plugin lands; the branch
+            # below takes over automatically once one does.
+            echo "Catalogue is empty — validating without --strict."
+            claude plugin validate .
+            exit 0
+          fi
+
+          claude plugin validate . --strict
+          for dir in "${plugins[@]}"; do
+            echo "::group::${dir}"
+            claude plugin validate "${dir%/}" --strict
+            echo "::endgroup::"
+          done
+
+      # Covers what `claude plugin validate` does not: components nested inside
+      # .claude-plugin/, manifest/directory name mismatches, unregistered plugins,
+      # absolute paths in configs, and committed credentials.
+      - name: Lint structure
+        run: python3 scripts/lint-structure.py
+
+      # The catalogue site's metadata gate: descriptions, keywords, trigger phrasing,
+      # dependency tags and overlapping skill triggers. Writes nothing — the site is
+      # built and deployed by pages.yml.
+      - name: Check catalogue metadata
+        run: python3 scripts/build-index.py --check

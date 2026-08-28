@@ -1,0 +1,17 @@
+---
+import { marketplace } from '../lib/catalog';
+const repo = marketplace.repo;
+---
+
+<div class="note">
+  <p class="eyebrow" style="color: var(--accent)">No plugins yet</p>
+  <p>The catalogue is empty. This page is generated from the repository, so the first
+    plugin merged into <code>plugins/</code> appears here without anyone editing the
+    site.</p>
+  <p>The repository docs below are already indexed and searchable.</p>
+  {repo && (
+    <p>
+      <a class="button" href={`https://github.com/${repo}/blob/main/CONTRIBUTING.md`}>How to add one</a>
+    </p>
+  )}
+</div>
