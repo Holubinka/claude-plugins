@@ -16,17 +16,16 @@ name: pages
 on:
   push:
     branches: [main]
-    paths:
-      - 'plugins/**'
-      - 'docs/**'
-      - 'site/**'
-      - 'scripts/build-index.py'
-      - '.claude-plugin/**'
-      - 'README.md'
-      - 'CONTRIBUTING.md'
-      - '.github/workflows/pages.yml'
-  # No path filter. The docs are the search corpus, so a docs-only change can move the
-  # ranking — which is exactly how a regression reached main once already.
+    # Release tags are data, not just labels: releases() reads refs/tags to build the
+    # release history, and the dependency-health badges are computed by resolving each
+    # declared range against them. Without this, pushing engineering-paved-path--v1.0.0
+    # changed what the catalogue should say and nothing rebuilt it — the published site
+    # kept reporting `no-matching-tag` for plugins that were, by then, tagged.
+    tags: ['*--v*']
+    # Deliberately no `paths` filter, on either trigger. The index is not a pure function
+    # of the files it reads: commit dates feed every artifact's "updated" field and the
+    # catalogue's "last change", and tags feed releases and health. A path filter would
+    # skip builds that change what the site says, which is the bug above in general form.
   pull_request:
   workflow_dispatch:
 

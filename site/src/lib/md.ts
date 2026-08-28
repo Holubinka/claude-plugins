@@ -21,5 +21,9 @@ marked.use({
 
 export function renderMarkdown(source: string | null | undefined): string {
   if (!source) return '';
-  return marked.parse(source) as string;
+  const html = marked.parse(source) as string;
+  // A table wide enough to overflow scrolls inside its own box rather than pushing
+  // the page sideways.
+  return html.replace(/<table>/g, '<div class="prose__scroll"><table>')
+             .replace(/<\/table>/g, '</table></div>');
 }

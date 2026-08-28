@@ -57,9 +57,9 @@
 .result__plugin { font-family: var(--mono); font-size: .74rem; color: var(--muted); }
 .result__title { font-family: var(--mono); font-size: .95rem; font-weight: 500; }
 .result__title a { color: var(--ink); }
-.result__trigger { font-size: .9rem; color: var(--ink-2); max-width: 70ch; }
+.result__trigger { font-size: .9rem; color: var(--ink-2); }
 .result__where {
-  font-size: .8rem; color: var(--muted); max-width: 70ch;
+  font-size: .8rem; color: var(--muted);
   border-left: 2px solid var(--rule-2); padding-left: .6rem;
 }
 .result__where b { font-family: var(--mono); font-weight: 500; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; }
