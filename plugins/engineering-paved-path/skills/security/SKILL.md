@@ -147,8 +147,7 @@ Before flagging any issue, **trace the data flow** and confirm the input source.
 
 ## A09 — Logging and Alerting
 
-**Log these**: Login success/failure, token rejection, admin actions, file uploads, rate limit hits, 5xx errors, 403 denials
-**Never log**: Passwords, JWT tokens, API keys, credit cards, SSNs
+**Log these**: Login success/failure, token rejection, admin actions, file uploads, rate limit hits, 5xx errors, 403 denials **Never log**: Passwords, JWT tokens, API keys, credit cards, SSNs
 
 - Redact sensitive fields (`password`, `token`, `secret`, `authorization`) before logging — replace with `***`
 - Use structured JSON logging for production (searchable, integrates with aggregation)

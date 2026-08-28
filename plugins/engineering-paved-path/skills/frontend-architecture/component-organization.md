@@ -1,7 +1,6 @@
 # Component organization
 
-How many components, and which file each piece of logic lives in. Applies principles 3, 4 and
-5 from [SKILL.md](SKILL.md).
+How many components, and which file each piece of logic lives in. Applies principles 3, 4 and 5 from [SKILL.md](SKILL.md).
 
 ## Contents
 
@@ -28,17 +27,11 @@ Split on a **symptom**, never on a number:
 - two people keep colliding in the same file
 - a third-party library needs its own mount point
 
-"Duplication is far cheaper than the wrong abstraction". A long component with none of
-those symptoms is fine — leave it. Dodds is explicit: *don't be afraid of a growing component
-until you start experiencing real problems.*
+"Duplication is far cheaper than the wrong abstraction". A long component with none of those symptoms is fine — leave it. Dodds is explicit: *don't be afraid of a growing component until you start experiencing real problems.*
 
-Past ~200 lines or ~7 props, **check** for a symptom. Finding none is a valid answer and ends
-the question. This deliberately overrides the hard limits stated in `react-best-practices`.
+Past ~200 lines or ~7 props, **check** for a symptom. Finding none is a valid answer and ends the question. This deliberately overrides the hard limits stated in `react-best-practices`.
 
-**Extract on a seam, not on size.** A child earns its own file when it owns state, is reused,
-or has behaviour worth asserting without rendering the parent. Moving 30 lines and one prop
-into a new folder plus an `index.ts` plus an import, for a block with none of those, is folder
-tax for no seam.
+**Extract on a seam, not on size.** A child earns its own file when it owns state, is reused, or has behaviour worth asserting without rendering the parent. Moving 30 lines and one prop into a new folder plus an `index.ts` plus an import, for a block with none of those, is folder tax for no seam.
 
 ## Where to draw the boundary
 
@@ -46,34 +39,25 @@ Three complementary ways to decide, from the React docs:
 
 1. **Single responsibility** — a component should ideally be concerned with one thing.
 2. **CSS** — what you would give a class selector to, though components are less granular.
-3. **The data model** — a well-structured payload maps onto a component tree, because UI and
-   data models usually share the same information architecture.
+3. **The data model** — a well-structured payload maps onto a component tree, because UI and data models usually share the same information architecture.
 
-**Do not reach for container/presentational splitting.** Its author retracted it — *"I don't
-suggest splitting your components like this anymore"* — and hooks achieve the same
-separation without the wrapper layer. The pattern survives only as vocabulary.
+**Do not reach for container/presentational splitting.** Its author retracted it — *"I don't suggest splitting your components like this anymore"* — and hooks achieve the same separation without the wrapper layer. The pattern survives only as vocabulary.
 
-**A repetition that the type system already describes should be a loop, not hand-written JSX.**
-Seven near-identical `<PromptBlock>` lines against an eight-field schema is how a field goes
-missing — and one did in `RunTraceDrawer`. A typed, ordered constant array plus `.map()` makes
-the next addition a one-line edit.
+**A repetition that the type system already describes should be a loop, not hand-written JSX.** Seven near-identical `<PromptBlock>` lines against an eight-field schema is how a field goes missing — and one did in `RunTraceDrawer`. A typed, ordered constant array plus `.map()` makes the next addition a one-line edit.
 
 ## Composition over prop drilling
 
 Before reaching for context, in this order:
 
 1. **Pass props.** Through two or three levels this is normal and makes the data flow legible.
-2. **Extract components and pass JSX as `children`.** If an intermediate component does not
-   use the data, restructure so it does not receive it:
+2. **Extract components and pass JSX as `children`.** If an intermediate component does not use the data, restructure so it does not receive it:
 
 ```tsx
 <Layout posts={posts} />              // ✗ Layout doesn't use posts
 <Layout><Posts posts={posts} /></Layout>   // ✓ Layout just renders a slot
 ```
 
-3. **Only then, context.** Legitimate uses: theme, current account, routing, and state genuinely
-   needed by distant components. Context is dependency injection, not a state manager — every
-   consumer re-renders when the value changes, so split contexts by concern.
+3. **Only then, context.** Legitimate uses: theme, current account, routing, and state genuinely needed by distant components. Context is dependency injection, not a state manager — every consumer re-renders when the value changes, so split contexts by concern.
 
 ## The three layers of logic
 
@@ -95,37 +79,25 @@ export function severityLabel(sev: Severity) {      // ✓ callable conditionall
 }
 ```
 
-The `use` prefix costs you conditional calls and buys nothing. It also lies to the linter,
-which then stops protecting the real hooks.
+The `use` prefix costs you conditional calls and buys nothing. It also lies to the linter, which then stops protecting the real hooks.
 
-**Keep the component body pure** — same props in, same JSX out; never mutate anything created
-outside this render. Side effects go in event handlers first, Effects only as a last
-resort. Mutating an object you created during the same render is fine.
+**Keep the component body pure** — same props in, same JSX out; never mutate anything created outside this render. Side effects go in event handlers first, Effects only as a last resort. Mutating an object you created during the same render is fine.
 
-Business logic — the calculations, validation and formatting — should be pure functions
-independent of React. That is what keeps it testable without a renderer and portable if
-the view layer ever changes.
+Business logic — the calculations, validation and formatting — should be pure functions independent of React. That is what keeps it testable without a renderer and portable if the view layer ever changes.
 
 ## Extracting a hook
 
-Extract when the logic is **duplicated across components**, is **complex enough that hiding it
-aids reading**, or **has a name you can state plainly**.
+Extract when the logic is **duplicated across components**, is **complex enough that hiding it aids reading**, or **has a name you can state plainly**.
 
-Keep hooks on concrete, high-level use cases — `useOnlineStatus`, `useChatRoom`, `useCopyFlash`.
-Never build `useMount` / `useEffectOnce` / `useUpdateEffect` lifecycle wrappers: they hide the
-reactive nature of Effects and make missing dependencies easy.
+Keep hooks on concrete, high-level use cases — `useOnlineStatus`, `useChatRoom`, `useCopyFlash`. Never build `useMount` / `useEffectOnce` / `useUpdateEffect` lifecycle wrappers: they hide the reactive nature of Effects and make missing dependencies easy.
 
-Custom hooks share stateful **logic, not state**. Two components calling the same hook get two
-independent states. If they must share a value, lift it.
+Custom hooks share stateful **logic, not state**. Two components calling the same hook get two independent states. If they must share a value, lift it.
 
-**Before writing a `useEffect`, check it against the twelve cases in.** Most Effects
-found in review are one of: derived state, event-handler logic, or a chain of Effects that
-should have been one event handler.
+**Before writing a `useEffect`, check it against the twelve cases in.** Most Effects found in review are one of: derived state, event-handler logic, or a chain of Effects that should have been one event handler.
 
 ## Which `hooks/` folder
 
-`src/lib/hooks/` is **data-only** — TanStack Query hooks over the API. A stateful hook that
-makes no request does not belong there.
+`src/lib/hooks/` is **data-only** — TanStack Query hooks over the API. A stateful hook that makes no request does not belong there.
 
 **Good** — a non-data hook owned by the component tree that uses it:
 
@@ -151,19 +123,15 @@ export function useCopyFlash(text: string, ms = 1500) {
 }
 ```
 
-**Bad** — `src/lib/hooks/useCopyFlash.ts`. It touches no endpoint, so it would sit in the data
-barrel and be pulled in by every `@/lib/hooks` import.
+**Bad** — `src/lib/hooks/useCopyFlash.ts`. It touches no endpoint, so it would sit in the data barrel and be pulled in by every `@/lib/hooks` import.
 
 **Bad** — leaving it in `helpers.ts`. Helpers are pure; this one holds state and a timer.
 
 ## The data layer
 
-- **Every API call sits behind a hook in `src/lib/hooks/<domain>.ts`.** No `fetch` in a
-  component.
-- **Never copy query data into `useState`** — it opts the component out of every background
-  refetch and leaves a stale duplicate.
-- **Query keys live beside their query**, in the same domain file, structured generic →
-  specific. The hook is the exported surface; the query function and key stay local.
+- **Every API call sits behind a hook in `src/lib/hooks/<domain>.ts`.** No `fetch` in a component.
+- **Never copy query data into `useState`** — it opts the component out of every background refetch and leaves a stale duplicate.
+- **Query keys live beside their query**, in the same domain file, structured generic → specific. The hook is the exported surface; the query function and key stay local.
 - Loading, error and empty states are handled by the component that owns the hook.
 
 ```tsx
@@ -178,8 +146,7 @@ useEffect(() => {                                        // fetch in a component
 }, [prId]);
 ```
 
-The `useState` copy is the worst of the three — it is silent, and it disables exactly the
-behaviour the cache was added for.
+The `useState` copy is the worst of the three — it is silent, and it disables exactly the behaviour the cache was added for.
 
 ## State placement
 
@@ -200,16 +167,11 @@ const searchParams = useSearchParams();
 const severity = (searchParams.get("severity") ?? "ALL") as Severity | "ALL";
 ```
 
-Validate what comes back from the URL. An unknown `?sev=MAJOR` reaching a lookup with no
-fallback takes the route down — narrow it to a known value or `null` first.
+Validate what comes back from the URL. An unknown `?sev=MAJOR` reaching a lookup with no fallback takes the route down — narrow it to a known value or `null` first.
 
-**Structure the state you keep**: group what updates together, avoid contradictory
-flags, avoid redundancy, avoid duplication, keep it flat. "Make your state as simple as it can
-be — but no simpler."
+**Structure the state you keep**: group what updates together, avoid contradictory flags, avoid redundancy, avoid duplication, keep it flat. "Make your state as simple as it can be — but no simpler."
 
-To decide whether something *is* state at all, ask: does it stay unchanged over time?
-Is it passed in via props? Can it be computed from existing state or props? A yes to any means
-it is not state.
+To decide whether something *is* state at all, ask: does it stay unchanged over time? Is it passed in via props? Can it be computed from existing state or props? A yes to any means it is not state.
 
 ## Derived state
 
@@ -224,10 +186,6 @@ useEffect(() => {
 const visible = findings.filter((f) => f.severity === sev);
 ```
 
-Computing derived values in the render body is correct — do **not** convert them to
-`useState` + `useEffect`.
+Computing derived values in the render body is correct — do **not** convert them to `useState` + `useEffect`.
 
-`useMemo` only when the input is genuinely large and the work is real — filtering every line of
-a full system prompt on each keystroke, for instance. Be consistent within a component: memoize
-both derived values or neither, so the next reader is not left guessing why one was singled
-out. With React Compiler enabled, do not hand-write memoization at all unless measured.
+`useMemo` only when the input is genuinely large and the work is real — filtering every line of a full system prompt on each keystroke, for instance. Be consistent within a component: memoize both derived values or neither, so the next reader is not left guessing why one was singled out. With React Compiler enabled, do not hand-write memoization at all unless measured.
