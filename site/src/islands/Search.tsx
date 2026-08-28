@@ -58,22 +58,38 @@ function excerpt(text: string, terms: string[], radius = 90): string {
   return (start > 0 ? '…' : '') + flat.slice(start, end).trim() + (end < flat.length ? '…' : '');
 }
 
-type Facets = { type: Set<string>; plugin: Set<string>; category: Set<string> };
+type Facets = { type: Set<string>; plugin: Set<string>; category: Set<string>; keyword: Set<string> };
+
+const FACET_KEYS = ['type', 'plugin', 'category', 'keyword'] as const;
+
+/** 32 keywords across 15 components is a useful search vocabulary and a useless facet
+ *  row, so the row shows the commonest and says how many it left out. The tail stays
+ *  reachable by typing the word — keywords are a boosted field. */
+const FACET_LIMIT = 12;
 
 function readUrl(): { q: string; facets: Facets } {
   const params = new URLSearchParams(location.search);
   const split = (key: string) => new Set((params.get(key) ?? '').split(',').filter(Boolean));
   return {
     q: params.get('q') ?? '',
-    facets: { type: split('type'), plugin: split('plugin'), category: split('category') },
+    facets: {
+      type: split('type'), plugin: split('plugin'),
+      category: split('category'), keyword: split('keyword'),
+    },
   };
 }
+
+const legend: Record<(typeof FACET_KEYS)[number], string> = {
+  type: s.facetType, plugin: s.facetPlugin, category: s.facetCategory, keyword: s.facetKeyword,
+};
 
 export default function Search({ docsUrl, base, issueUrl }: Props) {
   const [docs, setDocs] = useState<Doc[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [raw, setRaw] = useState('');
-  const [facets, setFacets] = useState<Facets>({ type: new Set(), plugin: new Set(), category: new Set() });
+  const [facets, setFacets] = useState<Facets>({
+    type: new Set(), plugin: new Set(), category: new Set(), keyword: new Set(),
+  });
   const [active, setActive] = useState(0);
   const input = useRef<HTMLInputElement>(null);
   const started = useRef(false);
@@ -92,10 +108,16 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
 
   const engine = useMemo(() => (docs ? createEngine(docs) : null), [docs]);
 
-  const results = useMemo(
-    () => (engine ? (runSearch(engine, raw) as SearchResult[]) : []),
-    [engine, raw],
-  );
+  const searching = raw.trim().length >= 2;
+
+  // With no query there is nothing to rank, so the whole corpus is the pool and the
+  // facets tally over it. That is what lets someone narrow the catalogue by hand
+  // instead of having to guess a word first.
+  const results = useMemo(() => {
+    if (!engine || !docs) return [] as SearchResult[];
+    if (searching) return runSearch(engine, raw) as SearchResult[];
+    return docs.map((doc) => ({ ...doc, terms: [], match: {}, score: 0 })) as unknown as SearchResult[];
+  }, [engine, docs, raw, searching]);
 
   const filtered = useMemo(
     () =>
@@ -103,30 +125,43 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
         (r) =>
           (facets.type.size === 0 || facets.type.has(r.type as string)) &&
           (facets.plugin.size === 0 || facets.plugin.has(String(r.plugin))) &&
-          (facets.category.size === 0 || facets.category.has(String(r.category))),
+          (facets.category.size === 0 || facets.category.has(String(r.category))) &&
+          (facets.keyword.size === 0 ||
+            ((r.keywords as string[]) ?? []).some((k) => facets.keyword.has(k))),
       ),
     [results, facets],
   );
 
   const counts = useMemo(() => {
-    const tally = (key: 'type' | 'plugin' | 'category') => {
+    const tally = (key: (typeof FACET_KEYS)[number]) => {
+      // The facet is named for what a reader picks — one keyword — while the document
+      // field holds the list. Getting this wrong tallies nothing and fails silently:
+      // the row simply does not render.
+      const field = key === 'keyword' ? 'keywords' : key;
       const out = new Map<string, number>();
       for (const r of results) {
-        const value = r[key] as string | null;
-        if (value) out.set(value, (out.get(value) ?? 0) + 1);
+        const value = r[field] as string | string[] | null;
+        for (const one of Array.isArray(value) ? value : [value]) {
+          if (one) out.set(one, (out.get(one) ?? 0) + 1);
+        }
       }
       return [...out].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
     };
-    return { type: tally('type'), plugin: tally('plugin'), category: tally('category') };
+    return {
+      type: tally('type'), plugin: tally('plugin'),
+      category: tally('category'), keyword: tally('keyword'),
+    };
   }, [results]);
 
-  const searching = raw.trim().length >= 2;
   const ready = docs !== null;
+  const chosen = FACET_KEYS.some((key) => facets[key].size > 0);
+  // Either a query or a facet puts the island in charge of what is on screen.
+  const filtering = searching || chosen;
 
   // The prerendered browse listing stays the content until a query is active.
   useEffect(() => {
-    document.getElementById('browse')?.toggleAttribute('hidden', searching);
-  }, [searching]);
+    document.getElementById('browse')?.toggleAttribute('hidden', filtering);
+  }, [filtering]);
 
   // Shareable searches, without flooding history.
   useEffect(() => {
@@ -134,7 +169,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
     const id = setTimeout(() => {
       const params = new URLSearchParams();
       if (raw) params.set('q', raw);
-      for (const key of ['type', 'plugin', 'category'] as const) {
+      for (const key of FACET_KEYS) {
         const values = [...facets[key]];
         if (values.length) params.set(key, values.join(','));
       }
@@ -194,7 +229,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
             ref={input}
             type="search"
             role="combobox"
-            aria-expanded={searching}
+            aria-expanded={filtering}
             aria-controls="search-results"
             aria-autocomplete="list"
             placeholder={s.placeholder}
@@ -215,13 +250,18 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
         {!docs && !failed && <p class="search__loading">{s.loading}</p>}
       </div>
 
-      {searching && counts.type.length > 0 && (
+      {ready && counts.type.length > 0 && (
         <div class="facets">
-          {(['type', 'plugin', 'category'] as const).map((key) =>
-            counts[key].length > 1 ? (
+          {FACET_KEYS.map((key) => {
+            // A facet with one value filters nothing — except when it is the one
+            // already chosen, which must stay on screen to be switched off again.
+            if (counts[key].length <= 1 && facets[key].size === 0) return null;
+            const shown = counts[key].slice(0, FACET_LIMIT);
+            const hidden = counts[key].length - shown.length;
+            return (
               <fieldset key={key}>
-                <legend>{key}</legend>
-                {counts[key].map(([value, n]) => (
+                <legend>{legend[key]}</legend>
+                {shown.map(([value, n]) => (
                   <label class="facet" key={value} data-on={facets[key].has(value) ? 'true' : 'false'}>
                     <input
                       type="checkbox"
@@ -231,23 +271,29 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
                     {value} <span class="n">{n}</span>
                   </label>
                 ))}
+                {hidden > 0 && <span class="facet__more">{s.facetMore(hidden)}</span>}
               </fieldset>
-            ) : null,
-          )}
+            );
+          })}
         </div>
       )}
 
-      {searching && ready && (
+      {ready && (
         <p class="search__count" aria-live="polite">
-          {filtered.length === 0 ? s.noMatch(raw) : s.matchCount(filtered.length)}
+          {filtered.length === 0
+            ? (searching ? s.noMatch(raw) : s.noMatchFiltered)
+            : filtering
+              ? s.matchCount(filtered.length)
+              : s.browsing(filtered.length)}
         </p>
       )}
 
-      {searching && filtered.length > 0 && (
+      {filtering && filtered.length > 0 && (
         <ul class="results" id="search-results" role="listbox">
           {filtered.map((result, index) => {
             const matchedFields = new Set(Object.values(result.match ?? {}).flat());
             const onlyDeep =
+              searching &&
               !matchedFields.has('description') &&
               !matchedFields.has('title') &&
               !matchedFields.has('keywords');
@@ -304,7 +350,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
         </ul>
       )}
 
-      {searching && ready && filtered.length === 0 && (
+      {filtering && ready && filtered.length === 0 && (
         <div class="search__empty">
           <p>{s.emptyTitle}</p>
           {issueUrl && (

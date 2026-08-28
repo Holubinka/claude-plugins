@@ -3,7 +3,7 @@ name: onion-architecture
 description: "Decides which ring backend code belongs in and which direction its dependencies may point. Use when adding or changing a route, service, repository or adapter; when choosing between a handler, a use case, a query and a pure transform; when introducing a port for a new external dependency; when wiring something into the composition root; or when a boundary gate such as dependency-cruiser fails. Covers layering, ports and adapters, the composition root, and which test each ring gets."
 metadata:
   version: "1.0.0"
-  tags: onion-architecture, hexagonal, ports-and-adapters, layering, dependency-rule, composition-root, backend
+keywords: [architecture, backend, layering, ports-and-adapters]
 ---
 
 # Onion Architecture — which ring, and which way it points

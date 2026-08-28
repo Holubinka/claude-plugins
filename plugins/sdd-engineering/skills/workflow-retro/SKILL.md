@@ -1,6 +1,7 @@
 ---
 name: workflow-retro
 description: Measure what a multi-agent run cost and what it taught, from the transcripts it left behind. Use after a run-plan execution, a workflow, or any session that dispatched several subagents — when the work is done and the question is whether the orchestration was worth what it spent. Reads the session's task transcripts for real token, tool and timing figures, finds what the agents duplicated, asks the agents themselves what their briefs failed to give them, and files the durable lessons. It reviews the run, never the code.
+keywords: [orchestration, retrospective, cost]
 ---
 
 # Workflow Retro — what the orchestration cost, and what it taught

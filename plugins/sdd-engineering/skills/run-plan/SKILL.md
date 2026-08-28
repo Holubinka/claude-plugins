@@ -3,7 +3,7 @@ name: run-plan
 description: "Executes an approved plan end to end — dispatches the implementer, exercises the feature through its real entry point, verifies it against the plan, reviews it for bugs and for boundaries, and runs a bounded fix loop over what the reviews returned. Use when the user runs /sdd-engineering:run-plan, when they hand over a plan path and ask to build it, or when they ask to carry out or execute a plan that already exists. It never authors a spec or a plan — spec-creator and implementation-planner are dispatched by hand before it. It never commits or pushes."
 metadata:
   version: "1.0.0"
-  tags: pipeline, orchestration, plan-execution, spec-driven, subagents, fix-rounds
+keywords: [spec-driven, orchestration, pipeline, subagents]
 ---
 
 # run-plan — an approved plan, carried out end to end

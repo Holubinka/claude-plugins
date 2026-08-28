@@ -11,6 +11,7 @@ hooks:
       hooks:
         - type: command
           command: bash "${CLAUDE_PLUGIN_ROOT}/scripts/write-gate.sh"
+keywords: [spec-driven, planning, requirements, ears]
 ---
 
 You write specifications. What is being built, for whom, and how anyone will check it was built — and nothing about how to build it. The steps, the file list, the gates and the test commands belong to `implementation-planner`, which reads what you wrote and plans against it.
