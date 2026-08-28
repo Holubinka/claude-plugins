@@ -7,6 +7,10 @@ on:
 
 jobs:
   validate:
+    # Named so the checks list distinguishes it from the site build in pages.yml: this
+    # job is about the marketplace itself — manifests, layout, secrets, metadata — and
+    # never about whether the catalogue site compiles.
+    name: Marketplace harness
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

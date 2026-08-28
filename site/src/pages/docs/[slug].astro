@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { docSlugs, docSections } from '../../lib/catalog';
 import { renderMarkdown } from '../../lib/md';
 import { href } from '../../lib/url';
+import { docs as s, chrome } from '../../lib/strings';
 
 export function getStaticPaths() {
   return docSlugs().map(({ slug, title }) => ({ params: { slug }, props: { slug, title } }));
@@ -16,15 +17,15 @@ const contents = sections.filter((section) => section.name !== sections[0]?.name
 <Base title={title} description={sections[0]?.description}
   record={{ name: title, kind: "doc", desc: sections[0]?.description ?? "" }}>
   <header class="head">
-    <p class="eyebrow">Documentation</p>
+    <p class="eyebrow">{s.eyebrow}</p>
     <h1>{title}</h1>
-    {sections[0]?.githubUrl && <p><a href={sections[0].githubUrl}>Edit on GitHub →</a></p>}
+    {sections[0]?.githubUrl && <p><a href={sections[0].githubUrl}>{chrome.editOnGitHub}</a></p>}
   </header>
 
   <div class="doc">
     {contents.length > 0 && (
-      <nav class="toc" aria-label="On this page">
-        <p class="eyebrow">On this page</p>
+      <nav class="toc" aria-label={s.onThisPage}>
+        <p class="eyebrow">{s.onThisPage}</p>
         <ol>
           {contents.map((section) => (
             <li><a href={`#${section.name}`}>{section.title}</a></li>
@@ -43,7 +44,7 @@ const contents = sections.filter((section) => section.name !== sections[0]?.name
     </div>
   </div>
 
-  <p class="back"><a href={href('/')}>← Back to the catalogue</a></p>
+  <p class="back"><a href={href('/')}>{chrome.backToCatalogue}</a></p>
 </Base>
 
 <style>

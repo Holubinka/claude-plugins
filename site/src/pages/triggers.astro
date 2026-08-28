@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { collisions, artifacts, invocable } from '../lib/catalog';
 import { href } from '../lib/url';
+import { triggers as s, fill } from '../lib/strings';
 
 const candidates = artifacts
   .filter((a) => invocable.includes(a.type) && a.description)
@@ -9,48 +10,36 @@ const candidates = artifacts
   .map((a) => ({ url: a.url, title: a.title, invocation: a.invocation, description: a.description }));
 ---
 
-<Base title="Trigger inspector" description="Which skills a prompt would plausibly reach, and which skill descriptions compete with each other.">
+<Base title={s.title} description={s.description}>
   <header class="head">
-    <p class="eyebrow">Triggers</p>
-    <h1>Which skill would this reach?</h1>
-    <p class="lede">
-      Paste a prompt the way a user would type it. The ranking below is the same lexical
-      engine the catalogue search uses, run against skill descriptions only.
-    </p>
+    <p class="eyebrow">{s.eyebrow}</p>
+    <h1>{s.heading}</h1>
+    <p class="lede">{s.lede}</p>
   </header>
 
   <div class="note">
-    <p class="eyebrow" style="color: var(--accent)">Read this before trusting the ranking</p>
-    <p>This approximates <strong>lexical overlap with skill descriptions</strong>. It is
-      not Claude's routing, and it cannot be — Claude weighs the whole conversation, not
-      a bag of words. Use it to spot descriptions that are too vague or too similar, not
-      to predict what will fire.</p>
+    <p class="eyebrow" style="color: var(--accent)">{s.cautionEyebrow}</p>
+    <p>{s.caution}</p>
   </div>
 
   <section class="block">
     <label class="field">
-      <span class="eyebrow">Prompt</span>
-      <textarea id="prompt" rows="3" placeholder="I need something that checks a database migration before it ships"></textarea>
+      <span class="eyebrow">{s.promptLabel}</span>
+      <textarea id="prompt" rows="3" placeholder={s.promptPlaceholder}></textarea>
     </label>
     <ol id="ranking" class="ranking"></ol>
-    <p id="note" class="empty">{candidates.length === 0
-      ? 'No invocable components in the catalogue yet, so there is nothing to rank.'
-      : `Ranking ${candidates.length} invocable components.`}</p>
+    <p id="note" class="empty">{candidates.length === 0 ? s.noCandidates : fill(s.ranking, { n: candidates.length })}</p>
   </section>
 
   <section class="block">
-    <h2>Colliding triggers</h2>
-    <p class="lede">
-      Pairs whose descriptions overlap above the threshold, computed at build time.
-      Two skills competing for the same prompt make each other unreliable, and nothing
-      else in the toolchain looks for this.
-    </p>
+    <h2>{s.collisions}</h2>
+    <p class="lede">{s.collisionsLede}</p>
     {collisions.length === 0 ? (
-      <p class="chip chip--ok">no descriptions overlap above the threshold</p>
+      <p class="chip chip--ok">{s.noCollisions}</p>
     ) : (
       <div class="scroll">
         <table>
-          <thead><tr><th>Score</th><th>One</th><th>The other</th></tr></thead>
+          <thead><tr><th>{s.colScore}</th><th>{s.colOne}</th><th>{s.colOther}</th></tr></thead>
           <tbody>
             {collisions.map((collision) => (
               <tr>
@@ -71,7 +60,7 @@ const candidates = artifacts
     )}
   </section>
 
-  <script is:inline define:vars={{ candidates, base: import.meta.env.BASE_URL.replace(/\/$/, '') }}>
+  <script is:inline define:vars={{ candidates, copy: s, base: import.meta.env.BASE_URL.replace(/\/$/, '') }}>
     const field = document.getElementById('prompt');
     const list = document.getElementById('ranking');
     const note = document.getElementById('note');
@@ -98,10 +87,10 @@ const candidates = artifacts
       const rows = rank(field.value);
       list.replaceChildren();
       if (!field.value.trim()) {
-        note.textContent = `Ranking ${docs.length} invocable components.`;
+        note.textContent = copy.ranking.replace('{n}', String(docs.length));
         return;
       }
-      note.textContent = rows.length ? '' : 'Nothing overlaps this prompt — which usually means a description is missing or too narrow.';
+      note.textContent = rows.length ? '' : copy.noOverlap;
       const top = rows[0]?.score ?? 1;
       for (const row of rows) {
         const li = document.createElement('li');
@@ -117,7 +106,7 @@ const candidates = artifacts
         desc.textContent = row.doc.description;
         const hits = document.createElement('p');
         hits.className = 'hits';
-        hits.textContent = row.hits.length ? `matched: ${row.hits.join(', ')}` : '';
+        hits.textContent = row.hits.length ? copy.matched.replace('{terms}', row.hits.join(', ')) : '';
         li.append(bar, name, desc, hits);
         list.append(li);
       }

@@ -111,11 +111,20 @@ export function runSearch(engine, raw) {
     },
   };
 
-  const strict = engine.search(query, { ...options, combineWith: 'AND' });
-  if (strict.length > 0) return strict;
+  // AND is for a query that *names* something — one or two words, where every word is
+  // meant. A longer query is a question, and conjunction over a question is a coincidence
+  // filter: a 30 KB agent body contains all four words by chance while the two-paragraph
+  // section that actually answers it does not, so the right answer is not merely ranked
+  // low, it is absent from the result set. Measured when the catalogue went from docs-only
+  // to docs plus fifteen components: two probes that had passed for a year began returning
+  // "not returned at all", and only because AND had started succeeding.
+  if (words.length <= 2) {
+    const strict = engine.search(query, { ...options, combineWith: 'AND' });
+    if (strict.length > 0) return strict;
+  }
 
-  // A long natural-language question matches nothing under AND, but plain OR lets a
-  // document that caught one common word outrank one that caught most of the question.
+  // Plain OR lets a document that caught one common word outrank one that caught most of
+  // the question, which is what the floor below is for.
   const loose = engine.search(expanded, { ...options, combineWith: 'OR' });
   // Two matched terms is the line between "this is about what you asked" and "this
   // document happens to contain one common word". Demanding a proportion of a padded

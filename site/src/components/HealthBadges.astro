@@ -1,5 +1,6 @@
 ---
 import type { HealthEntry } from '../lib/catalog';
+import { health as s } from '../lib/strings';
 
 interface Props { entries: HealthEntry[]; detailed?: boolean }
 const { entries, detailed = false } = Astro.props;
@@ -8,11 +9,11 @@ const warnings = entries.filter((e) => e.level === 'warn');
 ---
 
 {entries.length === 0 ? (
-  <p class="chip chip--ok">no findings</p>
+  <p class="chip chip--ok">{s.none}</p>
 ) : detailed ? (
   <div class="scroll">
     <table>
-      <thead><tr><th>Code</th><th>Finding</th></tr></thead>
+      <thead><tr><th>{s.colCode}</th><th>{s.colFinding}</th></tr></thead>
       <tbody>
         {[...errors, ...warnings].map((entry) => (
           <tr>
@@ -25,8 +26,8 @@ const warnings = entries.filter((e) => e.level === 'warn');
   </div>
 ) : (
   <p class="badges">
-    {errors.length > 0 && <span class="chip chip--err">{errors.length} error{errors.length === 1 ? '' : 's'}</span>}
-    {warnings.length > 0 && <span class="chip chip--warn">{warnings.length} warning{warnings.length === 1 ? '' : 's'}</span>}
+    {errors.length > 0 && <span class="chip chip--err">{s.errors(errors.length)}</span>}
+    {warnings.length > 0 && <span class="chip chip--warn">{s.warnings(warnings.length)}</span>}
   </p>
 )}
 

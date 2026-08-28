@@ -8,6 +8,7 @@ import { plugins, artifactsOf, health } from '../../../lib/catalog';
 import { renderMarkdown } from '../../../lib/md';
 import { href } from '../../../lib/url';
 import { date, authorName } from '../../../lib/format';
+import { pluginPage as s, chrome } from '../../../lib/strings';
 
 export function getStaticPaths() {
   return plugins.map((plugin) => ({ params: { plugin: plugin.name }, props: { plugin } }));
@@ -22,16 +23,16 @@ const author = authorName(plugin.author);
 <Base title={plugin.name} description={plugin.description}
   record={{ name: plugin.name, kind: "plugin", desc: plugin.description }}>
   <header class="head">
-    <p class="eyebrow">Plugin</p>
+    <p class="eyebrow">{s.eyebrow}</p>
     <h1>{plugin.name}</h1>
     <p class="lede">{plugin.description}</p>
     <dl class="meta">
-      {plugin.version && <div><dt>Version</dt><dd>{plugin.version}</dd></div>}
-      {author && <div><dt>Author</dt><dd>{author}</dd></div>}
-      {plugin.license && <div><dt>License</dt><dd>{plugin.license}</dd></div>}
-      {plugin.category && <div><dt>Category</dt><dd>{plugin.category}</dd></div>}
-      <div><dt>Always-on cost</dt><dd class="num">≈{plugin.tokens.always} tokens</dd></div>
-      <div><dt>Updated</dt><dd>{date(plugin.updatedAt)}</dd></div>
+      {plugin.version && <div><dt>{s.version}</dt><dd>{plugin.version}</dd></div>}
+      {author && <div><dt>{s.author}</dt><dd>{author}</dd></div>}
+      {plugin.license && <div><dt>{s.license}</dt><dd>{plugin.license}</dd></div>}
+      {plugin.category && <div><dt>{s.category}</dt><dd>{plugin.category}</dd></div>}
+      <div><dt>{s.alwaysCost}</dt><dd class="num">≈{plugin.tokens.always} {s.alwaysCostUnit}</dd></div>
+      <div><dt>{s.updated}</dt><dd>{date(plugin.updatedAt)}</dd></div>
     </dl>
     {plugin.keywords.length > 0 && (
       <p class="chips">{plugin.keywords.map((k) => <span class="chip chip--quiet">{k}</span>)}</p>
@@ -41,10 +42,9 @@ const author = authorName(plugin.author);
   <InstallBlock plugin={plugin.name} />
 
   <section class="block">
-    <h2>Components</h2>
+    <h2>{s.components}</h2>
     {own.length === 0 ? (
-      <p class="lede">This plugin exposes no components. That is almost always a layout
-        mistake — see <a href={href('/docs/plugin-structure/')}>plugin structure</a>.</p>
+      <p class="lede">{s.noComponents} <a href={href('/docs/plugin-structure/')}>{s.noComponentsLink}</a>.</p>
     ) : (
       <div class="cards">
         {own.map((artifact) => <ArtifactCard artifact={artifact} />)}
@@ -55,28 +55,28 @@ const author = authorName(plugin.author);
   <CapabilityPanel capabilities={plugin.capabilities} />
 
   <section class="block">
-    <h2>Health</h2>
+    <h2>{s.healthHeading}</h2>
     <HealthBadges entries={health(plugin)} detailed />
   </section>
 
   {(plugin.dependencies.length > 0 || plugin.dependents.length > 0) && (
     <section class="block">
-      <h2>Dependencies</h2>
+      <h2>{s.dependencies}</h2>
       {plugin.dependencies.length > 0 && (
         <div class="scroll">
           <table>
-            <thead><tr><th>Requires</th><th>Range</th><th>Resolves</th></tr></thead>
+            <thead><tr><th>{s.colRequires}</th><th>{s.colRange}</th><th>{s.colResolves}</th></tr></thead>
             <tbody>
               {plugin.dependencies.map((dep) => (
                 <tr>
                   <td><a href={href(`/p/${dep.name}/`)}>{dep.name}</a></td>
-                  <td>{dep.range ?? <span class="chip chip--warn">unconstrained</span>}</td>
+                  <td>{dep.range ?? <span class="chip chip--warn">{s.unconstrained}</span>}</td>
                   <td>
                     {!dep.constrained
-                      ? <span class="chip chip--warn">tracks latest</span>
+                      ? <span class="chip chip--warn">{s.tracksLatest}</span>
                       : dep.resolvable
-                        ? <span class="chip chip--ok">a tag satisfies it</span>
-                        : <span class="chip chip--err">no-matching-tag</span>}
+                        ? <span class="chip chip--ok">{s.resolves}</span>
+                        : <span class="chip chip--err">{s.noMatchingTag}</span>}
                   </td>
                 </tr>
               ))}
@@ -85,7 +85,7 @@ const author = authorName(plugin.author);
         </div>
       )}
       {plugin.dependents.length > 0 && (
-        <p class="chips">Required by {plugin.dependents.map((name) => (
+        <p class="chips">{s.requiredBy} {plugin.dependents.map((name) => (
           <a class="chip" href={href(`/p/${name}/`)}>{name}</a>
         ))}</p>
       )}
@@ -94,10 +94,10 @@ const author = authorName(plugin.author);
 
   {plugin.releases.length > 0 && (
     <section class="block">
-      <h2>Releases</h2>
+      <h2>{s.releases}</h2>
       <div class="scroll">
         <table>
-          <thead><tr><th>Version</th><th>Date</th><th>Changes</th></tr></thead>
+          <thead><tr><th>{s.colVersion}</th><th>{s.colDate}</th><th>{s.colChanges}</th></tr></thead>
           <tbody>
             {plugin.releases.map((release) => (
               <tr>
@@ -116,13 +116,13 @@ const author = authorName(plugin.author);
 
   {readme && (
     <section class="block">
-      <h2>README</h2>
+      <h2>{s.readme}</h2>
       <div class="prose" set:html={readme} />
     </section>
   )}
 
   {plugin.githubUrl && (
-    <p><a href={plugin.githubUrl}>Source on GitHub →</a></p>
+    <p><a href={plugin.githubUrl}>{chrome.sourceOnGitHub}</a></p>
   )}
 </Base>
 

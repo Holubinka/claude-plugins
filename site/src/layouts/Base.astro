@@ -3,6 +3,7 @@ import '../styles/tokens.css';
 import Palette from '../islands/Palette';
 import { marketplace, stats } from '../lib/catalog';
 import { href } from '../lib/url';
+import { chrome, nav } from '../lib/strings';
 
 interface Props {
   title: string;
@@ -14,22 +15,16 @@ interface Props {
 }
 
 const { title, description, wide = false, record } = Astro.props;
-const name = marketplace.name ?? 'catalogue';
+const name = marketplace.name ?? chrome.fallbackName;
 const full = title === name ? name : `${title} · ${name}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.invalid');
 
-const nav = [
-  { label: 'Catalogue', path: '/' },
-  { label: 'Bundle', path: '/bundle/' },
-  { label: 'Triggers', path: '/triggers/' },
-  { label: 'Graph', path: '/graph/' },
-  { label: 'Releases', path: '/releases/' },
-];
+const items = nav.items;
 const here = Astro.url.pathname;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const palettePages = nav.map((item) => ({
+const palettePages = items.map((item) => ({
   name: item.label,
-  desc: item.path === '/' ? 'Search every artifact in the marketplace' : `The ${item.label.toLowerCase()} page`,
+  desc: item.path === '/' ? nav.catalogueDesc : nav.pageDesc(item.label),
   url: item.path,
 }));
 ---
@@ -41,7 +36,7 @@ const palettePages = nav.map((item) => ({
     <title>{full}</title>
     {description && <meta name="description" content={description} />}
     <link rel="canonical" href={canonical.toString()} />
-    <link rel="alternate" type="application/atom+xml" title={`${name} releases`} href={href('/feed.xml')} />
+    <link rel="alternate" type="application/atom+xml" title={chrome.releasesFeed(name)} href={href('/feed.xml')} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -60,24 +55,24 @@ const palettePages = nav.map((item) => ({
   </head>
 
   <body>
-    <a class="skip" href="#main">Skip to content</a>
+    <a class="skip" href="#main">{chrome.skipToContent}</a>
 
     <header class="masthead">
       <div class="shell masthead__inner">
         <a class="brand" href={href('/')}>
           <span class="brand__name">{name}</span>
-          <span class="brand__meta">{stats.plugins} plugins · {stats.artifacts} artifacts</span>
+          <span class="brand__meta">{chrome.brandMeta(stats.plugins, stats.artifacts)}</span>
         </a>
-        <nav class="nav" aria-label="Sections">
-          {nav.map((item) => (
+        <nav class="nav" aria-label={chrome.sectionsLabel}>
+          {items.map((item) => (
             <a
               href={href(item.path)}
               aria-current={here === href(item.path) ? 'page' : undefined}
             >{item.label}</a>
           ))}
         </nav>
-        <button class="button button--ghost theme" type="button" data-theme-toggle aria-label="Switch theme">
-          <span data-theme-label>Theme</span>
+        <button class="button button--ghost theme" type="button" data-theme-toggle aria-label={chrome.themeSwitch}>
+          <span data-theme-label>{chrome.themeLabel}</span>
         </button>
       </div>
     </header>
@@ -104,18 +99,18 @@ const palettePages = nav.map((item) => ({
 
     <footer class="footer">
       <div class="shell footer__inner">
-        <span>Built from the repository — every page here is generated, none is written by hand.</span>
+        <span>{chrome.footer}</span>
         {marketplace.repo && (
           <a href={`https://github.com/${marketplace.repo}`}>{marketplace.repo}</a>
         )}
       </div>
     </footer>
 
-    <script>
+    <script is:inline define:vars={{ copy: chrome }}>
       const root = document.documentElement;
       const label = document.querySelector('[data-theme-label]');
       const paint = () => {
-        if (label) label.textContent = root.dataset.theme === 'dark' ? 'Dark' : root.dataset.theme === 'light' ? 'Light' : 'System';
+        if (label) label.textContent = root.dataset.theme === 'dark' ? copy.themeDark : root.dataset.theme === 'light' ? copy.themeLight : copy.themeSystem;
       };
       paint();
       document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
@@ -134,16 +129,16 @@ const palettePages = nav.map((item) => ({
 
       // One handler for every copy button on the page.
       document.addEventListener('click', async (event) => {
-        const button = (event.target as HTMLElement)?.closest<HTMLElement>('[data-copy]');
+        const button = event.target?.closest('[data-copy]');
         if (!button) return;
         const text = button.dataset.copy ?? '';
         try {
           await navigator.clipboard.writeText(text);
           const previous = button.textContent;
-          button.textContent = 'Copied';
+          button.textContent = copy.copied;
           setTimeout(() => { button.textContent = previous; }, 1400);
         } catch {
-          button.textContent = 'Press ⌘C';
+          button.textContent = copy.copyFallback;
         }
       });
     </script>

@@ -1,17 +1,16 @@
 ---
 import { marketplace } from '../lib/catalog';
+import { emptyCatalogue as s } from '../lib/strings';
 const repo = marketplace.repo;
 ---
 
 <div class="note">
-  <p class="eyebrow" style="color: var(--accent)">No plugins yet</p>
-  <p>The catalogue is empty. This page is generated from the repository, so the first
-    plugin merged into <code>plugins/</code> appears here without anyone editing the
-    site.</p>
-  <p>The repository docs below are already indexed and searchable.</p>
+  <p class="eyebrow" style="color: var(--accent)">{s.eyebrow}</p>
+  <p>{s.body}</p>
+  <p>{s.docsNote}</p>
   {repo && (
     <p>
-      <a class="button" href={`https://github.com/${repo}/blob/main/CONTRIBUTING.md`}>How to add one</a>
+      <a class="button" href={`https://github.com/${repo}/blob/main/CONTRIBUTING.md`}>{s.howTo}</a>
     </p>
   )}
 </div>

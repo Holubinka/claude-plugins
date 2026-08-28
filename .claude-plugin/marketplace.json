@@ -9,6 +9,61 @@
   "metadata": {
     "pluginRoot": "./plugins"
   },
-  "plugins": [],
+  "plugins": [
+    {
+      "name": "engineering-paved-path",
+      "source": "./plugins/engineering-paved-path",
+      "description": "Six shared engineering skills \u2014 backend and frontend architecture, security review, PostgreSQL table design, TypeScript type work and Mermaid diagrams. The single source other plugins depend on instead of copying.",
+      "category": "development",
+      "keywords": [
+        "architecture",
+        "security",
+        "typescript",
+        "postgresql",
+        "mermaid",
+        "skills"
+      ]
+    },
+    {
+      "name": "research-tools",
+      "source": "./plugins/research-tools",
+      "description": "A read-only researcher agent that answers how something works in this repository, or what the outside world says about a technology \u2014 with every claim addressed to a path:line or a URL it opened.",
+      "category": "development",
+      "keywords": [
+        "research",
+        "read-only",
+        "investigation",
+        "evidence",
+        "agent"
+      ]
+    },
+    {
+      "name": "architecture-review",
+      "source": "./plugins/architecture-review",
+      "description": "An agent that reviews boundaries and nothing else \u2014 ring placement, dependency direction, ports and adapters, and the Server/Client line. Reads the repository's own architecture rules first and works where the automated gate cannot reach.",
+      "category": "development",
+      "keywords": [
+        "architecture",
+        "review",
+        "boundaries",
+        "dependency-direction",
+        "agent"
+      ]
+    },
+    {
+      "name": "sdd-engineering",
+      "source": "./plugins/sdd-engineering",
+      "description": "Spec-driven development as four agents and three skills \u2014 spec-creator, implementation-planner, implementer and plan-verifier, orchestrated by run-plan, with a retrospective and an insights recorder.",
+      "category": "development",
+      "keywords": [
+        "sdd",
+        "spec-driven",
+        "planning",
+        "orchestration",
+        "agents",
+        "ears"
+      ]
+    }
+  ],
   "renames": {}
 }

@@ -3,26 +3,24 @@ import Base from '../layouts/Base.astro';
 import { timeline, marketplace } from '../lib/catalog';
 import { href } from '../lib/url';
 import { date } from '../lib/format';
+import { releases as s } from '../lib/strings';
 
 const entries = timeline();
 ---
 
-<Base title="Releases" description="Every tagged release across the catalogue, newest first.">
+<Base title={s.title} description={s.description}>
   <header class="head">
-    <p class="eyebrow">Releases</p>
-    <h1>What changed, and when</h1>
+    <p class="eyebrow">{s.eyebrow}</p>
+    <h1>{s.heading}</h1>
     <p class="lede">
-      Built from <code>&lt;plugin&gt;--v&lt;version&gt;</code> tags. Nothing reaches an
-      installed plugin until its version changes, so this list is also the list of what
-      users actually received.
+      {s.ledePrefix} <code>&lt;plugin&gt;--v&lt;version&gt;</code> {s.ledeSuffix}
     </p>
-    <p><a href={href('/feed.xml')}>Atom feed →</a></p>
+    <p><a href={href('/feed.xml')}>{s.feedLink}</a></p>
   </header>
 
   {entries.length === 0 ? (
     <div class="note">
-      <p>No tagged releases yet. Tags are what dependency constraints resolve against —
-        see <a href={href('/docs/releasing/')}>releasing</a>.</p>
+      <p>{s.emptyPrefix} <a href={href('/docs/releasing/')}>{s.emptyLink}</a>.</p>
     </div>
   ) : (
     <ol class="feed">

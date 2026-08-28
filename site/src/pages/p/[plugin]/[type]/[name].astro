@@ -7,6 +7,7 @@ import { artifacts, plugin as findPlugin } from '../../../../lib/catalog';
 import { renderMarkdown } from '../../../../lib/md';
 import { href } from '../../../../lib/url';
 import { date } from '../../../../lib/format';
+import { artifactPage as s, chrome } from '../../../../lib/strings';
 
 export function getStaticPaths() {
   return artifacts
@@ -27,7 +28,7 @@ const frontmatter = Object.entries(artifact.frontmatter);
   record={{ name: artifact.invocation || artifact.title, kind: artifact.type, desc: artifact.description }}>
   <header class="head">
     <p class="crumbs">
-      <a href={href('/')}>catalogue</a> /
+      <a href={href('/')}>{s.crumbRoot}</a> /
       <a href={href(`/p/${artifact.plugin}/`)}>{artifact.plugin}</a> /
       <span>{artifact.type}</span>
     </p>
@@ -36,27 +37,25 @@ const frontmatter = Object.entries(artifact.frontmatter);
       <h1>{artifact.invocation || artifact.title}</h1>
     </div>
     <dl class="meta">
-      {owner?.version && <div><dt>Plugin version</dt><dd>{owner.version}</dd></div>}
-      <div><dt>Updated</dt><dd>{date(artifact.updatedAt)}</dd></div>
-      <div><dt>Source</dt><dd><code>{artifact.path}</code></dd></div>
+      {owner?.version && <div><dt>{s.pluginVersion}</dt><dd>{owner.version}</dd></div>}
+      <div><dt>{s.updated}</dt><dd>{date(artifact.updatedAt)}</dd></div>
+      <div><dt>{s.source}</dt><dd><code>{artifact.path}</code></dd></div>
     </dl>
   </header>
 
   <InstallBlock plugin={artifact.plugin!} />
 
   <section class="note">
-    <p class="eyebrow" style="color: var(--accent)">What makes it fire</p>
+    <p class="eyebrow" style="color: var(--accent)">{s.triggerEyebrow}</p>
     {artifact.description
       ? <p class="trigger">{artifact.description}</p>
-      : <p class="trigger">No description. Claude has nothing to decide on, so this will
-          not fire reliably.</p>}
-    <p class="aside">This sentence is the whole of what Claude sees when deciding whether
-      to load it. The body below costs nothing until it does.</p>
+      : <p class="trigger">{s.noDescription}</p>}
+    <p class="aside">{s.triggerAside}</p>
   </section>
 
   {artifact.tokens && (
     <section class="panel">
-      <p class="panel__label"><span>Context cost</span><span>≈ chars ÷ 4</span></p>
+      <p class="panel__label"><span>{s.contextCost}</span><span>{s.contextCostFormula}</span></p>
       <div class="panel__body">
         <TokenBadge tokens={artifact.tokens} verbose />
       </div>
@@ -65,14 +64,14 @@ const frontmatter = Object.entries(artifact.frontmatter);
 
   {body && (
     <section class="block">
-      <h2>What Claude receives</h2>
+      <h2>{s.bodyHeading}</h2>
       <div class="prose" set:html={body} />
     </section>
   )}
 
   {frontmatter.length > 0 && (
     <section class="block">
-      <h2>Frontmatter</h2>
+      <h2>{s.frontmatter}</h2>
       <div class="scroll">
         <table>
           <tbody>
@@ -90,12 +89,12 @@ const frontmatter = Object.entries(artifact.frontmatter);
 
   {artifact.referencedFiles.length > 0 && (
     <section class="block">
-      <h2>Files it reads on demand</h2>
+      <h2>{s.referencedFiles}</h2>
       <p class="chips">{artifact.referencedFiles.map((file) => <span class="chip chip--quiet">{file}</span>)}</p>
     </section>
   )}
 
-  {artifact.githubUrl && <p><a href={artifact.githubUrl}>Source on GitHub →</a></p>}
+  {artifact.githubUrl && <p><a href={artifact.githubUrl}>{chrome.sourceOnGitHub}</a></p>}
 </Base>
 
 <style>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { SearchResult } from 'minisearch';
 import { createEngine, runSearch } from '../lib/search-core.js';
 import '../styles/search.css';
+import { search as s } from '../lib/strings';
 
 interface Doc {
   id: string;
@@ -196,7 +197,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
             aria-expanded={searching}
             aria-controls="search-results"
             aria-autocomplete="list"
-            placeholder="What do you need? e.g. a skill that reviews migrations"
+            placeholder={s.placeholder}
             value={raw}
             disabled={failed}
             onInput={(event) => setRaw((event.target as HTMLInputElement).value)}
@@ -205,13 +206,13 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
           <span class="search__hint"><kbd>/</kbd></span>
         </div>
         <p class="search__keys">
-          <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
-          <span><kbd>⏎</kbd> open</span>
-          <span><kbd>⌘</kbd><kbd>K</kbd> jump anywhere</span>
-          <span><kbd>esc</kbd> clear</span>
+          <span><kbd>↑</kbd><kbd>↓</kbd> {s.keyMove}</span>
+          <span><kbd>⏎</kbd> {s.keyOpen}</span>
+          <span><kbd>⌘</kbd><kbd>K</kbd> {s.keyJump}</span>
+          <span><kbd>esc</kbd> {s.keyClear}</span>
         </p>
-        {failed && <p class="search__loading">Search index failed to load. The pages below still work.</p>}
-        {!docs && !failed && <p class="search__loading">Loading index…</p>}
+        {failed && <p class="search__loading">{s.failed}</p>}
+        {!docs && !failed && <p class="search__loading">{s.loading}</p>}
       </div>
 
       {searching && counts.type.length > 0 && (
@@ -238,9 +239,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
 
       {searching && ready && (
         <p class="search__count" aria-live="polite">
-          {filtered.length === 0
-            ? `Nothing matches “${raw}”`
-            : `${filtered.length} ${filtered.length === 1 ? 'match' : 'matches'}`}
+          {filtered.length === 0 ? s.noMatch(raw) : s.matchCount(filtered.length)}
         </p>
       )}
 
@@ -277,7 +276,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
                   )}
                   {result.tokens && (
                     <span class="tokens">
-                      <span>always <b>≈{(result.tokens as { always: number }).always}</b></span>
+                      <span>{s.always} <b>≈{(result.tokens as { always: number }).always}</b></span>
                     </span>
                   )}
                 </div>
@@ -307,18 +306,16 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
 
       {searching && ready && filtered.length === 0 && (
         <div class="search__empty">
-          <p>No artifact in this marketplace matches that.</p>
+          <p>{s.emptyTitle}</p>
           {issueUrl && (
             <a
               class="button"
-              href={`${issueUrl}?title=${encodeURIComponent(`Plugin request: ${raw}`)}&body=${encodeURIComponent(
-                `Searched the catalogue for:\n\n> ${raw}\n\nNothing matched. Is this worth building?`,
+              href={`${issueUrl}?title=${encodeURIComponent(s.issueTitle(raw))}&body=${encodeURIComponent(
+                s.issueBody(raw),
               )}`}
-            >Ask for it</a>
+            >{s.askForIt}</a>
           )}
-          <p class="search__loading">
-            A search that finds nothing is the only demand signal a site without a backend can collect.
-          </p>
+          <p class="search__loading">{s.emptyAside}</p>
         </div>
       )}
     </div>

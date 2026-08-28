@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import '../styles/palette.css';
+import { palette as s } from '../lib/strings';
 
 interface Doc {
   id: string;
@@ -100,13 +101,13 @@ export default function Palette({ docsUrl, base, pages }: Props) {
       })).filter(match).slice(0, 6);
 
     const out: { label: string; rows: Row[] }[] = [];
-    if (!q && recent.length) out.push({ label: 'Recently viewed', rows: recent });
+    if (!q && recent.length) out.push({ label: s.groupRecent, rows: recent });
     const invocable = fromDocs((d) => ['skill', 'agent', 'command'].includes(d.type), (d) => d.type);
-    if (invocable.length) out.push({ label: 'Skills and agents', rows: invocable });
+    if (invocable.length) out.push({ label: s.groupInvocable, rows: invocable });
     const docPages = fromDocs((d) => d.type === 'doc', () => 'doc');
-    if (docPages.length) out.push({ label: 'Documentation', rows: docPages });
+    if (docPages.length) out.push({ label: s.groupDocs, rows: docPages });
     const listedPages = pageRows.filter(match);
-    if (listedPages.length) out.push({ label: 'Pages', rows: listedPages });
+    if (listedPages.length) out.push({ label: s.groupPages, rows: listedPages });
     return out;
   }, [docs, query, recent, pageRows]);
 
@@ -136,18 +137,18 @@ export default function Palette({ docsUrl, base, pages }: Props) {
   let index = -1;
   return (
     <div class="pal-scrim" onClick={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
-      <div class="pal" role="dialog" aria-modal="true" aria-label="Jump to">
+      <div class="pal" role="dialog" aria-modal="true" aria-label={s.dialogLabel}>
         <input
           ref={input}
           type="text"
           value={query}
-          placeholder="Jump to a skill, a doc or a page…"
+          placeholder={s.placeholder}
           onInput={(event) => { setQuery((event.target as HTMLInputElement).value); setActive(0); }}
           onKeyDown={onKeyDown}
         />
         <div class="pal__groups">
           {flat.length === 0 && (
-            <p class="pal__empty">{docs === null ? 'Loading…' : 'Nothing matches that.'}</p>
+            <p class="pal__empty">{docs === null ? s.loading : s.empty}</p>
           )}
           {groups.map((group) => (
             <div key={group.label}>
@@ -174,9 +175,9 @@ export default function Palette({ docsUrl, base, pages }: Props) {
           ))}
         </div>
         <div class="pal__foot">
-          <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
-          <span><kbd>⏎</kbd> open</span>
-          <span><kbd>esc</kbd> close</span>
+          <span><kbd>↑</kbd><kbd>↓</kbd> {s.keyMove}</span>
+          <span><kbd>⏎</kbd> {s.keyOpen}</span>
+          <span><kbd>esc</kbd> {s.keyClose}</span>
         </div>
       </div>
     </div>
