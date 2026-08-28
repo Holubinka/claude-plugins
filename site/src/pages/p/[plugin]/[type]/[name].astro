@@ -23,7 +23,8 @@ const body = renderMarkdown(artifact.body);
 const frontmatter = Object.entries(artifact.frontmatter);
 ---
 
-<Base title={artifact.invocation || artifact.title} description={artifact.description}>
+<Base title={artifact.invocation || artifact.title} description={artifact.description}
+  record={{ name: artifact.invocation || artifact.title, kind: artifact.type, desc: artifact.description }}>
   <header class="head">
     <p class="crumbs">
       <a href={href('/')}>catalogue</a> /

@@ -149,11 +149,8 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       const typing = target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName);
-      if ((event.key === 'k' || event.key === 'K') && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-        input.current?.focus();
-        input.current?.select();
-      } else if (event.key === '/' && !typing) {
+      // Cmd+K belongs to the palette, which is mounted on every page.
+      if (event.key === '/' && !typing) {
         event.preventDefault();
         input.current?.focus();
       }
@@ -205,8 +202,14 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
             onInput={(event) => setRaw((event.target as HTMLInputElement).value)}
             onKeyDown={onFieldKey}
           />
-          <span class="search__hint"><kbd>⌘K</kbd></span>
+          <span class="search__hint"><kbd>/</kbd></span>
         </div>
+        <p class="search__keys">
+          <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
+          <span><kbd>⏎</kbd> open</span>
+          <span><kbd>⌘</kbd><kbd>K</kbd> jump anywhere</span>
+          <span><kbd>esc</kbd> clear</span>
+        </p>
         {failed && <p class="search__loading">Search index failed to load. The pages below still work.</p>}
         {!docs && !failed && <p class="search__loading">Loading index…</p>}
       </div>
