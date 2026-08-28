@@ -1,5 +1,18 @@
 name: pages
 
+# Four jobs, and the split is the point: each one shows up as its own check, so a red
+# mark says *what* broke without opening the log.
+#
+#   Catalogue index  the data generates, and its metadata gate passes  → plugins/, docs/
+#   Search ranking   the natural-language probes still find the right page
+#   Site build       Astro builds, and the client bundle is within budget
+#   Deploy           publish to Pages
+#
+# Before this split, all three ran in one job called "build", so a failing metadata
+# warning and a broken Astro template were the same red X. The marketplace harness
+# itself — manifests, structure, secrets — is a separate workflow (validate.yml) and is
+# deliberately not mixed in here.
+
 on:
   push:
     branches: [main]
@@ -28,7 +41,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  index:
+    name: Catalogue index
     runs-on: ubuntu-latest
     steps:
       # Tags and commit dates are part of the data, so the full history is required.
@@ -36,24 +50,75 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Generates site/src/data/ and site/public/data/, and fails on a metadata error.
+      # Neither directory is committed — see .gitignore for why.
+      - name: Build the catalogue data
+        run: python3 scripts/build-index.py
+
+      # The two jobs below both need this data and neither should regenerate it: one
+      # index, measured once, is what makes their verdicts comparable.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: catalogue-data
+          path: |
+            site/src/data
+            site/public/data
+          retention-days: 1
+
+  probes:
+    name: Search ranking
+    needs: index
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: site/package-lock.json
 
-      - name: Build the catalogue data
-        run: python3 scripts/build-index.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: catalogue-data
+          path: site
 
       - name: Install
         working-directory: site
         run: npm ci
 
       # Natural-language probes against the real index, using the same ranking module
-      # the browser loads. A description change that breaks findability fails here.
+      # the browser loads. A description change that breaks findability fails here, and
+      # only here — it is not a build failure and should not read as one.
       - name: Probe the search ranking
         working-directory: site
         run: node tests/search.test.mjs
+
+  site:
+    name: Site build
+    needs: index
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: catalogue-data
+          path: site
+
+      - name: Install
+        working-directory: site
+        run: npm ci
+
+      - name: Type-check the components
+        working-directory: site
+        run: npx astro check
 
       - name: Build the site
         working-directory: site
@@ -61,7 +126,9 @@ jobs:
         env:
           SITE_ORIGIN: https://holubinka.github.io
           SITE_BASE: /claude-plugins/
-        run: npm run build
+        # The build's own prebuild hook would regenerate the index; the artifact from
+        # `index` is already in place, so run Astro directly.
+        run: npx astro build
 
       - name: Check the client bundle against its budget
         working-directory: site
@@ -89,7 +156,10 @@ jobs:
           retention-days: 7
 
   deploy:
-    needs: build
+    name: Deploy
+    # Both gates must be green: a site that builds but no longer finds its own docs is
+    # not something to publish.
+    needs: [probes, site]
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
