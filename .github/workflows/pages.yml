@@ -1,12 +1,20 @@
 name: pages
 
-# Four jobs, and the split is the point: each one shows up as its own check, so a red
+# Five jobs, and the split is the point: each one shows up as its own check, so a red
 # mark says *what* broke without opening the log.
 #
+#   Release tags     cut {plugin}--v{version} for any manifest version not yet tagged
 #   Catalogue index  the data generates, and its metadata gate passes  → plugins/, docs/
 #   Search ranking   the natural-language probes still find the right page
 #   Site build       Astro builds, and the client bundle is within budget
 #   Deploy           publish to Pages
+#
+# Tagging lives here rather than in a workflow of its own, and that is not tidiness. A
+# tag pushed with GITHUB_TOKEN does not trigger another workflow — GitHub's guard against
+# recursive runs — so a standalone tag workflow would cut the tags and leave the site
+# reporting the state before them, which is the exact staleness this file's `tags:`
+# trigger was added to fix. Making it the first job in this chain means the index reads
+# the tags in the same run that created them.
 #
 # Before this split, all three ran in one job called "build", so a failing metadata
 # warning and a broken Astro template were the same red X. The marketplace harness
@@ -40,8 +48,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  tags:
+    name: Release tags
+    # Only a real push to main may cut one. A pull request must never create a tag:
+    # a tag is a published fact, and a proposal is not.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Existing tags are the input — without them every run would try to cut all of them.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Cut any tag a manifest version is missing
+        run: bash scripts/tag-releases.sh
+
   index:
     name: Catalogue index
+    needs: [tags]
+    # `tags` is skipped on a pull request, and a skipped dependency skips its dependents
+    # unless the condition says otherwise.
+    if: always() && (needs.tags.result == 'success' || needs.tags.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       # Tags and commit dates are part of the data, so the full history is required.
