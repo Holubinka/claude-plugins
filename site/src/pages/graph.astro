@@ -1,0 +1,117 @@
+---
+import Base from '../layouts/Base.astro';
+import { graph, plugins } from '../lib/catalog';
+import { href } from '../lib/url';
+
+const byId = new Map(graph.nodes.map((node) => [node.id, node]));
+const problems = graph.edges.filter((edge) => !edge.constrained || !edge.resolvable);
+---
+
+<Base title="Dependency graph" description="Which plugins depend on which, and which of those dependencies cannot resolve.">
+  <header class="head">
+    <p class="eyebrow">Graph</p>
+    <h1>What depends on what</h1>
+    <p class="lede">
+      Edges carry the declared version range. Layout is computed by the indexer and drawn
+      as static SVG — no graph library ships to your browser.
+    </p>
+  </header>
+
+  {graph.nodes.length === 0 ? (
+    <div class="note"><p>No plugins yet, so there is nothing to draw.</p></div>
+  ) : (
+    <>
+      <div class="scroll figure">
+        <svg viewBox={`0 0 ${graph.width} ${graph.height}`} role="img"
+             aria-label={`Dependency graph of ${plugins.length} plugins`}>
+          <defs>
+            <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0 0 L8 4 L0 8 z" fill="currentColor" />
+            </marker>
+          </defs>
+          <g class="edges">
+            {graph.edges.map((edge) => {
+              const from = byId.get(edge.from);
+              const to = byId.get(edge.to);
+              if (!from || !to) return null;
+              const x1 = from.x;
+              const y1 = from.y + from.height / 2;
+              const x2 = to.x + to.width;
+              const y2 = to.y + to.height / 2;
+              const mid = (x1 + x2) / 2;
+              const state = !edge.constrained ? 'loose' : edge.resolvable ? 'ok' : 'broken';
+              return (
+                <g class={`edge edge--${state}`}>
+                  <path d={`M${x1} ${y1} C${mid} ${y1}, ${mid} ${y2}, ${x2 + 8} ${y2}`}
+                        marker-end="url(#arrow)" />
+                  <text x={mid} y={(y1 + y2) / 2 - 6} text-anchor="middle">
+                    {edge.range ?? 'latest'}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+          <g class="nodes">
+            {graph.nodes.map((node) => (
+              <g class="node">
+                <rect x={node.x} y={node.y} width={node.width} height={node.height} rx="3" />
+                <text x={node.x + 12} y={node.y + 22}>{node.label}</text>
+                <text x={node.x + 12} y={node.y + 38} class="sub">
+                  {node.version ? `v${node.version}` : 'unversioned'} · {node.artifacts} artifacts
+                </text>
+              </g>
+            ))}
+          </g>
+        </svg>
+      </div>
+
+      <section class="block">
+        <h2>Edges worth looking at</h2>
+        {problems.length === 0 ? (
+          <p class="chip chip--ok">every dependency is constrained and resolves</p>
+        ) : (
+          <div class="scroll">
+            <table>
+              <thead><tr><th>From</th><th>To</th><th>Range</th><th>Problem</th></tr></thead>
+              <tbody>
+                {problems.map((edge) => (
+                  <tr>
+                    <td><a href={href(`/p/${edge.from}/`)}>{edge.from}</a></td>
+                    <td>{edge.external ? edge.to : <a href={href(`/p/${edge.to}/`)}>{edge.to}</a>}</td>
+                    <td>{edge.range ?? '—'}</td>
+                    <td>
+                      {!edge.constrained
+                        ? <span class="chip chip--warn">tracks latest — an upstream release can change behaviour</span>
+                        : <span class="chip chip--err">no-matching-tag — this install fails</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </>
+  )}
+</Base>
+
+<style>
+  .head { display: flex; flex-direction: column; gap: .6rem; }
+  .block { display: flex; flex-direction: column; gap: .9rem; }
+  .figure { padding: 1.25rem 1rem; }
+  svg { display: block; width: 100%; min-width: 34rem; height: auto; }
+  .node rect { fill: var(--surface-2); stroke: var(--rule-2); stroke-width: 1; }
+  .node text { fill: var(--ink); font-family: var(--mono); font-size: 12px; }
+  .node text.sub { fill: var(--muted); font-size: 10px; }
+  .edge path { fill: none; stroke-width: 1.25; }
+  .edge text { font-family: var(--mono); font-size: 9px; }
+  .edge--ok     { color: var(--rule-2); }
+  .edge--ok path     { stroke: var(--rule-2); }
+  .edge--ok text     { fill: var(--muted); }
+  .edge--loose  { color: var(--warn); }
+  .edge--loose path  { stroke: var(--warn); stroke-dasharray: 4 3; }
+  .edge--loose text  { fill: var(--warn); }
+  .edge--broken { color: var(--danger); }
+  .edge--broken path { stroke: var(--danger); }
+  .edge--broken text { fill: var(--danger); }
+</style>

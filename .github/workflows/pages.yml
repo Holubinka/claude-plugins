@@ -1,0 +1,101 @@
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'plugins/**'
+      - 'docs/**'
+      - 'site/**'
+      - 'scripts/build-index.py'
+      - '.claude-plugin/**'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - '.github/workflows/pages.yml'
+  pull_request:
+    paths:
+      - 'site/**'
+      - 'scripts/build-index.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a superseded run has nothing worth finishing.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Tags and commit dates are part of the data, so the full history is required.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Build the catalogue data
+        run: python3 scripts/build-index.py
+
+      - name: Install
+        working-directory: site
+        run: npm ci
+
+      # Natural-language probes against the real index, using the same ranking module
+      # the browser loads. A description change that breaks findability fails here.
+      - name: Probe the search ranking
+        working-directory: site
+        run: node tests/search.test.mjs
+
+      - name: Build the site
+        working-directory: site
+        # Set SITE_ORIGIN to the domain and SITE_BASE to '/' once the CNAME lands.
+        env:
+          SITE_ORIGIN: https://holubinka.github.io
+          SITE_BASE: /claude-plugins/
+        run: npm run build
+
+      - name: Check the client bundle against its budget
+        working-directory: site
+        run: |
+          set -euo pipefail
+          bytes=$(find dist/_astro -name '*.js' -exec gzip -c {} \; | wc -c)
+          limit=$((60 * 1024))
+          echo "client JS: ${bytes} bytes gzipped (budget ${limit})"
+          if [ "$bytes" -gt "$limit" ]; then
+            echo "::error::client JS is over the 60 KB gzipped budget"
+            exit 1
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: site/dist
+
+      # Pages has no preview deployments, so a reviewer downloads the build instead.
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request'
+        with:
+          name: site-preview
+          path: site/dist
+          retention-days: 7
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

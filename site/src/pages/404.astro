@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import Search from '../islands/Search';
+import { marketplace } from '../lib/catalog';
+import { href } from '../lib/url';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const issueUrl = marketplace.repo ? `https://github.com/${marketplace.repo}/issues/new` : null;
+---
+
+<Base title="Not found">
+  <header class="head">
+    <p class="eyebrow">404</p>
+    <h1>That page is not here</h1>
+    <p class="lede">It may have been renamed — renaming a skill is a major version change,
+      and the old path stops working. Search for it instead.</p>
+  </header>
+
+  <Search client:load docsUrl={href('/data/search-docs.json')} base={base} issueUrl={issueUrl} />
+
+  <div id="browse">
+    <p><a href={href('/')}>← Back to the catalogue</a></p>
+  </div>
+
+  <script is:inline>
+    // Seed the box with whatever the visitor was reaching for.
+    addEventListener('DOMContentLoaded', () => {
+      const guess = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() ?? '')
+        .replace(/[-_]/g, ' ');
+      const field = document.querySelector('input[type="search"]');
+      if (field && guess && guess !== '404') {
+        field.value = guess;
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  </script>
+</Base>
+
+<style>
+  .head { display: flex; flex-direction: column; gap: .6rem; }
+</style>

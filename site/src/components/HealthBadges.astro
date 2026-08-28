@@ -1,0 +1,35 @@
+---
+import type { HealthEntry } from '../lib/catalog';
+
+interface Props { entries: HealthEntry[]; detailed?: boolean }
+const { entries, detailed = false } = Astro.props;
+const errors = entries.filter((e) => e.level === 'error');
+const warnings = entries.filter((e) => e.level === 'warn');
+---
+
+{entries.length === 0 ? (
+  <p class="chip chip--ok">no findings</p>
+) : detailed ? (
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Code</th><th>Finding</th></tr></thead>
+      <tbody>
+        {[...errors, ...warnings].map((entry) => (
+          <tr>
+            <td><span class={`chip ${entry.level === 'error' ? 'chip--err' : 'chip--warn'}`}>{entry.code}</span></td>
+            <td>{entry.message}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+) : (
+  <p class="badges">
+    {errors.length > 0 && <span class="chip chip--err">{errors.length} error{errors.length === 1 ? '' : 's'}</span>}
+    {warnings.length > 0 && <span class="chip chip--warn">{warnings.length} warning{warnings.length === 1 ? '' : 's'}</span>}
+  </p>
+)}
+
+<style>
+  .badges { display: flex; gap: .4rem; flex-wrap: wrap; }
+</style>

@@ -1,0 +1,154 @@
+---
+import Base from '../layouts/Base.astro';
+import { collisions, artifacts, invocable } from '../lib/catalog';
+import { href } from '../lib/url';
+
+const candidates = artifacts
+  .filter((a) => invocable.includes(a.type) && a.description)
+  // Descriptions are what gets ranked; shipping the bodies too would double the page.
+  .map((a) => ({ url: a.url, title: a.title, invocation: a.invocation, description: a.description }));
+---
+
+<Base title="Trigger inspector" description="Which skills a prompt would plausibly reach, and which skill descriptions compete with each other.">
+  <header class="head">
+    <p class="eyebrow">Triggers</p>
+    <h1>Which skill would this reach?</h1>
+    <p class="lede">
+      Paste a prompt the way a user would type it. The ranking below is the same lexical
+      engine the catalogue search uses, run against skill descriptions only.
+    </p>
+  </header>
+
+  <div class="note">
+    <p class="eyebrow" style="color: var(--accent)">Read this before trusting the ranking</p>
+    <p>This approximates <strong>lexical overlap with skill descriptions</strong>. It is
+      not Claude's routing, and it cannot be — Claude weighs the whole conversation, not
+      a bag of words. Use it to spot descriptions that are too vague or too similar, not
+      to predict what will fire.</p>
+  </div>
+
+  <section class="block">
+    <label class="field">
+      <span class="eyebrow">Prompt</span>
+      <textarea id="prompt" rows="3" placeholder="I need something that checks a database migration before it ships"></textarea>
+    </label>
+    <ol id="ranking" class="ranking"></ol>
+    <p id="note" class="empty">{candidates.length === 0
+      ? 'No invocable components in the catalogue yet, so there is nothing to rank.'
+      : `Ranking ${candidates.length} invocable components.`}</p>
+  </section>
+
+  <section class="block">
+    <h2>Colliding triggers</h2>
+    <p class="lede">
+      Pairs whose descriptions overlap above the threshold, computed at build time.
+      Two skills competing for the same prompt make each other unreliable, and nothing
+      else in the toolchain looks for this.
+    </p>
+    {collisions.length === 0 ? (
+      <p class="chip chip--ok">no descriptions overlap above the threshold</p>
+    ) : (
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Score</th><th>One</th><th>The other</th></tr></thead>
+          <tbody>
+            {collisions.map((collision) => (
+              <tr>
+                <td class="num">{collision.score.toFixed(2)}</td>
+                <td>
+                  <a href={href(`/p/${collision.a.plugin}/skill/${collision.a.name}/`)}>{collision.a.name}</a>
+                  <p class="desc">{collision.a.description}</p>
+                </td>
+                <td>
+                  <a href={href(`/p/${collision.b.plugin}/skill/${collision.b.name}/`)}>{collision.b.name}</a>
+                  <p class="desc">{collision.b.description}</p>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </section>
+
+  <script is:inline define:vars={{ candidates, base: import.meta.env.BASE_URL.replace(/\/$/, '') }}>
+    const field = document.getElementById('prompt');
+    const list = document.getElementById('ranking');
+    const note = document.getElementById('note');
+    const STOP = new Set('a an and are as at be by for from has have how in into is it its of on or that the this to use used uses user when where which who will with without you your not no'.split(' '));
+    const words = (text) => text.toLowerCase().match(/[a-z0-9][a-z0-9-]*/g)?.filter((w) => w.length > 1 && !STOP.has(w)) ?? [];
+
+    const docs = candidates.map((c) => ({ ...c, tokens: words(c.description) }));
+
+    function rank(query) {
+      const q = words(query);
+      if (!q.length) return [];
+      return docs
+        .map((doc) => {
+          const hits = q.filter((term) => doc.tokens.some((t) => t.startsWith(term)));
+          const score = hits.length / Math.sqrt(q.length * Math.max(doc.tokens.length, 1));
+          return { doc, score, hits: [...new Set(hits)] };
+        })
+        .filter((row) => row.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 8);
+    }
+
+    function render() {
+      const rows = rank(field.value);
+      list.replaceChildren();
+      if (!field.value.trim()) {
+        note.textContent = `Ranking ${docs.length} invocable components.`;
+        return;
+      }
+      note.textContent = rows.length ? '' : 'Nothing overlaps this prompt — which usually means a description is missing or too narrow.';
+      const top = rows[0]?.score ?? 1;
+      for (const row of rows) {
+        const li = document.createElement('li');
+        li.className = 'rank';
+        const bar = document.createElement('span');
+        bar.className = 'bar';
+        bar.style.setProperty('--w', `${Math.max(6, (row.score / top) * 100)}%`);
+        const name = document.createElement('a');
+        name.href = base + row.doc.url;
+        name.textContent = row.doc.invocation || row.doc.title;
+        const desc = document.createElement('p');
+        desc.className = 'desc';
+        desc.textContent = row.doc.description;
+        const hits = document.createElement('p');
+        hits.className = 'hits';
+        hits.textContent = row.hits.length ? `matched: ${row.hits.join(', ')}` : '';
+        li.append(bar, name, desc, hits);
+        list.append(li);
+      }
+    }
+
+    field?.addEventListener('input', render);
+    render();
+  </script>
+</Base>
+
+<style>
+  .head { display: flex; flex-direction: column; gap: .6rem; }
+  .block { display: flex; flex-direction: column; gap: .9rem; }
+  .field { display: flex; flex-direction: column; gap: .4rem; }
+  textarea {
+    font: inherit; font-size: 1rem; padding: .8rem 1rem; resize: vertical;
+    color: var(--ink); background: var(--surface);
+    border: 1px solid var(--rule-2); border-radius: var(--radius);
+  }
+  textarea:focus-visible { border-color: var(--accent); }
+  .ranking { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .6rem; }
+  .desc { font-size: .86rem; color: var(--ink-2); max-width: 70ch; }
+  .hits { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+  .empty { font-size: .85rem; color: var(--muted); }
+</style>
+<style is:global>
+  .rank {
+    display: flex; flex-direction: column; gap: .25rem;
+    padding: .75rem .9rem; border: 1px solid var(--rule);
+    border-radius: var(--radius); background: var(--surface);
+  }
+  .rank .bar { height: 3px; width: var(--w); background: var(--accent); border-radius: 2px; }
+  .rank a { font-family: var(--mono); font-size: .9rem; }
+</style>

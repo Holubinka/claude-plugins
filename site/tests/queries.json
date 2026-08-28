@@ -1,0 +1,30 @@
+{
+  "note": "Natural-language probes. Each must return `expect` within the top `within` results. These are how the ranking is held to account when the catalogue changes.",
+  "probes": [
+    {
+      "query": "I need something that explains how releases reach users",
+      "expect": "doc:releasing#how-users-receive-an-update",
+      "within": 3
+    },
+    {
+      "query": "how do I roll back a bad plugin version",
+      "expect": "doc:releasing#rollback",
+      "within": 3
+    },
+    {
+      "query": "where do skills and agents go inside a plugin",
+      "expect": "doc:plugin-structure#directory-layout",
+      "within": 5
+    },
+    {
+      "query": "is a plugin allowed to run shell commands",
+      "expect": "doc:security#what-a-plugin-may-do-here",
+      "within": 5
+    },
+    {
+      "query": "committed a secret by mistake",
+      "expect": "doc:security#secrets",
+      "within": 5
+    }
+  ]
+}

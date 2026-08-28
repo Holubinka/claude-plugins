@@ -1,0 +1,6 @@
+---
+import type { ArtifactType } from '../lib/catalog';
+interface Props { type: ArtifactType }
+const { type } = Astro.props;
+---
+<span class="chip chip--type">{type}</span>

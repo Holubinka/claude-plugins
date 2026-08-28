@@ -1,0 +1,114 @@
+---
+import Base from '../layouts/Base.astro';
+import Search from '../islands/Search';
+import EmptyCatalogue from '../components/EmptyCatalogue.astro';
+import HealthBadges from '../components/HealthBadges.astro';
+import { marketplace, plugins, stats, docSlugs, health } from '../lib/catalog';
+import { href } from '../lib/url';
+import { date } from '../lib/format';
+
+const docs = docSlugs();
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const issueUrl = marketplace.repo ? `https://github.com/${marketplace.repo}/issues/new` : null;
+---
+
+<Base
+  title={marketplace.name ?? 'Catalogue'}
+  description={marketplace.description ?? undefined}
+>
+  <section class="hero">
+    <h1>Ask for what you need</h1>
+    <p class="lede">
+      {marketplace.description}
+      Search every skill, agent, command, hook, server and doc in this marketplace —
+      the index is built from the repository, so it is never out of date.
+    </p>
+  </section>
+
+  <Search client:load docsUrl={href('/data/search-docs.json')} base={base} issueUrl={issueUrl} />
+
+  <div id="browse" class="browse">
+    {plugins.length === 0 ? (
+      <EmptyCatalogue />
+    ) : (
+      <section class="block">
+        <h2>Plugins</h2>
+        <div class="grid">
+          {plugins.map((p) => (
+            <article class="tile">
+              <div class="tile__head">
+                <a class="tile__name" href={href(p.url)}>{p.name}</a>
+                {p.version && <span class="chip chip--quiet">v{p.version}</span>}
+              </div>
+              <p class="tile__desc">{p.description}</p>
+              <p class="tile__counts">
+                {Object.entries(p.counts).map(([type, n]) => (
+                  <span class="chip chip--quiet">{n} {type}{n === 1 ? '' : 's'}</span>
+                ))}
+              </p>
+              <div class="tile__foot">
+                <span class="tokens"><span>always <b>≈{p.tokens.always}</b></span></span>
+                <HealthBadges entries={health(p)} />
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="block">
+      <h2>Documentation</h2>
+      <p class="lede">How this marketplace is built, released and reviewed. Every section is indexed.</p>
+      <div class="grid grid--tight">
+        {docs.map((doc) => (
+          <a class="tile tile--link" href={href(`/docs/${doc.slug}/`)}>
+            <span class="tile__name">{doc.title}</span>
+            <span class="chip chip--quiet">{doc.slug}.md</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Catalogue at a glance</h2>
+      <div class="scroll">
+        <table>
+          <tbody>
+            <tr><th scope="row">Plugins</th><td class="num">{stats.plugins}</td></tr>
+            <tr><th scope="row">Artifacts</th><td class="num">{stats.artifacts}</td></tr>
+            <tr>
+              <th scope="row">By type</th>
+              <td>{Object.entries(stats.byType).map(([type, n]) => <span class="chip chip--quiet">{type} {n}</span>)}</td>
+            </tr>
+            <tr><th scope="row">Always-on tokens</th><td class="num">≈{stats.alwaysTokens}</td></tr>
+            <tr><th scope="row">Trigger collisions</th><td class="num">{stats.collisions}</td></tr>
+            <tr><th scope="row">Last change</th><td>{date(stats.updatedAt)}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .hero { display: flex; flex-direction: column; gap: .75rem; }
+  .browse { display: flex; flex-direction: column; gap: 2.5rem; }
+  .block { display: flex; flex-direction: column; gap: .9rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); gap: .75rem; }
+  .grid--tight { grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
+  .tile {
+    display: flex; flex-direction: column; gap: .5rem;
+    padding: 1rem; border: 1px solid var(--rule); border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .tile--link { gap: .45rem; align-items: flex-start; }
+  .tile--link .tile__name { color: var(--accent); }
+  .tile--link:hover { border-color: var(--accent); text-decoration: none; }
+  .tile__head { display: flex; align-items: center; gap: .5rem; justify-content: space-between; }
+  .tile__name { font-family: var(--mono); font-size: .92rem; font-weight: 500; }
+  .tile__desc { font-size: .88rem; color: var(--ink-2); }
+  .tile__counts, .tile__foot { display: flex; gap: .35rem; flex-wrap: wrap; align-items: center; }
+  .tile__foot { justify-content: space-between; border-top: 1px solid var(--rule); padding-top: .55rem; margin-top: auto; }
+  th[scope='row'] { font-family: var(--mono); font-size: .74rem; color: var(--muted); font-weight: 500; white-space: nowrap; }
+  td .chip { margin-right: .3rem; }
+</style>

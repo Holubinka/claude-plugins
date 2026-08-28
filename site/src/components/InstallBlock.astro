@@ -1,0 +1,35 @@
+---
+import { marketplace } from '../lib/catalog';
+
+interface Props { plugin: string }
+const { plugin } = Astro.props;
+
+const add = marketplace.install.add;
+const install = marketplace.install.install.replace('{plugin}', plugin);
+const dev = marketplace.install.dev.replace('{plugin}', plugin);
+const both = [add, install].filter(Boolean).join('\n');
+---
+
+<section class="panel install" aria-label="Install">
+  <p class="panel__label">
+    <span>Install</span>
+    <button class="button" type="button" data-copy={both}>Copy</button>
+  </p>
+  <div class="panel__body">
+    <pre>{both}</pre>
+    <details>
+      <summary>Load it from a working tree instead</summary>
+      <pre>{dev}</pre>
+      <p>Run <code>/reload-plugins</code> after each edit.</p>
+    </details>
+  </div>
+</section>
+
+<style>
+  .install .panel__label { align-items: center; }
+  .install .panel__body { display: flex; flex-direction: column; gap: .75rem; }
+  details summary { cursor: pointer; font-size: .84rem; color: var(--muted); }
+  details summary:hover { color: var(--accent); }
+  details[open] summary { margin-bottom: .55rem; }
+  details p { font-size: .82rem; color: var(--muted); margin-top: .45rem; }
+</style>
