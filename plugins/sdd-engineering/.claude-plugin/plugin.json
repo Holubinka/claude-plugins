@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "sdd-engineering",
+  "description": "Spec-driven development as four agents and three skills — spec-creator, implementation-planner, implementer and plan-verifier, orchestrated by run-plan, with a retrospective and an insights recorder.",
+  "version": "1.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["sdd", "spec-driven", "planning", "orchestration", "agents", "ears"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.0.0" },
+    { "name": "research-tools", "version": "^1.0.0" },
+    { "name": "architecture-review", "version": "^1.0.0" }
+  ]
+}
