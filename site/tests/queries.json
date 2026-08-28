@@ -14,7 +14,8 @@
     {
       "query": "where do skills and agents go inside a plugin",
       "expect": "doc:plugin-structure#directory-layout",
-      "within": 5
+      "within": 10,
+      "note": "Widened from 5 to 10 on 2026-08-29, when the catalogue stopped being docs-only. The query names two artifact types, so real skills and agents legitimately rank above the section describing where they live. Narrow it again if doc findability is ever improved against components."
     },
     {
       "query": "is a plugin allowed to run shell commands",
