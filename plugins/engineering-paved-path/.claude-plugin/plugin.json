@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "engineering-paved-path",
   "description": "Six shared engineering skills — backend and frontend architecture, security review, PostgreSQL table design, TypeScript type work and Mermaid diagrams. The single source other plugins depend on instead of copying.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": { "name": "Vitalii Holubinka" },
   "license": "MIT",
   "keywords": ["architecture", "security", "typescript", "postgresql", "mermaid", "skills"]

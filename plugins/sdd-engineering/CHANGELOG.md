@@ -4,6 +4,24 @@ All notable changes to `sdd-engineering`. This project follows [SemVer](https://
 
 Releases are tagged `sdd-engineering--v<version>`.
 
+## [1.0.1] — 2026-08-29
+
+Patch: metadata only. No agent, skill or script changed behaviour, and no dependency range
+moved.
+
+### Added
+
+- **`keywords` on every component.** The indexer reads them from a component's own
+  frontmatter, which is a different field from the plugin manifest's `keywords`; without
+  them the chips under every catalogue card were empty and the keyword facet had nothing
+  to filter.
+
+### Removed
+
+- The `metadata.tags` lines three skills carried. The indexer never read that field, and
+  two lists of the same concept drift on the next change. Their values are now in
+  `keywords`.
+
 ## [1.0.0] — 2026-08-29
 
 First release. Extracted from a private product repository and generalised: every path, module name, package-manager script and framework assumption specific to that codebase was replaced with either an explicit input or a discovery step.
