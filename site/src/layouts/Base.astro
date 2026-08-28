@@ -1,5 +1,6 @@
 ---
 import '../styles/tokens.css';
+import Palette from '../islands/Palette';
 import { marketplace, stats } from '../lib/catalog';
 import { href } from '../lib/url';
 
@@ -8,9 +9,11 @@ interface Props {
   description?: string;
   /** Page-level <h1>; omit when the page renders its own header. */
   wide?: boolean;
+  /** Content pages record themselves, so the palette can offer them back. */
+  record?: { name: string; kind: string; desc?: string };
 }
 
-const { title, description, wide = false } = Astro.props;
+const { title, description, wide = false, record } = Astro.props;
 const name = marketplace.name ?? 'catalogue';
 const full = title === name ? name : `${title} · ${name}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.invalid');
@@ -23,6 +26,12 @@ const nav = [
   { label: 'Releases', path: '/releases/' },
 ];
 const here = Astro.url.pathname;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const palettePages = nav.map((item) => ({
+  name: item.label,
+  desc: item.path === '/' ? 'Search every artifact in the marketplace' : `The ${item.label.toLowerCase()} page`,
+  url: item.path,
+}));
 ---
 
 <html lang="en">
@@ -76,6 +85,22 @@ const here = Astro.url.pathname;
     <main id="main" class={wide ? 'shell main main--wide' : 'shell main'}>
       <slot />
     </main>
+
+    <Palette client:idle docsUrl={href('/data/search-docs.json')} base={base} pages={palettePages} />
+
+    {record && (
+      <script is:inline define:vars={{ entry: { ...record, url: here.replace(base, '') || '/' } }}>
+        // Five most recent content pages, newest first, for the palette to offer back.
+        try {
+          const key = 'dw:recent';
+          const kept = JSON.parse(localStorage.getItem(key) || '[]')
+            .filter((r) => r && r.url !== entry.url);
+          kept.unshift({ key: entry.url, kind: entry.kind, name: entry.name,
+                         desc: entry.desc || '', url: entry.url });
+          localStorage.setItem(key, JSON.stringify(kept.slice(0, 5)));
+        } catch {}
+      </script>
+    )}
 
     <footer class="footer">
       <div class="shell footer__inner">

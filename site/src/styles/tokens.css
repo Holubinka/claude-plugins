@@ -4,22 +4,22 @@
    a complete palette, and only tokens are redefined for dark. */
 
 :root {
-  --bg:        #F6F8F7;
-  --surface:   #FFFFFF;
-  --surface-2: #EFF3F1;
-  --ink:       #131A19;
-  --ink-2:     #3A4644;
-  --muted:     #5F6D6A;
-  --rule:      #D9E0DD;
-  --rule-2:    #C3CECA;
-  --accent:    #0E6A60;
-  --accent-2:  #0A4F48;
-  --accent-bg: #E4F0EE;
-  --danger:    #AE3427;
-  --warn:      #8A5A0B;
-  --ok:        #14705A;
-  --mark:      #FFE9A8;
-  --mark-ink:  #3A2E05;
+  --bg:        #FFFFFF;
+  --surface:   #EDF2F0;
+  --surface-2: #E2EAE7;
+  --ink:       #101816;
+  --ink-2:     #3A4744;
+  --muted:     #5D6B67;
+  --rule:      #D0DAD6;
+  --rule-2:    #7F8E8A;
+  --accent:    #0B5F56;
+  --accent-2:  #084A43;
+  --accent-bg: #DCEBE8;
+  --danger:    #A02D22;
+  --warn:      #7A4E08;
+  --ok:        #0F6152;
+  --mark:      #F6E4B4;
+  --mark-ink:  #45350A;
 
   --serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
   --sans:  "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -27,6 +27,7 @@
 
   --shell: 78rem;
   --radius: 4px;
+  --block-line: transparent;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,6 +48,7 @@
     --ok:        #58C9A6;
     --mark:      #4A3C0E;
     --mark-ink:  #F6E7B0;
+    --block-line: #22302D;
   }
 }
 
@@ -67,6 +69,7 @@
   --ok:        #58C9A6;
   --mark:      #4A3C0E;
   --mark-ink:  #F6E7B0;
+  --block-line: #22302D;
 }
 
 * { box-sizing: border-box; }
@@ -152,7 +155,8 @@ pre {
   font-size: .72rem;
   line-height: 1.5;
   padding: .08rem .4rem;
-  border: 1px solid var(--rule-2);
+  background: var(--surface-2);
+  border: 1px solid var(--block-line);
   border-radius: 3px;
   color: var(--muted);
   white-space: nowrap;
@@ -161,7 +165,7 @@ pre {
 .chip--err     { color: var(--danger); border-color: var(--danger); }
 .chip--warn    { color: var(--warn);   border-color: var(--warn); }
 .chip--ok      { color: var(--ok);     border-color: var(--ok); }
-.chip--quiet   { border-color: var(--rule); }
+.chip--quiet   { background: none; border-color: var(--block-line); }
 
 /* Token cost carries two numbers that must never read as one. */
 .tokens { display: inline-flex; gap: .35rem; font-family: var(--mono); font-size: .72rem; color: var(--muted); }
@@ -170,7 +174,7 @@ pre {
 /* ---------- surfaces ---------- */
 
 .panel {
-  border: 1px solid var(--rule);
+  border: 1px solid var(--block-line);
   background: var(--surface);
   border-radius: var(--radius);
 }
@@ -201,7 +205,7 @@ pre {
 
 .scroll {
   overflow-x: auto;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--block-line);
   border-radius: var(--radius);
   background: var(--surface);
 }

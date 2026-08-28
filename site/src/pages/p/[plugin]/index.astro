@@ -19,7 +19,8 @@ const readme = renderMarkdown(plugin.readme);
 const author = authorName(plugin.author);
 ---
 
-<Base title={plugin.name} description={plugin.description}>
+<Base title={plugin.name} description={plugin.description}
+  record={{ name: plugin.name, kind: "plugin", desc: plugin.description }}>
   <header class="head">
     <p class="eyebrow">Plugin</p>
     <h1>{plugin.name}</h1>

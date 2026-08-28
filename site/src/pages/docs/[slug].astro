@@ -13,7 +13,8 @@ const sections = docSections(slug);
 const contents = sections.filter((section) => section.name !== sections[0]?.name);
 ---
 
-<Base title={title} description={sections[0]?.description}>
+<Base title={title} description={sections[0]?.description}
+  record={{ name: title, kind: "doc", desc: sections[0]?.description ?? "" }}>
   <header class="head">
     <p class="eyebrow">Documentation</p>
     <h1>{title}</h1>
