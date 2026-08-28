@@ -4,10 +4,7 @@
 
 **Claude Code >= 2.1.110.**
 
-That floor is set by **version-constrained plugin dependencies**: this plugin declares
-`engineering-paved-path@^1.0.0`, `research-tools@^1.0.0` and `architecture-review@^1.0.0`, and
-constraint resolution against git tags is what earlier versions do not have. On an older release
-the dependencies either resolve to whatever the marketplace currently holds or fail outright.
+That floor is set by **version-constrained plugin dependencies**: this plugin declares `engineering-paved-path@^1.0.0`, `research-tools@^1.0.0` and `architecture-review@^1.0.0`, and constraint resolution against git tags is what earlier versions do not have. On an older release the dependencies either resolve to whatever the marketplace currently holds or fail outright.
 
 Developed and exercised on 2.1.251.
 
@@ -37,14 +34,9 @@ Developed and exercised on 2.1.251.
 ## Not required
 
 - No MCP server.
-- No network access. `spec-creator`, `implementation-planner`, `implementer` and `plan-verifier`
-  have neither `WebSearch` nor `WebFetch`. Only `research-tools:researcher`, in the dependency
-  plugin, reaches the network — and only when dispatched.
-- No particular language, framework, package manager or test runner. Where the repository has
-  none of these configured, the workflow says so rather than assuming one.
+- No network access. `spec-creator`, `implementation-planner`, `implementer` and `plan-verifier` have neither `WebSearch` nor `WebFetch`. Only `research-tools:researcher`, in the dependency plugin, reaches the network — and only when dispatched.
+- No particular language, framework, package manager or test runner. Where the repository has none of these configured, the workflow says so rather than assuming one.
 
 ## Early access
 
-`claude plugin eval` — needed to run the suite under `evals/` — is in early access. Without it
-enabled the command exits without running anything, and the cases' schema is unverified. Nothing
-else in this plugin depends on it.
+`claude plugin eval` — needed to run the suite under `evals/` — is in early access. Without it enabled the command exits without running anything, and the cases' schema is unverified. Nothing else in this plugin depends on it.

@@ -196,8 +196,7 @@ gantt
     Task C :2024-01-10, 7d
 ```
 
-**Duration formats**: `1d` (days), `1w` (weeks), `1h` (hours)
-**Dependencies**: `after taskId` for sequential tasks
+**Duration formats**: `1d` (days), `1w` (weeks), `1h` (hours) **Dependencies**: `after taskId` for sequential tasks
 
 ---
 
@@ -251,8 +250,7 @@ GitHub, GitLab, Notion, and most markdown renderers support mermaid blocks nativ
 
 ````
 ```mermaid
-flowchart LR
-  A --> B
+flowchart LR A --> B
 ```
 ````
 
