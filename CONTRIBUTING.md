@@ -107,6 +107,21 @@ things that leave a plugin installable but unfindable, or findable but unreadabl
 
 All three run in CI on every pull request. Errors fail the build; warnings do not.
 
+## Run them before you push
+
+```sh
+git config core.hooksPath .githooks
+```
+
+Once per clone. `.githooks/pre-push` then runs the two linters and the search probes
+before anything leaves the machine — under a second in total, so there is no reason to
+reach for `--no-verify`. The full site build stays in CI.
+
+The probes are the least obvious of the three. `site/tests/queries.json` holds
+natural-language questions and the artifact each must return; the docs are the search
+corpus, so editing a doc can move the ranking and break one. That has already happened
+once.
+
 ## Releasing
 
 Bump `version` in `plugin.json` — nothing reaches existing users otherwise — then tag
