@@ -87,6 +87,17 @@ export function runSearch(engine, raw) {
   const { query, type } = normalise(raw);
   if (query.trim().length < 2) return [];
 
+  // People type "roll back" for a section called "Rollback". Searching the joined form
+  // of each adjacent pair as well costs nothing when it matches nothing, and rescues the
+  // compound when it matches a title.
+  const words = query.split(' ').filter(Boolean);
+  const joined = [];
+  for (let i = 0; i < words.length - 1; i += 1) {
+    const pair = words[i] + words[i + 1];
+    if (pair.length <= 24) joined.push(pair);
+  }
+  const expanded = words.concat(joined).join(' ');
+
   const options = {
     boost: BOOST,
     prefix: true,
@@ -105,11 +116,11 @@ export function runSearch(engine, raw) {
 
   // A long natural-language question matches nothing under AND, but plain OR lets a
   // document that caught one common word outrank one that caught most of the question.
-  const loose = engine.search(query, { ...options, combineWith: 'OR' });
+  const loose = engine.search(expanded, { ...options, combineWith: 'OR' });
   // Two matched terms is the line between "this is about what you asked" and "this
   // document happens to contain one common word". Demanding a proportion of a padded
   // question instead throws out the right answer.
-  const asked = query.split(' ').filter(Boolean).length;
+  const asked = words.length;
   const floor = Math.min(2, asked);
   const enough = loose.filter((result) => result.terms.length >= floor);
   return enough.length > 0 ? enough : loose;
