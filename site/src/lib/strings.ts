@@ -115,7 +115,16 @@ export const search = {
   loading: 'Loading index…',
   failed: 'Search index failed to load. The pages below still work.',
   noMatch: (query: string) => `Nothing matches “${query}”`,
+  noMatchFiltered: 'Nothing matches those filters.',
   matchCount: (n: number) => `${n} ${n === 1 ? 'match' : 'matches'}`,
+  /** Facet legends. The key is the field name; this is what a reader sees. */
+  facetType: 'type',
+  facetPlugin: 'plugin',
+  facetCategory: 'category',
+  facetKeyword: 'keyword',
+  /** Shown under the keyword row when the tail is hidden — see FACET_LIMIT. */
+  facetMore: (n: number) => `+${n} more, reachable by searching`,
+  browsing: (n: number) => `Browsing ${n} artifacts. Type to search, or filter below.`,
   emptyTitle: 'No artifact in this marketplace matches that.',
   askForIt: 'Ask for it',
   emptyAside:

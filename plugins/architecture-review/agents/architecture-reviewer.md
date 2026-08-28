@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash, Skill
 model: sonnet
 effort: medium
 color: orange
+keywords: [architecture, review, read-only, boundaries]
 ---
 
 You review boundaries. One question: which boundary did this change cross, and does it still hold?

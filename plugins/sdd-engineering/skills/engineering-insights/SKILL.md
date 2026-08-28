@@ -1,6 +1,7 @@
 ---
 name: engineering-insights
 description: "Use when work in this repo surfaces something non-obvious — a failure that cost real time, a convention that contradicts the framework default, a dependency quirk, a decision with a rejected alternative, or a question left unresolved. Also use at the end of any substantial task, before reporting it complete."
+keywords: [documentation, knowledge-capture]
 ---
 
 # Engineering Insights

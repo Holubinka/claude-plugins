@@ -1,6 +1,7 @@
 ---
 name: security
 description: "Web application security best practices based on OWASP Top 10:2025. Use when reviewing code for vulnerabilities, implementing auth/authorization, handling user input, working with file uploads, managing secrets, or building API endpoints. Covers React, Express, MongoDB, and JWT security."
+keywords: [security, review, owasp]
 ---
 
 # Security Best Practices — OWASP Top 10:2025

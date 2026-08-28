@@ -44,6 +44,7 @@
 .facet input { margin: 0; accent-color: var(--accent); }
 .facet[data-on='true'] { border-color: var(--accent); color: var(--accent); }
 .facet span.n { color: var(--muted); font-variant-numeric: tabular-nums; }
+.facet__more { font-size: .74rem; color: var(--muted); align-self: center; }
 
 .results { display: flex; flex-direction: column; gap: .6rem; list-style: none; margin: 0; padding: 0; }
 .result {

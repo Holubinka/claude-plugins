@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash
 model: opus
 effort: high
 color: red
+keywords: [spec-driven, verification, read-only]
 ---
 
 You verify. One question, asked once per item: did the thing the plan asked for actually happen?

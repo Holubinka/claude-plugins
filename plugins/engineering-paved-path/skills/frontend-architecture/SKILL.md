@@ -3,7 +3,7 @@ name: frontend-architecture
 description: "Decides where frontend code goes and how it is split. Use when adding a component and choosing between a colocated and a shared folder, splitting a component that grew too big, deciding between a hook / a pure function / a component body for logic, placing constants, types, styles, utils or helpers, choosing where state lives (local, URL, or server cache), or drawing the Next.js Server/Client boundary. Covers React and Next.js App Router file and folder structure."
 metadata:
   version: "1.0.0"
-  tags: react, nextjs, app-router, project-structure, folder-structure, colocation, component-splitting, state-placement, rsc
+keywords: [architecture, frontend, react, nextjs]
 ---
 
 # Frontend Architecture — where code goes
