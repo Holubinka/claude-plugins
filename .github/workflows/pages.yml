@@ -1,12 +1,26 @@
 name: pages
 
-# Four jobs, and the split is the point: each one shows up as its own check, so a red
+# Five jobs, and the split is the point: each one shows up as its own check, so a red
 # mark says *what* broke without opening the log.
 #
+#   Release tags     cut {plugin}--v{version} for any manifest version not yet tagged
 #   Catalogue index  the data generates, and its metadata gate passes  → plugins/, docs/
 #   Search ranking   the natural-language probes still find the right page
 #   Site build       Astro builds, and the client bundle is within budget
 #   Deploy           publish to Pages
+#
+# Tagging lives here rather than in a workflow of its own, and that is not tidiness.
+# Two things rule the alternatives out:
+#
+#   - A tag pushed with GITHUB_TOKEN does not trigger another workflow — GitHub's guard
+#     against recursive runs — so a standalone tag workflow would cut the tags and leave
+#     the site reporting the state before them.
+#   - Triggering this workflow on a tag push cannot work either: the run checks out the
+#     tag ref, and the github-pages environment admits `main` alone, so the deploy is
+#     rejected by the environment rather than skipped.
+#
+# Making it the first job in this chain sidesteps both: the index reads the tags in the
+# same main-branch run that created them.
 #
 # Before this split, all three ran in one job called "build", so a failing metadata
 # warning and a broken Astro template were the same red X. The marketplace harness
@@ -15,17 +29,21 @@ name: pages
 
 on:
   push:
+    # Branches only. A `tags:` filter was here, added because release tags are data —
+    # releases() reads refs/tags, and the dependency-health badges resolve each declared
+    # range against them — so a tag push changed what the catalogue should say and
+    # nothing rebuilt it.
+    #
+    # It is gone because it cannot work and is no longer needed. Cannot: the run checks
+    # out the tag ref, and the github-pages environment admits deployments from `main`
+    # alone, so every tag-triggered run died with "not allowed to deploy to github-pages
+    # due to environment protection rules". No longer needed: the `tags` job below cuts
+    # the tags inside the main-branch run, before the index reads them.
     branches: [main]
-    # Release tags are data, not just labels: releases() reads refs/tags to build the
-    # release history, and the dependency-health badges are computed by resolving each
-    # declared range against them. Without this, pushing engineering-paved-path--v1.0.0
-    # changed what the catalogue should say and nothing rebuilt it — the published site
-    # kept reporting `no-matching-tag` for plugins that were, by then, tagged.
-    tags: ['*--v*']
-    # Deliberately no `paths` filter, on either trigger. The index is not a pure function
-    # of the files it reads: commit dates feed every artifact's "updated" field and the
-    # catalogue's "last change", and tags feed releases and health. A path filter would
-    # skip builds that change what the site says, which is the bug above in general form.
+    # Deliberately no `paths` filter. The index is not a pure function of the files it
+    # reads: commit dates feed every artifact's "updated" field and the catalogue's "last
+    # change", and tags feed releases and health. A path filter would skip builds that
+    # change what the site says.
   pull_request:
   workflow_dispatch:
 
@@ -40,8 +58,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  tags:
+    name: Release tags
+    # Only a real push to main may cut one. A pull request must never create a tag:
+    # a tag is a published fact, and a proposal is not.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Existing tags are the input — without them every run would try to cut all of them.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Cut any tag a manifest version is missing
+        run: bash scripts/tag-releases.sh
+
   index:
     name: Catalogue index
+    needs: [tags]
+    # `tags` is skipped on a pull request, and a skipped dependency skips its dependents
+    # unless the condition says otherwise.
+    if: always() && (needs.tags.result == 'success' || needs.tags.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       # Tags and commit dates are part of the data, so the full history is required.
@@ -159,7 +205,11 @@ jobs:
     # Both gates must be green: a site that builds but no longer finds its own docs is
     # not something to publish.
     needs: [probes, site]
-    if: github.event_name != 'pull_request'
+    # The ref check is not redundant with the trigger. The github-pages environment
+    # admits `main` and nothing else, and a run that reaches the environment from any
+    # other ref is *rejected* — a red Deploy on a run where nothing was wrong. Skipping
+    # is the honest outcome, so make it structural rather than leaving it to be refused.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
