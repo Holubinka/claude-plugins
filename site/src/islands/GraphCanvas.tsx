@@ -35,7 +35,10 @@ export default function GraphCanvas(
 ) {
   const [moved, setMoved] = useState<Record<string, Point>>({});
   const svgRef = useRef<SVGSVGElement>(null);
-  const drag = useRef<{ id: string; dx: number; dy: number; from: Point; slipped: boolean } | null>(null);
+  const drag = useRef<{
+    id: string; dx: number; dy: number; from: Point; slipped: boolean;
+    target: Element; pointerId: number;
+  } | null>(null);
 
   // Restore an arrangement from a previous visit. A stored value can be absent, stale or
   // unreadable in a private window — none of which should stop the graph rendering.
@@ -74,8 +77,10 @@ export default function GraphCanvas(
   const onDown = (event: PointerEvent, node: Node) => {
     if (event.button !== 0) return;
     const p = toCanvas(event);
-    drag.current = { id: node.id, dx: p.x - node.x, dy: p.y - node.y, from: p, slipped: false };
-    (event.currentTarget as Element).setPointerCapture?.(event.pointerId);
+    drag.current = {
+      id: node.id, dx: p.x - node.x, dy: p.y - node.y, from: p, slipped: false,
+      target: event.currentTarget as Element, pointerId: event.pointerId,
+    };
   };
 
   const onMove = (event: PointerEvent) => {
@@ -83,6 +88,7 @@ export default function GraphCanvas(
     if (!d) return;
     const p = toCanvas(event);
     if (!d.slipped && Math.hypot(p.x - d.from.x, p.y - d.from.y) < CLICK_SLOP) return;
+    if (!d.slipped) d.target.setPointerCapture?.(d.pointerId);
     d.slipped = true;
     event.preventDefault();
     setMoved((prev) => ({
@@ -162,7 +168,7 @@ export default function GraphCanvas(
               const routed = edge.lane !== null && edge.lane !== undefined;
               return (
                 <g class={`edge edge--${state}${routed ? ' edge--routed' : ''}`}>
-                  <path d={geom.d} fill="none" marker-end={`url(#arrow-${state})`} />
+                  <path d={geom.d} fill="none" stroke="currentColor" marker-end={`url(#arrow-${state})`} />
                   <text x={geom.label.x} y={geom.label.y} text-anchor={geom.label.anchor}>{geom.label.text}</text>
                 </g>
               );

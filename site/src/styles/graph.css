@@ -39,13 +39,13 @@ svg { display: block; width: 100%; min-width: 34rem; height: auto; }
 .arrowhead--broken { color: var(--danger); }
 .edge--routed path { stroke-dasharray: none; opacity: 0.85; }
 .edge text { font-family: var(--mono); font-size: 9px; }
-/* stroke is an inherited SVG property, so the group carries it and the path picks it up.
-   One selector instead of two, and nothing depends on a descendant match reaching the
-   path — which is the kind of dependency that fails quietly and takes the diagram with it. */
-.edge--ok     { stroke: var(--muted); }
+/* The path carries stroke="currentColor" as an attribute and takes its colour from the
+   group's `color`. Whether an edge is visible at all should not depend on a selector
+   reaching the path — that dependency has now failed twice on this diagram. */
+.edge--ok     { color: var(--muted); }
 .edge--ok text     { fill: var(--ink-2); stroke: none; }
-.edge--loose  { stroke: var(--warn); }
+.edge--loose  { color: var(--warn); }
 .edge--loose path  { stroke-dasharray: 4 3; }
 .edge--loose text  { fill: var(--warn); stroke: none; }
-.edge--broken { stroke: var(--danger); }
+.edge--broken { color: var(--danger); }
 .edge--broken text { fill: var(--danger); stroke: none; }
