@@ -13,7 +13,7 @@
     {
       "name": "engineering-paved-path",
       "source": "./plugins/engineering-paved-path",
-      "description": "Six shared engineering skills \u2014 backend and frontend architecture, security review, PostgreSQL table design, TypeScript type work and Mermaid diagrams. The single source other plugins depend on instead of copying.",
+      "description": "Eight shared engineering skills \u2014 backend and frontend architecture, security review, PostgreSQL table design, TypeScript type work, Mermaid diagrams, the four-level severity scale and the rule for discovering a repository's own commands. The single source other plugins depend on instead of copying.",
       "category": "development",
       "keywords": [
         "architecture",
@@ -21,18 +21,20 @@
         "typescript",
         "postgresql",
         "mermaid",
+        "severity",
         "skills"
       ]
     },
     {
       "name": "research-tools",
       "source": "./plugins/research-tools",
-      "description": "A read-only researcher agent that answers how something works in this repository, or what the outside world says about a technology \u2014 with every claim addressed to a path:line or a URL it opened.",
+      "description": "Two read-only agents for questions that need a checkable answer \u2014 a researcher that reports how something works or what the outside world says, with every claim addressed to a path:line or a URL it opened, and a cheap investigator that traces what connects to what.",
       "category": "development",
       "keywords": [
         "research",
         "read-only",
         "investigation",
+        "tracing",
         "evidence",
         "agent"
       ]

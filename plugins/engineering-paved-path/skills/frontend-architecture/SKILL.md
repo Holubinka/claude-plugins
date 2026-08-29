@@ -49,7 +49,7 @@ Run these in order for any "where does this go" question. Stop as soon as the an
 
 **1 — Name what it is.** Component · hook · pure function · constant · type · style · user-facing text · server-only module. The kind decides the file; the consumers decide the folder. If you cannot name it, it is not ready to be extracted.
 
-**2 — Check it already doesn't exist.** Principle 6, and this is the step most often skipped. Design tokens are the usual casualty: a severity or status colour map defined once in the token module and then restated locally in two components is the standard shape of this failure. Search before you add, and if you find two definitions already, say so — the third is not the problem.
+**2 — Check it already doesn't exist.** Principle 6, and this is the step most often skipped. Design tokens are the usual casualty: a status colour map defined once in the token module and then restated locally in two components is the standard shape of this failure. Search before you add, and if you find two definitions already, say so — the third is not the problem.
 
 **3 — Count the consumers.** One → colocate beside it. Two or more, in different routes → promote to the shared folder for that kind. Zero — you are speculating; go back to step 1.
 
@@ -99,7 +99,7 @@ Stop when you catch yourself writing any of these.
 |---|---|
 | "I'll put it in `components/` since it might be reused" | 2 — one consumer, one home |
 | "It's over 200 lines, so split it" | 3 — name the symptom or leave it |
-| "`useSeverityLabel` reads better" | 4 — it calls no hook, so it is not a hook |
+| "`useStatusLabel` reads better" | 4 — it calls no hook, so it is not a hook |
 | "I'll copy the fetched row into `useState` so I can filter it" | 5 — derive during render |
 | "The filter can just be `useState`" | 5 — it is shareable, so it is URL state |
 | "I'll add a small colour map here" | 6 — the token module already has one |

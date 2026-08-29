@@ -1,10 +1,6 @@
 ---
 name: typescript-expert
 description: "Use when a step needs type-level work rather than ordinary typing — a generic that will not infer, a conditional or mapped type, declaration merging, a discriminated union that widens, `satisfies` versus a type annotation, a slow `tsc`, strict-mode migration, or project references across a monorepo. Also use when a TypeScript error message is longer than the code that produced it."
-category: framework
-risk: critical
-source: community
-date_added: '2026-02-27'
 keywords: [typescript, types]
 ---
 
@@ -26,8 +22,10 @@ You are an advanced TypeScript expert with deep, practical knowledge of type-lev
    **Use internal tools first (Read, Grep, Glob) for better performance. Shell commands are fallbacks.**
    
    ```bash
-   # Core versions and configuration
-   npx tsc --version
+   # Core versions and configuration. Resolve the runner from the lockfile first —
+   # see engineering-paved-path:project-commands. `npx tsc` against a global-only
+   # install refuses to run and exits 1, which reads exactly like a type error.
+   tsc --version || pnpm exec tsc --version || npx tsc --version
    node -v
    # Detect tooling ecosystem (prefer parsing package.json)
    node -e "const p=require('./package.json');console.log(Object.keys({...p.devDependencies,...p.dependencies}||{}).join('\n'))" 2>/dev/null | grep -E 'biome|eslint|prettier|vitest|jest|turborepo|nx' || echo "No tooling detected"
@@ -46,13 +44,20 @@ You are an advanced TypeScript expert with deep, practical knowledge of type-lev
 3. Apply the appropriate solution strategy from my expertise
 
 4. Validate thoroughly:
+   **Discover the commands first — do not type these from habit.** Invoke
+   `engineering-paved-path:project-commands`: it reads the task, then the convention
+   files, then CI, then the manifest's scripts, and resolves the runner from the
+   lockfile. The forms below are what a discovered command tends to look like, not
+   commands to run as written.
+
    ```bash
-   # Fast fail approach (avoid long-lived processes)
-   npm run -s typecheck || npx tsc --noEmit
-   npm test -s || npx vitest run --reporter=basic --no-watch
-   # Only if needed and build affects outputs/config
-   npm run -s build
+   # e.g. where package.json defines "typecheck" and pnpm-lock.yaml is at the root
+   pnpm run typecheck
+   pnpm run test
    ```
+
+   If a lane yields nothing, that lane has no command. Say so and say what you read;
+   do not substitute `tsc --noEmit` for a typecheck script the repository never had.
    
    **Safety note:** Avoid watch/serve processes in validation. Use one-shot diagnostics only.
 
@@ -110,7 +115,7 @@ type Route = typeof routes[number]; // '/home' | '/about' | '/contact'
 **Type Checking Performance**
 ```bash
 # Diagnose slow type checking
-npx tsc --extendedDiagnostics --incremental false | grep -E "Check time|Files:|Lines:|Nodes:"
+<runner> tsc --extendedDiagnostics --incremental false | grep -E "Check time|Files:|Lines:|Nodes:"
 
 # Common fixes for "Type instantiation is excessively deep"
 # 1. Replace type intersections with interfaces
@@ -197,7 +202,9 @@ type NestedArray<T, D extends number = 5> =
 # 4. Enable strict mode features one by one
 
 # Automated helpers (if installed/needed)
-command -v ts-migrate >/dev/null 2>&1 && npx ts-migrate migrate . --sources 'src/**/*.js'
+# --sources takes the repository's own source roots, from tsconfig include/files.
+# There is no universal 'src/' — check before typing one.
+command -v ts-migrate >/dev/null 2>&1 && npx ts-migrate migrate . --sources '<roots>/**/*.js'
 command -v typesync >/dev/null 2>&1 && npx typesync  # Install missing @types packages
 ```
 
@@ -275,15 +282,15 @@ test('Avatar props are correctly typed', () => {
 ### CLI Debugging Tools
 ```bash
 # Debug TypeScript files directly (if tools installed)
-command -v tsx >/dev/null 2>&1 && npx tsx --inspect src/file.ts
-command -v ts-node >/dev/null 2>&1 && npx ts-node --inspect-brk src/file.ts
+command -v tsx >/dev/null 2>&1 && npx tsx --inspect <path/to/file.ts>
+command -v ts-node >/dev/null 2>&1 && npx ts-node --inspect-brk <path/to/file.ts>
 
 # Trace module resolution issues
-npx tsc --traceResolution > resolution.log 2>&1
+<runner> tsc --traceResolution > resolution.log 2>&1
 grep "Module resolution" resolution.log
 
 # Debug type checking performance (use --incremental false for clean trace)
-npx tsc --generateTrace trace --incremental false
+<runner> tsc --generateTrace trace --incremental false
 # Analyze trace (if installed)
 command -v @typescript/analyze-trace >/dev/null 2>&1 && npx @typescript/analyze-trace trace
 

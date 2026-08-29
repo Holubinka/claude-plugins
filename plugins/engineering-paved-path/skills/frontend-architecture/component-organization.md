@@ -29,7 +29,7 @@ Split on a **symptom**, never on a number:
 
 "Duplication is far cheaper than the wrong abstraction". A long component with none of those symptoms is fine — leave it. Dodds is explicit: *don't be afraid of a growing component until you start experiencing real problems.*
 
-Past ~200 lines or ~7 props, **check** for a symptom. Finding none is a valid answer and ends the question. This deliberately overrides the hard limits stated in `react-best-practices`.
+Past ~200 lines or ~7 props, **check** for a symptom. Finding none is a valid answer and ends the question. Where a repository or a framework-specific skill states a hard line or prop limit, this check deliberately overrides it: a symptom is evidence, a threshold is a guess.
 
 **Extract on a seam, not on size.** A child earns its own file when it owns state, is reused, or has behaviour worth asserting without rendering the parent. Moving 30 lines and one prop into a new folder plus an `index.ts` plus an import, for a block with none of those, is folder tax for no seam.
 
@@ -43,7 +43,7 @@ Three complementary ways to decide, from the React docs:
 
 **Do not reach for container/presentational splitting.** Its author retracted it — *"I don't suggest splitting your components like this anymore"* — and hooks achieve the same separation without the wrapper layer. The pattern survives only as vocabulary.
 
-**A repetition that the type system already describes should be a loop, not hand-written JSX.** Seven near-identical `<PromptBlock>` lines against an eight-field schema is how a field goes missing — and one did in `RunTraceDrawer`. A typed, ordered constant array plus `.map()` makes the next addition a one-line edit.
+**A repetition that the type system already describes should be a loop, not hand-written JSX.** Seven near-identical `<PromptBlock>` lines against an eight-field schema is how a field goes missing — and one did in `ShipmentDrawer`. A typed, ordered constant array plus `.map()` makes the next addition a one-line edit.
 
 ## Composition over prop drilling
 
@@ -70,12 +70,12 @@ Before reaching for context, in this order:
 **The hook test: if a function calls no hook, it is not a hook**.
 
 ```ts
-export function useSeverityLabel(sev: Severity) {   // ✗ not a hook
-  return SEV_LABEL[sev] ?? "Unknown";
+export function useStatusLabel(s: OrderStatus) {    // ✗ not a hook
+  return STATUS_LABEL[s] ?? "Unknown";
 }
 
-export function severityLabel(sev: Severity) {      // ✓ callable conditionally, in loops
-  return SEV_LABEL[sev] ?? "Unknown";
+export function statusLabel(s: OrderStatus) {       // ✓ callable conditionally, in loops
+  return STATUS_LABEL[s] ?? "Unknown";
 }
 ```
 
@@ -97,7 +97,7 @@ Custom hooks share stateful **logic, not state**. Two components calling the sam
 
 ## Which `hooks/` folder
 
-`src/lib/hooks/` is **data-only** — TanStack Query hooks over the API. A stateful hook that makes no request does not belong there.
+Where a repository keeps its data hooks in one folder, that folder is **data-only** — server-cache hooks over the API, nothing else. A stateful hook that makes no request does not belong there, whatever the folder is called.
 
 **Good** — a non-data hook owned by the component tree that uses it:
 
@@ -111,7 +111,7 @@ src/components/app-shell/hooks/
 **Good** — a new one, colocated the same way at the shallowest folder with a consumer:
 
 ```ts
-// _components/RunTraceDrawer/hooks/useCopyFlash.ts
+// _components/ShipmentDrawer/hooks/useCopyFlash.ts
 export function useCopyFlash(text: string, ms = 1500) {
   const [copied, setCopied] = React.useState(false);
   React.useEffect(() => {
@@ -123,27 +123,27 @@ export function useCopyFlash(text: string, ms = 1500) {
 }
 ```
 
-**Bad** — `src/lib/hooks/useCopyFlash.ts`. It touches no endpoint, so it would sit in the data barrel and be pulled in by every `@/lib/hooks` import.
+**Bad** — putting `useCopyFlash.ts` in the shared data-hooks folder. It touches no endpoint, so it would sit in the data barrel and be pulled in by every import of it.
 
 **Bad** — leaving it in `helpers.ts`. Helpers are pure; this one holds state and a timer.
 
 ## The data layer
 
-- **Every API call sits behind a hook in `src/lib/hooks/<domain>.ts`.** No `fetch` in a component.
+- **Every API call sits behind a hook, grouped by domain in whichever folder this repository already uses for them.** No `fetch` in a component.
 - **Never copy query data into `useState`** — it opts the component out of every background refetch and leaves a stale duplicate.
 - **Query keys live beside their query**, in the same domain file, structured generic → specific. The hook is the exported surface; the query function and key stay local.
 - Loading, error and empty states are handled by the component that owns the hook.
 
 ```tsx
 // ✓ Good
-const { data: runs, isLoading } = usePrActiveRuns(prId);
+const { data: shipments, isLoading } = useOrderShipments(orderId);
 
 // ✗ Bad — three violations at once
 const [runs, setRuns] = useState([]);                    // server data in local state
 useEffect(() => {                                        // fetch in a component
-  fetch(`${API_BASE}/pulls/${prId}/runs`)                // no hook, no key, no cache
+  fetch(`${API_BASE}/orders/${orderId}/shipments`)       // no hook, no key, no cache
     .then((r) => r.json()).then(setRuns);
-}, [prId]);
+}, [orderId]);
 ```
 
 The `useState` copy is the worst of the three — it is silent, and it disables exactly the behaviour the cache was added for.
@@ -160,14 +160,14 @@ The `useState` copy is the worst of the three — it is silent, and it disables 
 
 ```tsx
 // ✗ Bad — lost on reload, cannot be shared
-const [severity, setSeverity] = useState<Severity | "ALL">("ALL");
+const [status, setStatus] = useState<OrderStatus | "ALL">("ALL");
 
 // ✓ Good — survives reload, back/forward and copy-paste
 const searchParams = useSearchParams();
-const severity = (searchParams.get("severity") ?? "ALL") as Severity | "ALL";
+const status = (searchParams.get("status") ?? "ALL") as OrderStatus | "ALL";
 ```
 
-Validate what comes back from the URL. An unknown `?sev=MAJOR` reaching a lookup with no fallback takes the route down — narrow it to a known value or `null` first.
+Validate what comes back from the URL. An unknown `?status=SHIPPED_MAYBE` reaching a lookup with no fallback takes the route down — narrow it to a known value or `null` first.
 
 **Structure the state you keep**: group what updates together, avoid contradictory flags, avoid redundancy, avoid duplication, keep it flat. "Make your state as simple as it can be — but no simpler."
 
@@ -177,13 +177,13 @@ To decide whether something *is* state at all, ask: does it stay unchanged over 
 
 ```tsx
 // ✗ Bad — an extra render pass and a value that can disagree with its source
-const [visible, setVisible] = useState<FindingRecord[]>([]);
+const [visible, setVisible] = useState<OrderRecord[]>([]);
 useEffect(() => {
-  setVisible(findings.filter((f) => f.severity === sev));
-}, [findings, sev]);
+  setVisible(orders.filter((o) => o.status === status));
+}, [orders, status]);
 
 // ✓ Good
-const visible = findings.filter((f) => f.severity === sev);
+const visible = orders.filter((o) => o.status === status);
 ```
 
 Computing derived values in the render body is correct — do **not** convert them to `useState` + `useEffect`.
