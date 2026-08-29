@@ -60,7 +60,7 @@ const candidates = artifacts
     )}
   </section>
 
-  <script is:inline define:vars={{ candidates, copy: s, base: import.meta.env.BASE_URL.replace(/\/$/, '') }}>
+  <script is:inline define:vars={{ candidates, pageCopy: s, base: import.meta.env.BASE_URL.replace(/\/$/, '') }}>
     const field = document.getElementById('prompt');
     const list = document.getElementById('ranking');
     const note = document.getElementById('note');
@@ -87,10 +87,10 @@ const candidates = artifacts
       const rows = rank(field.value);
       list.replaceChildren();
       if (!field.value.trim()) {
-        note.textContent = copy.ranking.replace('{n}', String(docs.length));
+        note.textContent = pageCopy.ranking.replace('{n}', String(docs.length));
         return;
       }
-      note.textContent = rows.length ? '' : copy.noOverlap;
+      note.textContent = rows.length ? '' : pageCopy.noOverlap;
       const top = rows[0]?.score ?? 1;
       for (const row of rows) {
         const li = document.createElement('li');
@@ -106,7 +106,7 @@ const candidates = artifacts
         desc.textContent = row.doc.description;
         const hits = document.createElement('p');
         hits.className = 'hits';
-        hits.textContent = row.hits.length ? copy.matched.replace('{terms}', row.hits.join(', ')) : '';
+        hits.textContent = row.hits.length ? pageCopy.matched.replace('{terms}', row.hits.join(', ')) : '';
         li.append(bar, name, desc, hits);
         list.append(li);
       }

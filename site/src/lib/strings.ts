@@ -251,15 +251,21 @@ export const bundle = {
   eyebrow: 'Bundle',
   heading: 'Set someone up in one paste',
   lede:
-    'Choose what a machine should have, then copy a single block. The selection lives in ' +
-    'the URL, so the link itself is the onboarding instruction.',
+    'Tick the plugins a machine should have. You get one block of commands that installs ' +
+    'them and everything they depend on, and the cost of carrying them before you commit ' +
+    'to it. The selection lives in the URL, so the link itself is the instruction.',
   empty: 'Nothing to bundle yet — the catalogue is empty.',
   pick: 'Pick',
-  takeItAway: 'Take it away',
+  takeItAway: 'What to paste',
   installBlock: 'Install block',
-  placeholder: 'Pick at least one plugin.',
+  placeholder:
+    'Tick a plugin and the commands appear here — including anything it depends on, ' +
+    'which you then do not have to go and look up.',
   selected: 'Selected',
   alwaysTokens: 'Always-on tokens',
+  costNote:
+    'Always-on cost is what these plugins add to every turn while they are enabled, ' +
+    'before any skill fires. Conflicting version ranges are flagged here too.',
   /** Templates — all three cross `define:vars` into the bundle builder's script. */
   pulledIn: 'Pulled in as dependencies: {names}',
   conflict: 'range-conflict — {detail}',
