@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # A local log of how a plugin behaved, and two ways to hand it on.
 #
+#     feedback.sh collect [--all-projects] [--days N]    scan local transcripts; nothing to compose
+#     feedback.sh usage                                  which components actually fired, and how often
 #     feedback.sh record <plugin> <verdict> <<'ENTRY'   append an entry from stdin
 #     feedback.sh list [plugin]                          what is in the log
 #     feedback.sh show <id>                              one entry
@@ -43,6 +45,23 @@ case "${1:-}" in
       cat
     } > "$file"
     echo "$file"
+    ;;
+
+  collect)
+    shift
+    all=0; days=90
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --all-projects) all=1; shift ;;
+        --days) days="${2:-90}"; shift 2 ;;
+        *) echo "unknown option: $1" >&2; exit 1 ;;
+      esac
+    done
+    python3 "$(dirname "$0")/collect_usage.py" "$dir" "$all" "$days" "$(pwd | sed 's|/|-|g')"
+    ;;
+
+  usage)
+    python3 "$(dirname "$0")/collect_usage.py" --report "$dir"
     ;;
 
   list)

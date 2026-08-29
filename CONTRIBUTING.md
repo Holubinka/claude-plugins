@@ -122,10 +122,14 @@ resolves at install time, and this is the only check that catches one with no ed
 it.
 
 `build-index.py --check` also enforces a **search-payload budget**: it warns over 150 KB gzipped and
-fails over 400 KB. It sits at 149 KB, and the headroom went to three `sdd-engineering` agent bodies
-of 28, 27 and 20 KB — well past the 10 KB this repository budgets per agent. When the warning fires,
-the fix is to move prose out of those three into reference files they read on demand, **not** to
-delete it and **not** to trim a doc that is a fraction of the total.
+fails over 400 KB. **W108 is firing now, at exactly 150 KB.** CI stays green — it is a warning — but
+it is a real item rather than noise.
+
+The headroom went to three `sdd-engineering` agent bodies of 28, 27 and 20 KB, against the 10 KB this
+repository budgets per agent. The fix is to move prose out of those three into reference files they
+read on demand — **not** to delete it, and **not** to trim a doc, since all 39 doc sections together
+are 29 KB of a 324 KB corpus. It is a behaviour change to three shipped agents and belongs in its own
+pass with its own verification, not bundled into whatever change happens to cross the line.
 
 The self-tests belong to plugins whose behaviour is a shell script rather than a prompt.
 They are the whole of what is checkable for those, and they have already caught two real

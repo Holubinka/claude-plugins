@@ -1,12 +1,14 @@
 ---
 name: plugin-feedback
-description: "Records how an installed plugin's skill or agent actually behaved, into a local log, and turns an entry into a paste-ready bug report or an eval case for a pull request. Use when something a plugin did was wrong, when one you expected did not load at all, when something worked notably well, or when asked to report, log or send feedback about a plugin. Nothing is sent anywhere — the log stays on this machine until you export an entry and paste it yourself."
+description: "Keeps a local record of how installed plugins actually behave — both scanned automatically from the transcripts Claude Code already writes, and noted by hand when something goes wrong. Use when a plugin did something wrong, when one you expected never loaded, when asked which skills are actually being used or whether they are earning their cost, and when turning any of that into a bug report or an eval case. Nothing is sent anywhere; the log stays on this machine until an entry is exported and pasted deliberately."
 metadata:
   version: "1.0.0"
 keywords: [feedback, reporting, log, eval-case, maintenance]
 ---
 
 # plugin-feedback
+
+Two halves. One runs on its own from what is already on disk; the other costs a line and covers what a scan cannot see.
 
 The failures worth reporting happen mid-task, when the person has no intention of stopping to
 write a bug report — and by the evening the detail that made it reproducible is gone.
@@ -15,6 +17,37 @@ So record it in one line now, and decide later whether to send it.
 
 **Nothing here touches the network.** The log is local, it stays local, and it moves only when
 someone runs an export and pastes the result somewhere themselves.
+
+## Start with the passive half — it needs nothing from anyone
+
+```sh
+${CLAUDE_PLUGIN_ROOT}/scripts/feedback.sh collect      # scan this project's transcripts
+${CLAUDE_PLUGIN_ROOT}/scripts/feedback.sh usage        # what actually fired, and how often
+```
+
+Claude Code already writes a transcript for every session. `collect` reads them and records
+**structural facts only** — which namespaced components were invoked, how many times, turn counts,
+token totals, dates, branch. Never prompt text, never output text, never file contents.
+
+This is the half that survives contact with real work, because it asks nothing of a busy person.
+It also produces the one number a maintainer can never have: **how often a component fired out of
+sessions actually run.**
+
+`--all-projects` widens it beyond the current repository; `--days N` sets the window.
+
+**A component sitting at 0% is the finding.** It is charging its description on every turn and
+returning nothing, and nothing else in the toolchain can see that. An empty report — nothing fired
+at all — is a finding too, not an empty result: either nothing is installed, or the descriptions are
+not matching the work being done.
+
+Read `reread_ratio` while you are there. A multi-agent bill is re-reading context, not producing
+output, so an optimisation that cuts output and leaves re-reading alone has changed nothing.
+
+## Then the manual half, for what a scan cannot see
+
+A scan knows a component fired. It does not know whether what it did was any good, and it cannot
+know about the one that should have fired and did not. That needs a person, and it needs to cost
+them one line.
 
 ## Three verdicts
 

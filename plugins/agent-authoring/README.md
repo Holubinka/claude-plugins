@@ -85,6 +85,8 @@ python3 scripts/audit-harness.py evals/fixtures/
 The failures worth reporting happen mid-task, when nobody intends to stop and write a bug report — and by the evening the detail that made it reproducible is gone. So `plugin-feedback` records it in one line now and leaves the decision to send it for later.
 
 ```sh
+scripts/feedback.sh collect                     # scan local transcripts — nothing to compose
+scripts/feedback.sh usage                       # what fired, how often, out of how many sessions
 scripts/feedback.sh record <plugin> <verdict>   # worked | misfired | did-not-fire
 scripts/feedback.sh list
 scripts/feedback.sh export-issue <id>           # a body for the GitHub issue form
@@ -93,7 +95,13 @@ scripts/feedback.sh export-case <id> <dir>      # prompt.md + graders/criteria.m
 
 **Nothing touches the network.** The log is local and moves only when someone exports an entry and pastes it themselves. Adding telemetry to prose-ware would breach [docs/security.md](../../docs/security.md) and would deserve an uninstall.
 
-Two of the three verdicts exist for reasons that are easy to miss:
+**`collect` is the half that actually happens.** Claude Code already writes a transcript per session; it reads them for structural facts only — component names, invocation counts, turn counts, token totals — and never prompt text, output text or file contents. It asks nothing of a busy person, which is the only reason it will still be running in three weeks.
+
+It also produces the number I said elsewhere was unavailable without telemetry: **how often a component fired out of sessions actually run.** A maintainer cannot have it, because there is no denominator across other people's machines. For your own usage there is.
+
+**A component at 0% is the finding**, and nothing else can see it: it is charging its description on every turn and returning nothing. An empty report is a finding too — either nothing is installed, or the descriptions are not matching the work being done.
+
+Two of the three manual verdicts exist for reasons that are easy to miss:
 
 **`did-not-fire` is the one to bother with.** Nobody reports it spontaneously — nothing visibly breaks, you do the work yourself and move on — so from a maintainer's seat it is indistinguishable from success. It is also the expensive failure: a component that never fires is pure always-on cost.
 
