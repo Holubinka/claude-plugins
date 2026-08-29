@@ -38,14 +38,25 @@ svg { display: block; width: 100%; min-width: 34rem; height: auto; }
 .arrowhead--loose  { color: var(--warn); }
 .arrowhead--broken { color: var(--danger); }
 .edge--routed path { stroke-dasharray: none; opacity: 0.85; }
-.edge text { font-family: var(--mono); font-size: 9px; }
+/* A label sits on top of the line it belongs to, so it is painted with a halo in the page
+   background colour first and its fill second. Without it the stroke runs straight through
+   the glyphs and neither the label nor the line is readable where they meet. 9px was also
+   simply too small to read at any contrast. */
+.edge text {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
 /* The path carries stroke="currentColor" as an attribute and takes its colour from the
    group's `color`. Whether an edge is visible at all should not depend on a selector
    reaching the path — that dependency has now failed twice on this diagram. */
 .edge--ok     { color: var(--muted); }
-.edge--ok text     { fill: var(--ink-2); stroke: none; }
+.edge--ok text     { fill: var(--ink-2); }
 .edge--loose  { color: var(--warn); }
 .edge--loose path  { stroke-dasharray: 4 3; }
-.edge--loose text  { fill: var(--warn); stroke: none; }
+.edge--loose text  { fill: var(--warn); }
 .edge--broken { color: var(--danger); }
-.edge--broken text { fill: var(--danger); stroke: none; }
+.edge--broken text { fill: var(--danger); }

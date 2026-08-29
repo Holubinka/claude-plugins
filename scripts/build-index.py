@@ -654,7 +654,7 @@ GRAPH_PAD = 14
 GRAPH_GUTTER = 118
 GRAPH_ROW_GAP = 26
 GRAPH_MAX_ROWS = 7
-GRAPH_LANE_GAP = 15   # vertical spacing between the lanes long edges are routed through
+GRAPH_LANE_GAP = 21   # vertical spacing between lanes: enough for a 10.5px label plus its halo
 
 
 def _text_w(text: str, size: float) -> float:
