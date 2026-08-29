@@ -4,6 +4,31 @@ All notable changes to `sdd-engineering`. This project follows [SemVer](https://
 
 Releases are tagged `sdd-engineering--v<version>`.
 
+## [1.1.0] — 2026-08-29
+
+Backward compatible: nothing was removed or renamed, and no dependency range moved. A spec
+that already covered its goals is written exactly as before.
+
+### Added
+
+- **`spec-creator` will not finish a spec while a mandatory requirement has no acceptance
+  criterion.** Every goal, and every user story stating something the feature must do, either
+  carries a criterion or becomes a numbered open question with the spec reported as blocked.
+  Non-goals are exempt — a boundary is not a requirement.
+
+  It is a gate rather than a checklist line because of what happens downstream: the planner
+  renumbers criteria into requirements and plans against those, and the verifier grades the
+  plan. Neither reads the goals. A goal nobody wrote a criterion for is therefore approved by
+  a human, built by nobody, and reported `MET` by every later stage.
+
+- **A `## Coverage` line in the agent's report** — how many mandatory requirements the spec
+  carries, and that each has a criterion, or which goal blocks it.
+
+- **Three eval cases.** `spec-creator-requires-acceptance-criteria` covers the behaviour above.
+  `sdd-does-not-fire-on-an-unrelated-request` and `workflow-retro-only-on-request` are the
+  first negative cases in the suite: an expensive pipeline that fires on a one-line CSS fix is
+  as broken as one that skips a gate, and only a negative case catches it.
+
 ## [1.0.1] — 2026-08-29
 
 Patch: metadata only. No agent, skill or script changed behaviour, and no dependency range
