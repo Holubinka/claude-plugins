@@ -97,10 +97,17 @@ export interface Plugin {
   semver: number[] | null;
 }
 
+export interface GraphPart { type: string; name: string }
+
 export interface GraphNode {
   id: string; label: string; depth: number;
   x: number; y: number; width: number; height: number;
   version: string | null; artifacts: number;
+  /** Where the component name starts, so the type column lines up across every box. */
+  typeColumn: number;
+  /** What the plugin installs, capped; `more` counts what did not fit. */
+  rows: GraphPart[];
+  more: number;
 }
 export interface GraphEdge {
   from: string; to: string; range: string | null;

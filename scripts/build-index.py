@@ -644,9 +644,26 @@ def collisions(skills: list[dict]) -> list[dict]:
 # -------------------------------------------------------------------------- graph
 
 
-def build_graph(plugins: list[dict]) -> dict:
-    """Layered by dependency depth, positions computed here so the site can render
-    static SVG without a graph library."""
+# IBM Plex Mono advances 0.6em, so a box can be sized from its longest line rather
+# than guessed at. Guessing is what made the labels overflow.
+GRAPH_TITLE_PX = 13.0
+GRAPH_LINE_PX = 11.0
+GRAPH_SUB_PX = 9.5
+MONO_ADVANCE = 0.6
+GRAPH_PAD = 14
+GRAPH_GUTTER = 118
+GRAPH_ROW_GAP = 26
+GRAPH_MAX_ROWS = 7
+
+
+def _text_w(text: str, size: float) -> float:
+    return len(text) * size * MONO_ADVANCE
+
+
+def build_graph(plugins: list[dict], artifacts: list[dict]) -> dict:
+    """Plugin boxes carrying the components they install, laid out in columns by
+    dependency depth. Every box is sized from its own longest line and every edge label
+    sits in a gutter, so nothing can overlap anything."""
     by_name = {p["name"]: p for p in plugins}
     depth: dict[str, int] = {}
 
@@ -663,23 +680,73 @@ def build_graph(plugins: list[dict]) -> dict:
     for plugin in plugins:
         resolve(plugin["name"], frozenset())
 
+    # What each plugin actually installs, which is the question the page is asked.
+    owned: dict[str, list[dict]] = {}
+    for artifact in artifacts:
+        if artifact["plugin"]:
+            owned.setdefault(artifact["plugin"], []).append(artifact)
+
+    order = {"skill": 0, "agent": 1, "command": 2, "hook": 3, "mcp": 4, "lsp": 5}
+    parts: dict[str, dict] = {}
+    for plugin in plugins:
+        items = sorted(owned.get(plugin["name"], []),
+                       key=lambda a: (order.get(a["type"], 9), a["name"]))
+        shown = [{"type": a["type"], "name": a["name"]} for a in items[:GRAPH_MAX_ROWS]]
+        parts[plugin["name"]] = {"rows": shown, "more": max(0, len(items) - len(shown))}
+
+    type_col = max(
+        (_text_w(row["type"], GRAPH_LINE_PX) for p in parts.values() for row in p["rows"]),
+        default=0.0,
+    ) + 10
+
     layers: dict[int, list[str]] = {}
     for plugin in plugins:
         layers.setdefault(depth.get(plugin["name"], 0), []).append(plugin["name"])
 
-    step_x, step_y, box_w, box_h = 200, 88, 152, 52
+    def node_size(name: str) -> tuple[float, float]:
+        plugin = by_name[name]
+        body = parts[name]
+        sub = f"v{plugin['version']}" if plugin["version"] else "unversioned"
+        widest = max(
+            _text_w(name, GRAPH_TITLE_PX),
+            _text_w(sub, GRAPH_SUB_PX),
+            max((type_col + _text_w(row["name"], GRAPH_LINE_PX) for row in body["rows"]), default=0.0),
+        )
+        rows = len(body["rows"]) + (1 if body["more"] else 0)
+        return widest + GRAPH_PAD * 2, 44 + rows * 17 + (GRAPH_PAD if rows else 4)
+
+    sizes = {name: node_size(name) for name in by_name}
+
+    # Columns are as wide as their widest box, so a long plugin name never runs into
+    # the gutter its edges are labelled in.
+    column_w = {
+        level: max(sizes[name][0] for name in names) for level, names in layers.items()
+    }
+    column_x: dict[int, float] = {}
+    cursor = 16.0
+    for level in sorted(layers):
+        column_x[level] = cursor
+        cursor += column_w[level] + GRAPH_GUTTER
+
     nodes = []
     for level in sorted(layers):
-        for row, name in enumerate(sorted(layers[level])):
+        y = 16.0
+        for name in sorted(layers[level]):
+            w, h = sizes[name]
+            plugin = by_name[name]
             nodes.append(
                 {
                     "id": name, "label": name, "depth": level,
-                    "x": 16 + level * step_x, "y": 16 + row * step_y,
-                    "width": box_w, "height": box_h,
-                    "version": by_name[name]["version"],
-                    "artifacts": len(by_name[name]["artifacts"]),
+                    "x": round(column_x[level], 1), "y": round(y, 1),
+                    "width": round(w, 1), "height": round(h, 1),
+                    "version": plugin["version"],
+                    "artifacts": len(plugin["artifacts"]),
+                    "typeColumn": round(type_col, 1),
+                    "rows": parts[name]["rows"],
+                    "more": parts[name]["more"],
                 }
             )
+            y += h + GRAPH_ROW_GAP
 
     edges = []
     for plugin in plugins:
@@ -692,8 +759,15 @@ def build_graph(plugins: list[dict]) -> dict:
                 }
             )
 
-    width = 32 + (max(layers) + 1) * step_x if layers else 0
-    height = 32 + max((len(v) for v in layers.values()), default=0) * step_y
+    width = round(cursor - GRAPH_GUTTER + 16, 1) if layers else 0
+    height = round(
+        16 + max(
+            (sum(sizes[n][1] for n in names) + GRAPH_ROW_GAP * (len(names) - 1)
+             for names in layers.values()),
+            default=0,
+        ) + 16,
+        1,
+    )
     return {"nodes": nodes, "edges": edges, "width": width, "height": height}
 
 
@@ -910,7 +984,7 @@ def build(root: Path, report: Report) -> dict:
         "plugins": plugins,
         "artifacts": artifacts,
         "collisions": overlaps,
-        "graph": build_graph(plugins),
+        "graph": build_graph(plugins, artifacts),
         "stats": _stats(plugins, artifacts, overlaps, newest),
     }
 

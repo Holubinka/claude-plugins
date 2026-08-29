@@ -272,10 +272,13 @@ export const graph = {
   eyebrow: 'Graph',
   heading: 'What depends on what',
   lede:
-    'Edges carry the declared version range. Layout is computed by the indexer and drawn ' +
+    'Each box lists what that plugin installs; the arrows point at what it drags in with ' +
+    'it, labelled with the range it asks for. Layout is computed by the indexer and drawn ' +
     'as static SVG — no graph library ships to your browser.',
   empty: 'No plugins yet, so there is nothing to draw.',
-  figureLabel: (n: number) => `Dependency graph of ${n} plugins`,
+  figureLabel: (n: number) =>
+    `Dependency graph: ${n} plugins, the components each installs, and the version range ` +
+    'each dependency asks for',
   latest: 'latest',
   unversioned: 'unversioned',
   artifacts: 'artifacts',
