@@ -24,7 +24,7 @@ Call `Skill(test-discipline:testwrite)` and follow it. In particular: open the n
 
 ## Phase 2 — restructure
 
-Now move code, under green tests, applying `Skill(refactor-safely:refactor-triage)`'s tiers:
+Now move code, under green tests, applying `Skill(refactor-safely:refactor-triage)`'s tiers. `Skill(engineering-paved-path:scoped-change)` bounds what counts as in scope at all — a refactor is the one activity where "while I'm here" is hardest to resist and most expensive, because everything you touch looks like it is the job:
 
 - **apply directly** — mechanical, no caller can observe it
 - **apply after reading the callers** — every call site, not a sample

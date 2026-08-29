@@ -1,6 +1,6 @@
 # engineering-paved-path
 
-Ten engineering skills that more than one agent needs, packaged once so nothing has to copy them. Five other plugins in this marketplace depend on it; you can also install it on its own and invoke the skills by hand.
+Eleven engineering skills that more than one agent needs, packaged once so nothing has to copy them. Five other plugins in this marketplace depend on it; you can also install it on its own and invoke the skills by hand.
 
 ```sh
 /plugin install engineering-paved-path@dev-workbench
@@ -17,13 +17,14 @@ Ten engineering skills that more than one agent needs, packaged once so nothing 
 | `security` | What untrusted input does this touch, and what is the check? | 109 | 3 420 |
 | `typescript-expert` | How do I express this in the type system? | 96 | 3 827 |
 | `mermaid-diagram` | Which diagram type, and how do I write it? | 63 | 1 798 |
-| `postgresql-table-design` | How should this table look — types, indexes, constraints? | 44 | 3 951 |
+| `postgresql-table-design` | How should this table look — types  indexes  constraints? | 44 | 3 951 |
+| `scoped-change` | Am I building or changing more than was asked? | 123 | 1 008 |
 | `systematic-debugging` | Something is wrong. What is actually causing it? | 120 | 1 210 |
 | `verification-before-completion` | Can I say this is done? | 102 | 1 120 |
 
 **Always-on** is the `description` line, in tokens. It is in context for every session the plugin is enabled, because that line is how Claude decides whether the skill is relevant. **On invoke** is the body of `SKILL.md`, paid only when the skill fires. Reference files under each skill load on demand and are not counted here — that distinction is why a skill can carry a large reference tree without costing anything until it is used.
 
-Total always-on cost: **1020 tokens** across 10 skills.
+Total always-on cost: **1143 tokens** across 11 skills.
 
 ## Invoking them
 
@@ -40,6 +41,7 @@ Skills are namespaced by plugin:
 /engineering-paved-path:postgresql-table-design
 /engineering-paved-path:systematic-debugging
 /engineering-paved-path:verification-before-completion
+/engineering-paved-path:scoped-change
 ```
 
 Most of the time you will not type these. Claude loads a skill when its `description` matches what you are doing, and the agents in the plugins that depend on this one name them directly in their own routing tables.
@@ -69,6 +71,16 @@ Six components in this marketplace were each restating a piece of that rule. The
 **`systematic-debugging`** holds the other: *no fix before the cause is known.* A change that makes a symptom disappear without an explanation has either fixed the defect or moved it, and you cannot tell which from the outside — the second being worse than leaving it, because the next person inherits a bug with a comment above it saying it was handled.
 
 It starts from **an observed symptom you can point at**. Reading code to judge whether it looks right, with nothing having gone wrong, is a review and routes elsewhere. That boundary is not decorative: it was added after a routing probe caught the skill firing on "is this function correct?"
+
+## The half a plugin cannot do
+
+**`scoped-change`** holds two failures that are the same failure pointed different ways: building more than was asked, and changing more than was needed. Both feel like care while you are doing them, and both read as noise to a reviewer, who cannot tell a deliberate improvement from an accident without asking.
+
+Its test for anything in a diff: **would this line be here if the request had never arrived?**
+
+But the skill can only reach half the problem, and the README should say so rather than imply otherwise. **A skill fires on a request; over-building is an impulse.** "Make it configurable" reaches this skill. The urge to add a factory while implementing something perfectly well-specified does not, because nothing in the request signals it.
+
+That half is always-on behaviour, and always-on belongs in the repository's own `CLAUDE.md` — where it costs the user's own budget, knowingly, rather than a plugin's. [`always-on.md`](skills/scoped-change/always-on.md) carries six lines to copy in, and the reasoning for why this marketplace does not inject them with a hook the way some others do: a plugin that installs its opinions into every turn has taken a decision belonging to whoever owns the repository.
 
 ## The one thing to know before using the architecture skills
 

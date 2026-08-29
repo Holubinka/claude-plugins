@@ -5,6 +5,32 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `engineering-paved-path--v<version>`.
 
+## [1.3.0] — 2026-08-29
+
+Backward compatible: one skill arrives, carrying the half of a well-known set of principles that a
+plugin can actually hold.
+
+### Added
+
+- **`scoped-change`** — build only what was asked, change only what you must, and say which reading
+  you took when a request has two. Derived from four widely-circulated principles about how coding
+  agents fail; two of the four were already covered here — clarification blocks for not guessing, and
+  `verification-before-completion` for success criteria — so only the scope half is new.
+
+  Its test for any line in a diff: **would this be here if the request had never arrived?**
+
+  **The skill deliberately says what it cannot reach.** A skill fires on a request; over-building is
+  an impulse. "Make it configurable" reaches it. The urge to add a factory while implementing
+  something perfectly well-specified does not, because nothing in the request signals it. That half
+  is always-on behaviour and belongs in the repository's own `CLAUDE.md`, so
+  `skills/scoped-change/always-on.md` ships six lines to copy in — with the reasoning for why this
+  marketplace does not inject them with a session-start hook the way some others do. A plugin that
+  installs its opinions into every turn has taken a decision that belongs to whoever owns the
+  repository.
+
+  Wired into `refactor-safely:refactor-implementer` and `test-discipline:test-writer`, the two
+  code-writing agents whose plugins could tighten their range for it without a major bump.
+
 ## [1.2.0] — 2026-08-29
 
 Backward compatible: two skills arrive and six components stop restating one of them.

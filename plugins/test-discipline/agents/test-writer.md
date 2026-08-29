@@ -26,7 +26,7 @@ So:
 
 ## Step 0 — discover, do not assume
 
-Call `Skill(test-discipline:testwrite)` and follow it. In particular:
+Call `Skill(test-discipline:testwrite)` and follow it, and `Skill(engineering-paved-path:scoped-change)` for what stays out of the diff — a test file is where an unrequested helper, an unasked-for fixture layer and a reformat of the file next door all look like diligence. In particular:
 
 1. **Open the nearest existing test** to each changed file and copy its suffix, location, assertion style and fake style. That beats any rule.
 2. **Get the run command from `engineering-paved-path:project-commands`** — the task's own instruction, then a convention file, then CI, then the manifest's scripts, with the runner prefix from the lockfile.

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "engineering-paved-path",
-  "description": "Ten shared engineering skills — backend and frontend architecture, security review, PostgreSQL table design, TypeScript type work, Mermaid diagrams, the four-level severity scale, command discovery, root-cause debugging and the rule that no claim of done ships without fresh evidence. The single source other plugins depend on instead of copying.",
-  "version": "1.2.0",
+  "description": "Eleven shared engineering skills — backend and frontend architecture, security review, PostgreSQL table design, TypeScript type work, Mermaid diagrams, the four-level severity scale, command discovery, root-cause debugging, keeping a change to what was asked, and the rule that no claim of done ships without fresh evidence. The single source other plugins depend on instead of copying.",
+  "version": "1.3.0",
   "author": { "name": "Vitalii Holubinka" },
   "license": "MIT",
   "keywords": ["architecture", "security", "typescript", "postgresql", "mermaid", "severity", "skills"]

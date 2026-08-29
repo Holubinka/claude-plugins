@@ -3,7 +3,11 @@
 # Round 1 was 5/5 and 3/3, which per docs/evals.md §6.2 means the set was too easy rather
 # than that routing was proven. The build-memory probe was a negative for project-commands until
 # systematic-debugging shipped, at which point it became a positive for that skill instead — a
-# probe's label is a claim about ownership, and ownership moves when the set does. These negatives are adjacent on purpose: each sits next to a
+# probe's label is a claim about ownership, and ownership moves when the set does.
+#
+# The `!skill` form was added after the same mistake happened twice: a refactoring request that
+# refactor-triage correctly owns was labelled `-`, which scores a right answer as a false fire.
+# `-` means nothing may fire; `!x` means x may not, and a sibling taking it is fine. These negatives are adjacent on purpose: each sits next to a
 # skill it must not load, and several discriminate between two skills in the same plugin.
 #
 # --- positives
@@ -27,3 +31,5 @@ engineering-paved-path:verification-before-completion	I think that is done — c
 review-lenses:receiving-review	The reviewer says my error handling is wrong here. I am not sure they are right.
 -	Explain what a stack trace is.
 -	Write me a commit message for this change.
+engineering-paved-path:scoped-change	Add a rate limiter to the upload endpoint. Make it configurable and flexible so we can swap strategies later.
+!engineering-paved-path:scoped-change	Refactor this module — it has three near-identical functions and I want them merged properly.

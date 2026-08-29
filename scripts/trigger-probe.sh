@@ -9,11 +9,18 @@
 #     scripts/trigger-probe.sh review-diff           # probes for one skill
 #
 # Probes live in scripts/trigger-probes.tsv, one per line:
-#     <expected skill or "-">  <the request>
+#     <expectation>  <the request>
 #
-# "-" is a NEGATIVE probe: a request that is close to some skill and must not load it.
-# Negatives are the half that matters — recall is easy to buy by widening a description, and
-# the price is paid on every turn by every other skill.
+# Three forms of expectation:
+#     plugin:skill    a POSITIVE — that skill must load
+#     -               a NEGATIVE — nothing at all may load
+#     !plugin:skill   a DISPLACEMENT — that skill must NOT load; anything else, or nothing,
+#                     is fine. For a request another skill legitimately owns.
+#
+# The negatives are the half that matters — recall is easy to buy by widening a description, and
+# the price is paid on every turn by every other skill. The third form exists because "-" was
+# too blunt twice: a request that a sibling skill correctly owns is not a request that must go
+# unanswered, and labelling it "-" scores a correct routing decision as a failure.
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
@@ -43,6 +50,10 @@ Before doing anything else, answer with ONE line and nothing else: the namespace
   if [ "$expected" = "-" ]; then
     if [ "$answer" = "NONE" ]; then result="ok        stayed quiet"; clean=$((clean+1))
     else result="FALSE FIRE loaded $answer"; false_fire=$((false_fire+1)); fi
+  elif [ "${expected#!}" != "$expected" ]; then
+    forbidden="${expected#!}"
+    if [ "$answer" = "$forbidden" ]; then result="FALSE FIRE loaded $forbidden"; false_fire=$((false_fire+1))
+    else result="ok        $answer"; clean=$((clean+1)); fi
   else
     if [ "$answer" = "$expected" ]; then result="ok        $answer"; hit=$((hit+1))
     else result="MISS      got $answer"; miss=$((miss+1)); fi
