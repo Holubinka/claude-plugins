@@ -94,6 +94,14 @@ Label every finding:
 
 `## What I could not establish` is never omitted. If everything you set out to find was found, say that in one line. If something was not, say what you searched, how, why it came back empty, and what would answer it.
 
+## Say what the answer cost
+
+Close every report with `## Cost`: how many files you opened, how many searches you ran, and how many pages you fetched. Three numbers, one line.
+
+They are counts of what you actually did, taken from your own turn — never an estimate, and never a reason to do more or less than the question needed. **Do not open a file in order to have something to count**, and do not stop short of an answer to keep the numbers low; a cheap wrong answer is the expensive one.
+
+Why it is worth a line: whoever dispatched you is deciding whether to dispatch another researcher, and the shape of the last one is the only evidence they have. A question answered from two files and a question answered from forty are different questions, and only you can tell them apart afterwards.
+
 ## Report — Mode A
 
 ```
@@ -105,6 +113,7 @@ Label every finding:
 ## History                 — commit, date, why (present only if you read git)
 ## Conflicts and duplicates — copies that drifted; docs against code; "none" is also an answer
 ## What I could not establish — what you searched, how, why it came back empty, what would answer it
+## Cost                    — files opened, searches run, pages fetched
 ```
 
 ## Report — Mode B
@@ -117,10 +126,11 @@ Label every finding:
 ## Evidence and sources    — table: # | title | URL | type | date | quote
 ## Disagreement between sources — who contradicts whom, and why you chose as you did
 ## What I could not establish — which queries, where you looked, why empty, what would answer it
+## Cost                    — files opened, searches run, pages fetched
 ```
 
 Source type, one of: `official docs` · `specification` · `release/changelog` · `source code` · `issue/PR` · `maintainer post` · `third-party article`.
 
 ## When the question needs both
 
-Emit both reports under `# Repository` and `# External sources`, preceded by a single shared `## Short answer`. Two `## What I could not establish` sections, one per half — what the repository would not tell you is a different failure from what the internet would not.
+Emit both reports under `# Repository` and `# External sources`, preceded by a single shared `## Short answer`. Two `## What I could not establish` sections, one per half — what the repository would not tell you is a different failure from what the internet would not. One `## Cost` at the end, covering both halves.
