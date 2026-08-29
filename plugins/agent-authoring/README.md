@@ -99,7 +99,9 @@ scripts/feedback.sh export-case <id> <dir>      # prompt.md + graders/criteria.m
 
 **`collect` is the half that actually happens.** Claude Code already writes a transcript per session; it reads them for structural facts only — component names, invocation counts, turn counts, token totals — and never prompt text, output text or file contents. It asks nothing of a busy person, which is the only reason it will still be running in three weeks.
 
-It also produces the number I said elsewhere was unavailable without telemetry: **how often a component fired out of sessions actually run.** A maintainer cannot have it, because there is no denominator across other people's machines. For your own usage there is.
+It also produces the number that is unavailable without telemetry: **how often a component fired out of sessions actually run.** A maintainer cannot have it, because there is no denominator across other people's machines. For your own usage there is.
+
+**For the general version of that question, use `session-report` in the official marketplace instead** — same source, wider window, richer breakdowns, an explorable HTML report. `collect` here is narrower on purpose: it writes into this log, so usage sits beside the failures recorded by hand, and *"this fired twelve times and here are the three entries where it went wrong"* is a sentence neither half produces alone. If you are not using the manual half, you do not need this one.
 
 **A component at 0% is the finding**, and nothing else can see it: it is charging its description on every turn and returning nothing. An empty report is a finding too — either nothing is installed, or the descriptions are not matching the work being done.
 

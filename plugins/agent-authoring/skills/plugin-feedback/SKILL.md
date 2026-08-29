@@ -43,6 +43,21 @@ not matching the work being done.
 Read `reread_ratio` while you are there. A multi-agent bill is re-reading context, not producing
 output, so an optimisation that cuts output and leaves re-reading alone has changed nothing.
 
+### Use the official session report for the general question
+
+**`session-report` in the official marketplace does this better and does more of it.** Same source,
+a configurable window, `by_skill` and `by_subagent_type` breakdowns with shares, expensive-prompt
+drill-downs, and an explorable HTML report. If the question is *where did my tokens go and what am I
+using*, reach for that.
+
+`collect` here is deliberately narrower and exists for one reason: **it writes into this log, so the
+usage numbers sit beside the failures somebody recorded by hand.** "This fired twelve times and here
+are the three entries where it went wrong" is a sentence neither half can produce alone. It also
+counts only namespaced plugin components, because a built-in agent firing is not evidence about a
+plugin.
+
+If you are not using the manual half, you do not need this half either.
+
 ### What this is not
 
 **It does not run, replace, or call a retrospective on a single orchestrated run**, and the two read
