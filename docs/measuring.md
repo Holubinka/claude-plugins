@@ -148,6 +148,78 @@ spend the attention on one that still produces them. **A measurement that always
 is costing you attention and telling you nothing** — which is the same argument these plugins make
 about a review lane that never fires.
 
+## When other people are using it
+
+Everything above assumes you are the user and can watch your own sessions. Once other people
+install these, almost none of it is available: their sessions are local, their transcripts are
+their code, and nothing here calls the network — [security.md](security.md) forbids it without an
+explicit justification, and prose-ware that phones home would deserve to be uninstalled.
+
+So the question changes from *what do I measure* to **what will people actually tell me, and what
+will they never tell me.**
+
+### The asymmetry that decides everything
+
+**Nobody files an issue saying a skill correctly stayed quiet.** Nobody files one saying it fired
+at the right moment either. What arrives unprompted is a narrow slice: it did something visibly
+wrong, or it got in the way.
+
+Which means the incoming signal is biased entirely toward **false fires**, and you will hear almost
+nothing about the opposite failure — the skill that should have loaded and did not. That one costs
+more: the person did the work themselves, got a worse result than they could have, and moved on
+with nothing to report. It looks exactly like success from where you are sitting.
+
+The only fix is to ask for it directly, which is why `.github/ISSUE_TEMPLATE/did-not-fire.yml`
+exists as its own form and opens by saying please file these. A silent failure has to be solicited
+or it does not arrive.
+
+### The statistic worth keeping
+
+Not installs, not stars, not issue volume. **Distinct reproduced failures per component.**
+
+A report becomes a number only once someone has reproduced it and written a case. Until then it is
+an anecdote — and for prose-ware, an unreproduced anecdote is often a description of a different
+model version, a different prompt, or a plugin that was not actually enabled.
+
+| What to count | Why |
+| :--- | :--- |
+| Distinct reproduced failures, per component | The only thing that means a component has a real defect |
+| Reports that could **not** be reproduced | A rising number here means the reports lack detail — fix the form, not the component |
+| Time from report to case | The case is the artefact. A report that never becomes one has taught nothing |
+| Components with zero reports over a long period | Ambiguous, and worth naming as ambiguous: unused, or working. Do not read it as working |
+
+**Issue volume per component is not a quality signal.** The most-used component collects the most
+reports, and a component nobody has installed collects none. Divide by nothing and you learn
+nothing; there is no denominator available without telemetry, and inventing one is worse than
+having none.
+
+### Make the report an eval case, or it will not survive
+
+The two issue forms are built backwards from the case format: the request becomes `prompt.md`, and
+*what it should have done, and how you would tell* becomes `graders/criteria.md`. That last field is
+doing the real work — it asks for the same thing rule 1.2 in [evals.md](evals.md) asks of every
+case, in the reporter's own words:
+
+> If two people read your answer, would they agree on whether a given response passes?
+
+A report that cannot answer that is not actionable, however clearly it describes frustration. A
+report that can is already half a regression test.
+
+**Ask for the version of both the plugin and Claude Code.** Behaviour here is model-dependent, and a
+report against an unknown pair cannot be reproduced or closed.
+
+**Ask for redaction, and say why.** People will paste their code. Say in the form that the shape of
+what happened is what matters, and give them placeholders to use.
+
+### What a maintainer owes back
+
+The suite is the shared record. When a reported failure is reproduced, [evals.md](evals.md) §6.3
+requires a case in the same change as the fix — and that case is what the reporter gets in return:
+a permanent guarantee that this specific thing will not come back quietly.
+
+Say so in the issue when you close it. It is the difference between a report feeling like a
+complaint and feeling like a contribution, and it is the only reason anyone files a second one.
+
 ## What this does not measure
 
 **Whether the advice is any good.** Every metric here is about behaviour — did it fire, did it

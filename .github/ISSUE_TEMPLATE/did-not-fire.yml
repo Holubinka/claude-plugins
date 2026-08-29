@@ -1,0 +1,41 @@
+name: A component did NOT fire when it should have
+description: You expected a skill or agent to be used and it was not — or a different one was.
+labels: ["did-not-fire"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Please file these.** This is the failure nobody reports spontaneously, because nothing
+        visibly goes wrong — you just did the work yourself and moved on. It is also the failure
+        that costs the most: a component that never fires is pure always-on cost, and we have no
+        way of finding out except from you.
+
+        A single line is a useful report here. Everything below except the first two fields is
+        optional.
+  - type: input
+    id: expected
+    attributes:
+      label: Which skill or agent you expected
+      placeholder: test-discipline:testfix
+    validations: { required: true }
+  - type: textarea
+    id: request
+    attributes:
+      label: What you asked
+      description: The request that should have loaded it. Verbatim if you still have it.
+    validations: { required: true }
+  - type: input
+    id: instead
+    attributes:
+      label: What loaded instead, if anything
+      placeholder: nothing / a different skill / it answered from memory
+  - type: input
+    id: versions
+    attributes:
+      label: Plugin and Claude Code version
+      placeholder: "test-discipline 1.0.0 · Claude Code 2.1.251"
+  - type: dropdown
+    id: enabled
+    attributes:
+      label: Was the plugin definitely enabled in that session?
+      options: ["Yes", "Not sure", "No — that was the problem"]

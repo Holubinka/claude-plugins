@@ -1,0 +1,58 @@
+name: A component did something wrong
+description: It fired, and what it did was wrong — a bad finding, an edit it should not have made, a refusal that was incorrect.
+labels: ["misfire"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **What this form is really collecting.** Every field below maps onto a line of an eval case.
+        A report with the request and the excerpt becomes a permanent regression test; a report
+        without them becomes a conversation that ends when both of us get bored.
+
+        **Redact before you paste.** Replace paths, names and identifiers with placeholders — the
+        shape of what happened is what matters, never your code.
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Which plugin
+      options: [agent-authoring, architecture-review, change-docs, engineering-paved-path, hook-guardrails, refactor-safely, research-tools, review-lenses, sdd-engineering, test-discipline, "not sure"]
+    validations: { required: true }
+  - type: input
+    id: component
+    attributes:
+      label: Which skill or agent
+      placeholder: review-diff, finding-verifier, testfix …
+  - type: input
+    id: versions
+    attributes:
+      label: Plugin version and Claude Code version
+      description: Behaviour here is model-dependent, so a report without both is hard to act on.
+      placeholder: "review-lenses 1.0.0 · Claude Code 2.1.251"
+    validations: { required: true }
+  - type: textarea
+    id: request
+    attributes:
+      label: What you asked for
+      description: The request, as close to verbatim as you can. This becomes the case's prompt.
+    validations: { required: true }
+  - type: textarea
+    id: happened
+    attributes:
+      label: What it did
+      description: The relevant excerpt, not the whole transcript. The part that was wrong.
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes:
+      label: What it should have done, and how you would tell
+      description: |
+        The second half matters more than it looks. "It should have been better" cannot be graded;
+        "it should not have edited a file outside the test directory" can. If two people read your
+        answer, would they agree on whether a given response passes?
+    validations: { required: true }
+  - type: dropdown
+    id: repeat
+    attributes:
+      label: Did it happen more than once?
+      options: ["Once", "More than once", "Every time I try", "Have not retried"]
+    validations: { required: true }
