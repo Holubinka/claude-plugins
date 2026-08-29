@@ -4,8 +4,9 @@
 # Enable once per clone:   git config core.hooksPath .githooks
 # Skip deliberately:       git push --no-verify
 #
-# Kept to the fast checks — under a second in total — so there is never a reason to
-# reach for --no-verify out of impatience. The full site build stays in CI.
+# Kept to the fast checks — about a second in total — so there is never a reason to
+# reach for --no-verify out of impatience. The full site build stays in CI, and so do
+# the behaviour evals, which call a model and cost money.
 
 set -e
 root=$(git rev-parse --show-toplevel)
@@ -27,6 +28,9 @@ run() {
 echo "pre-push checks"
 run "lint-structure.py"        python3 scripts/lint-structure.py
 run "build-index.py --check"   python3 scripts/build-index.py --check
+run "plugin-set audit"         python3 plugins/agent-authoring/scripts/audit-harness.py plugins/
+run "hook self-tests"          sh -c 'for s in plugins/*/scripts/selftest.sh; do [ -x "$s" ] || continue; bash "$s" || exit 1; done'
+
 
 # The probe suite needs the site's dependencies; a fresh clone has not installed them.
 if [ -d site/node_modules ]; then

@@ -1,0 +1,121 @@
+name: evals
+
+# Separate from validate.yml on purpose. That job is free — `claude plugin validate`,
+# the structure linter and the metadata check all run locally with no credentials, so it
+# can run on every push from anyone. This one calls a model and costs money, so it needs
+# a key, a ceiling, and a narrower trigger.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Plugin name, or blank for every plugin with cases'
+        required: false
+        type: string
+      case:
+        description: 'Case name glob, e.g. verifier-*'
+        required: false
+        type: string
+      max_cost_usd:
+        description: 'Hard cost ceiling for the run'
+        required: false
+        default: '10'
+        type: string
+      judge_model:
+        description: 'Override the grader model (default: haiku)'
+        required: false
+        type: string
+  pull_request:
+    paths:
+      - 'plugins/**'
+
+concurrency:
+  group: evals-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evals:
+    name: Behaviour evals
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      # Full history: the pull_request run evaluates only the plugins this branch
+      # touched, which needs the base commit present to diff against.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      # A secret is empty for a fork's pull request, and `if:` cannot read `secrets`
+      # directly at job level — so the presence check goes through a step output.
+      - name: Is a key available
+        id: key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No ANTHROPIC_API_KEY — the evals are not run." >> "$GITHUB_STEP_SUMMARY"
+            echo "This is expected on a pull request from a fork, and it is not a failure." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # The self-tests need no key and no model. They run either way, because a plugin
+      # whose behaviour is a shell script is still checkable when the graded suite is not.
+      - name: Bundled self-tests
+        if: steps.key.outputs.present != 'true'
+        run: |
+          set -euo pipefail
+          for script in plugins/*/scripts/selftest.sh; do
+            [ -x "$script" ] || continue
+            echo "::group::$script"
+            bash "$script"
+            echo "::endgroup::"
+          done
+
+      # Every input reaches the shell through `env`, never through `${{ }}` interpolation
+      # into the script body: docs/security.md asks for exactly this, and a dispatch input
+      # spliced into a command line is a shell-injection hole even when only a maintainer
+      # can pull the trigger.
+      - name: Run evals
+        if: steps.key.outputs.present == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EVAL_TARGET: ${{ inputs.target }}
+          EVAL_CASE: ${{ inputs.case }}
+          EVAL_MAX_COST: ${{ inputs.max_cost_usd }}
+          EVAL_JUDGE: ${{ inputs.judge_model }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -uo pipefail
+          args=(--max-cost-usd "${EVAL_MAX_COST:-10}")
+          [ -n "${EVAL_CASE:-}" ]  && args+=(--case "$EVAL_CASE")
+          [ -n "${EVAL_JUDGE:-}" ] && args+=(--judge-model "$EVAL_JUDGE")
+
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            # Only what this branch touched. Evaluating every plugin on every pull
+            # request costs real money for changes that cannot have affected them.
+            args+=(--changed-since "origin/$BASE_REF")
+          elif [ -n "${EVAL_TARGET:-}" ]; then
+            args+=("$EVAL_TARGET")
+          fi
+
+          scripts/run-evals.sh "${args[@]}"
+
+      # Kept whatever the outcome — a failed run is exactly when the per-case scores
+      # are worth reading, and they are not in the log.
+      - name: Keep the results
+        if: always() && steps.key.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: plugins/*/evals/results/
+          if-no-files-found: ignore
+          retention-days: 14

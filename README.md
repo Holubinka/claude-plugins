@@ -66,10 +66,32 @@ skill whose trigger overlaps another's, a release nothing tagged:
 python3 scripts/build-index.py --check
 ```
 
+A fourth asks whether the plugins still say true things about each other — a fan-out
+table with no per-lane condition, a description promising a roster the body never
+dispatches, a `plugin:name` in backticks that resolves to nothing:
+
+```sh
+python3 plugins/agent-authoring/scripts/audit-harness.py plugins/
+```
+
+All four are free, take about a second together, and run on every pull request alongside
+the bundled `selftest.sh` scripts. The **behaviour evals are separate**, because they
+call a model and cost money:
+
+```sh
+scripts/run-evals.sh                    # every plugin that has cases
+scripts/run-evals.sh review-lenses      # one
+```
+
+They run from `.github/workflows/evals.yml` — by hand from the Actions tab, or on a pull
+request for the plugins it touched, given an `ANTHROPIC_API_KEY` secret. `claude plugin
+eval` is currently in early access; without it the runner reports those plugins as
+*gated* rather than failed. [CONTRIBUTING.md](CONTRIBUTING.md#the-evals-which-are-not-free)
+has the manual fallback.
+
 Other useful commands: `claude plugin details <name>` (component inventory and token
-cost), `claude plugin eval ./plugins/<name>` (score a skill against eval cases),
-`claude plugin tag ./plugins/<name> --dry-run` (check the manifest and the marketplace
-entry agree on the version).
+cost), `claude plugin tag ./plugins/<name> --dry-run` (check the manifest and the
+marketplace entry agree on the version).
 
 ## Add a plugin
 
