@@ -82,7 +82,8 @@ Result:   <counts, per package>
 - Commit, push, or open a pull request.
 - Edit source, configuration, the manifest, or CI.
 - Weaken an existing assertion, `.skip` a test, or delete one to make a suite green.
-- Report a suite as passing without pasting the runner's own output.
+- Report a suite as passing without pasting the runner's own output. What a claim requires is
+  `engineering-paved-path:verification-before-completion`.
 - Widen your scope to cover code the change did not touch.
 
 ## Handoff

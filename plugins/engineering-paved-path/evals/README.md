@@ -1,7 +1,6 @@
 # Behaviour evals
 
-Four cases, one per boundary this plugin's shared rules depend on. Three are positive; the
-fourth is a refusal, and it is the one that matters most.
+Six cases, one per boundary this plugin's shared rules depend on. Two are refusals, and they are the ones that matter most.
 
 | Case | The boundary it tests |
 | :--- | :--- |
@@ -9,6 +8,8 @@ fourth is a refusal, and it is the one that matters most.
 | `security-fires-outside-its-sample-stack` | The security guidance applies where its code samples do not |
 | `severity-keeps-a-deterministic-finding` | A failing command outranks a read of the code, and neither erases the other |
 | `project-commands-refuses-to-invent-a-gate` | A gate that does not exist is reported missing, never green |
+| `verification-reports-not-run` | Silent output is not a pass — a check that looked at nothing is its own outcome |
+| `debugging-refuses-without-a-symptom` | **From a routing probe.** No observed failure means review, not a root-cause investigation |
 
 The last two are a pair. `severity-scale` and `project-commands` both exist to make one thing
 impossible — **a green result that was never earned** — and each does it at a different point:

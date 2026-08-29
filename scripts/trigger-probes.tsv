@@ -1,7 +1,9 @@
 # expected-skill-or-dash	request
 #
 # Round 1 was 5/5 and 3/3, which per docs/evals.md §6.2 means the set was too easy rather
-# than that routing was proven. These negatives are adjacent on purpose: each sits next to a
+# than that routing was proven. The build-memory probe was a negative for project-commands until
+# systematic-debugging shipped, at which point it became a positive for that skill instead — a
+# probe's label is a claim about ownership, and ownership moves when the set does. These negatives are adjacent on purpose: each sits next to a
 # skill it must not load, and several discriminate between two skills in the same plugin.
 #
 # --- positives
@@ -15,7 +17,13 @@ engineering-paved-path:severity-scale	Two reviewers graded the same problem diff
 # --- adjacent negatives: close to a skill above, must not load it
 -	What does this diff actually do? Just explain it, I am not asking for a review.
 -	What should I name this branch?
--	Why is `npm run build` running out of memory on my laptop but not in CI?
+engineering-paved-path:systematic-debugging	Why is `npm run build` running out of memory on my laptop but not in CI?
 -	Is this function correct? I think the loop bounds are off by one.
 -	Explain what a characterisation test is.
 -	What is the difference between a shallow copy and a deep copy in JavaScript?
+# --- added with the four new skills
+engineering-paved-path:systematic-debugging	The import silently drops about 3% of rows and I cannot see why. Same file works on my colleague's machine.
+engineering-paved-path:verification-before-completion	I think that is done — can I tell the team it is fixed?
+review-lenses:receiving-review	The reviewer says my error handling is wrong here. I am not sure they are right.
+-	Explain what a stack trace is.
+-	Write me a commit message for this change.

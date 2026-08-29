@@ -62,7 +62,9 @@ is real, common, and exits 0. So is a `typecheck` script that only covers one wo
 its exit code as evidence, and quote the value when you report the gate.
 
 **Report a discovered command as discovered.** Name the lane, the command, and which of the
-five sources produced it:
+five sources produced it. What a result may then claim is
+`engineering-paved-path:verification-before-completion` — in particular that a lane with no
+command is reported as having none, never as green:
 
 ```
 typecheck: pnpm -r typecheck        (package.json scripts, pnpm-lock.yaml at root)

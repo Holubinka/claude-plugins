@@ -43,15 +43,15 @@ Not aspirational — this is what `plugins/*/evals/` contains today.
 
 | Measurement | Value | Against |
 | :--- | ---: | :--- |
-| Cases | 45 | 20–50 recommended to start ✅ |
+| Cases | 51 | 20–50 recommended to start ⚠️ past it |
 | Negative cases | 19 (44%) | balance required; single-sided evals cause one-sided optimisation ✅ |
 | Numbered criteria | 183 | — |
 | Plausibly script-checkable | 29 (15%) | "deterministic where possible" ❌ |
 | Highest skill-trigger overlap (static) | 0.136 | warns at 0.55 ✅ |
 | Median trigger overlap (static) | 0.029 | — |
-| Trigger routing, behavioural | 7/7 recall · 6/6 precision | over 13 probes ⚠️ small |
+| Trigger routing, behavioural | 11/11 recall · 7/7 precision | over 18 probes ⚠️ small |
 | Calibration examples | 0 | "a judge that doesn't agree with humans on a small labeled set is not a judge" ❌ |
-| Cases sourced from an observed failure | 5 | "drawn from real failures" ⚠️ |
+| Cases sourced from an observed failure | 7 | "drawn from real failures" ⚠️ |
 
 The two ❌ rows and the thin third are the work items at the end of this document.
 

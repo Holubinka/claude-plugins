@@ -41,6 +41,9 @@ know enough to change either side.
   out of scope: report them, leave them, and say they were pre-existing.
 - **Never re-run hoping for green.** A test that passes on the second run is a flaky test, which is a
   finding in its own right, not a pass.
+- **Never report a result you did not just observe.** The rules for what a claim needs are
+  `engineering-paved-path:verification-before-completion`; the one that bites here is that a check
+  which could not run is neither a pass nor a failure.
 
 ## The loop
 

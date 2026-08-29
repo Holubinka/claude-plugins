@@ -4,6 +4,36 @@ All notable changes to `sdd-engineering`. This project follows [SemVer](https://
 
 Releases are tagged `sdd-engineering--v<version>`.
 
+## [1.3.0] — 2026-08-29
+
+Backward compatible in artefacts: an architectural request produces the same spec it always did.
+What changes is that two other kinds of request now get served instead of turned away.
+
+### Changed
+
+- **`spec-creator` classifies the request out loud before its first question**, and says which of
+  three paths it is taking, so whoever dispatched it can overrule the classification before anything
+  has been spent. A classification made silently is a decision nobody got to see.
+
+  | Path | Returns | File |
+  | :--- | :--- | :--- |
+  | Spike | the question restated and what it would try, in two or three sentences | none |
+  | Bounded | the clarifying questions that matter, then a short design in chat | none |
+  | Architectural | the full specification | the spec |
+
+  **The ceremony scales with the request; the approval gate never does.** A bounded design is
+  returned and the agent stops — implementation begins when a human says yes, exactly as after a
+  spec. That is the half worth stating, because a lighter path invites a lighter gate and the gate is
+  the point of the pipeline.
+
+  Previously a small request was refused with "someone makes the change and runs that module's
+  gates", which is accurate and unhelpful: the workflow was all-or-nothing, and a one-file fix had to
+  choose between a full specification and nothing at all.
+
+  **Bounded means the flow being changed already exists in the repository to read.** Knowing what
+  kind of application it is does not qualify — if there is no existing flow, it is architectural,
+  however small the diff turns out to be.
+
 ## [1.2.0] — 2026-08-29
 
 Backward compatible: a fifth agent arrives, stage 4 gains a better reviewer, and two agents gain

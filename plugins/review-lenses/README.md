@@ -13,6 +13,7 @@ Installing this pulls in `engineering-paved-path` and `architecture-review` — 
 | Component | Lane | Always-on | On invoke |
 | :--- | :--- | ---: | ---: |
 | `review-diff` (skill) | the orchestrator — sizes, picks, dispatches, merges | 106 | 1 460 |
+| `receiving-review` (skill) | the other end — what an author owes a finding | 109 | 1 049 |
 | `correctness-reviewer` (agent) | does the code do what it says, on the inputs it will get? | 82 | 1 543 |
 | `dependency-auditor` (agent) | what did this do to the dependency tree? | 95 | 1 038 |
 | `finding-verifier` (agent) | is this blocking finding actually true? | 61 | 1 147 |
@@ -78,6 +79,16 @@ That is not a stylistic choice. **Three lanes appending to one file are three tr
 Lane-prefixed ids are what make the file unnecessary: `C1…`, `A1…`, `D1…`. Three concurrent returns merge without a shared counter, therefore without shared state.
 
 The merge itself is deterministic — anchors normalised, collisions within ±2 lines, agreeing invariants folded into one row at the highest severity, disagreeing ones kept as a flagged pair, then sorted by severity, deterministic-first, path, line, id. **Two runs over the same diff produce the same report**, so a diff of two reports means something.
+
+## The other end of the same idea
+
+`review-diff` files findings and puts every blocking one through an adversary. **`receiving-review` owes them the same scrutiny from the author's side** — a finding is a claim about the code, and the author is the person best placed to check it.
+
+Agreeing quickly is the failure mode. It reads as cooperative and produces edits nobody verified, made to code the reviewer was wrong about, which the next reviewer then has to find. So: read all of it before responding to any of it, restate the requirement, **open the cited line**, and only then decide.
+
+Four verdicts, and all of them are legitimate: correct and fixed, correct but out of scope, wrong with the line quoted, or unclear with both readings named. **Disagreeing is not rudeness and agreeing is not politeness** — a reviewer who is wrong is better served by being told than by watching a change go in that they will have to review again.
+
+Two adjustments for findings from a tool. A **deterministic** one — a failing gate, an advisory — is not up for debate; its evidence is an exit code. A **model-produced** one is a claim that has already survived `finding-verifier`, which makes it worth taking seriously and does not make it correct. Where it names an input that supposedly breaks the code, try that input: one run settles it either way.
 
 ## What is deliberately not a lane
 

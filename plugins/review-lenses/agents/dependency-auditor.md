@@ -63,7 +63,7 @@ Number your findings `D1`, `D2`, … so a caller can merge your report with othe
 - File an advisory without saying whether the path ships.
 - Report an upstream label as if it were this scale's level.
 - Grade something in another lane — logic, boundaries, tests.
-- Report "no advisories" without saying which command you ran and what it covered. A clean audit from a command that scanned the wrong scope is worse than no audit.
+- Report "no advisories" without saying which command you ran and what it covered. A clean audit from a command that scanned the wrong scope is worse than no audit — see `engineering-paved-path:verification-before-completion` for the three outcomes a check can have.
 
 ## Handoff
 

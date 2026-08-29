@@ -5,6 +5,41 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `engineering-paved-path--v<version>`.
 
+## [1.2.0] — 2026-08-29
+
+Backward compatible: two skills arrive and six components stop restating one of them.
+
+### Added
+
+- **`verification-before-completion`** — *if you have not run the command in this turn, you cannot
+  say it passes.* Six components were each carrying a piece of that rule in their own words:
+  `project-commands`, `ts_diagnostic.py`, `implementer`, `plan-verifier`, `test-writer` and
+  `testfix`. Where a dependency range allowed it, they now point here instead.
+
+  Its load-bearing half is that a check has **three** outcomes rather than two. "Nothing found" and
+  "nothing looked at" produce the same silence and mean opposite things — a linter with no files in
+  scope, a suite that collected zero tests, a gate the repository never defined, each exits 0 and
+  proves nothing. That is the same distinction `ts_diagnostic.py` was fixed for in 1.1.0, stated once
+  where everything can reach it.
+
+- **`systematic-debugging`** — *no fix before the cause is known.* Nothing in this marketplace owned
+  debugging; `testfix` was the only component that touched it, and only to decide whether a test or
+  the source was wrong.
+
+  A change that removes a symptom without an explanation has either fixed the defect or moved it, and
+  from the outside those look identical — the second being worse, because the next reader finds a bug
+  with a comment above it saying it was handled.
+
+  **It requires an observed symptom.** Reading code to judge whether it looks correct, with nothing
+  having failed, is a review. That clause was added after a routing probe caught the skill firing on
+  "is this function correct? I think the loop bounds are off by one" — a suspicion, not a defect.
+
+### Changed
+
+- **The trigger for `project-commands` is narrower**, after the same probe caught it firing on "why
+  is `npm run build` running out of memory on my laptop but not in CI?" — a question about how a
+  command behaves, not about which command to run. It now says so explicitly.
+
 ## [1.1.0] — 2026-08-29
 
 Backward compatible: two skills arrive, one trigger description widens, and one bundled script

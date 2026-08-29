@@ -1,6 +1,6 @@
 # engineering-paved-path
 
-Eight engineering skills that more than one agent needs, packaged once so nothing has to copy them. Five other plugins in this marketplace depend on it; you can also install it on its own and invoke the skills by hand.
+Ten engineering skills that more than one agent needs, packaged once so nothing has to copy them. Five other plugins in this marketplace depend on it; you can also install it on its own and invoke the skills by hand.
 
 ```sh
 /plugin install engineering-paved-path@dev-workbench
@@ -18,10 +18,12 @@ Eight engineering skills that more than one agent needs, packaged once so nothin
 | `typescript-expert` | How do I express this in the type system? | 96 | 3 827 |
 | `mermaid-diagram` | Which diagram type, and how do I write it? | 63 | 1 798 |
 | `postgresql-table-design` | How should this table look — types, indexes, constraints? | 44 | 3 951 |
+| `systematic-debugging` | Something is wrong. What is actually causing it? | 120 | 1 210 |
+| `verification-before-completion` | Can I say this is done? | 102 | 1 120 |
 
 **Always-on** is the `description` line, in tokens. It is in context for every session the plugin is enabled, because that line is how Claude decides whether the skill is relevant. **On invoke** is the body of `SKILL.md`, paid only when the skill fires. Reference files under each skill load on demand and are not counted here — that distinction is why a skill can carry a large reference tree without costing anything until it is used.
 
-Total always-on cost: **802 tokens** across 26 files, about 296 KB on disk.
+Total always-on cost: **1020 tokens** across 10 skills.
 
 ## Invoking them
 
@@ -36,6 +38,8 @@ Skills are namespaced by plugin:
 /engineering-paved-path:typescript-expert
 /engineering-paved-path:mermaid-diagram
 /engineering-paved-path:postgresql-table-design
+/engineering-paved-path:systematic-debugging
+/engineering-paved-path:verification-before-completion
 ```
 
 Most of the time you will not type these. Claude loads a skill when its `description` matches what you are doing, and the agents in the plugins that depend on this one name them directly in their own routing tables.
@@ -55,6 +59,16 @@ Finding nothing is a valid answer. The skill says which four sources it read and
 | A deterministic finding outranks a model-produced one, and nothing may downgrade it | A failing test is reproducible. A read of the code is not, however right it is |
 | A model-produced `critical` must survive an adversarial pass before it blocks anything, and **uncertain counts as refuted** | The first time a gate refuses a correct change on a finding nobody can reproduce, the gate starts getting bypassed |
 | A model finding on a line the branch never touched is a `note` | It is a pre-existing condition someone chose to mention, not a consequence of this change |
+
+## The two that everything else leans on
+
+**`verification-before-completion`** holds one rule: *if you have not run the command in this turn, you cannot say it passes.* Its useful half is that a check has **three** outcomes, not two — passed, failed, and **did not run**. "Nothing found" and "nothing looked at" produce the same silence and mean opposite things, and a linter with no files, a suite that collected zero tests, or a gate the repository never defined all exit 0 while proving nothing.
+
+Six components in this marketplace were each restating a piece of that rule. They now point at it instead, which is the duplication [docs/COST-BASELINE.md](../../docs/COST-BASELINE.md) nominates as its first optimisation target: an agent prompt is paid on every dispatch, a skill body only when it fires.
+
+**`systematic-debugging`** holds the other: *no fix before the cause is known.* A change that makes a symptom disappear without an explanation has either fixed the defect or moved it, and you cannot tell which from the outside — the second being worse than leaving it, because the next person inherits a bug with a comment above it saying it was handled.
+
+It starts from **an observed symptom you can point at**. Reading code to judge whether it looks right, with nothing having gone wrong, is a review and routes elsewhere. That boundary is not decorative: it was added after a routing probe caught the skill firing on "is this function correct?"
 
 ## The one thing to know before using the architecture skills
 

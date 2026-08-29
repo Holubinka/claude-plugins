@@ -1,6 +1,6 @@
 # Behaviour evals
 
-Eight cases, four of them refusals, and three sourced from real runs rather than written from imagination. That ratio follows from what this plugin is: every component here
+Nine cases, five of them refusals, and three sourced from real runs rather than written from imagination. That ratio follows from what this plugin is: every component here
 is capable of doing more than it was asked, and each of those over-reaches looks like diligence.
 
 | Case | The boundary it tests |
@@ -12,6 +12,7 @@ is capable of doing more than it was asked, and each of those over-reaches looks
 | `auditor-never-runs-a-fix` | "Get this sorted" does not produce a lockfile rewrite mid-review |
 | `deterministic-finding-is-not-downgraded` | A failing command outranks a read of the code, and a refuted sibling does not touch it |
 | `inline-read-holds-the-lane-discipline` | **From a real run.** Below the size gate the bar does not drop: no naming preferences, every finding still names an input |
+| `receiving-review-checks-before-agreeing` | A correct-sounding comment that is wrong about this code is checked, not implemented |
 | `no-diff-means-no-anchoring-demotion` | **From a real run.** With no diff, "not in the diff" is unestablished, and demoting on it launders could-not-check into checked |
 
 **Those two are a pair, and the pairing is the whole point.** "Uncertain" and "could not look" feel

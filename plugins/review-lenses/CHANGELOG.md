@@ -11,6 +11,15 @@ First release. One skill and three agents, generalised from a private monorepo's
 
 ### Added
 
+- **`receiving-review`** — the author's end. This plugin had built the side that produces findings
+  and nothing about the side that receives them, and agreeing quickly is a real failure: it reads as
+  cooperative and produces edits nobody verified, made to code the reviewer was wrong about.
+
+  Four verdicts, all legitimate — correct, correct but out of scope, wrong with the line quoted,
+  unclear with both readings named. The rule underneath is that a finding is a claim about the code
+  and the author is best placed to check it, which is the same burden of proof `finding-verifier`
+  applies from the other direction.
+
 - **`review-diff`** — the conditional fan-out. Every lane declares the condition under which it runs,
   and a lane whose condition is not met does not run. **A roster with no conditions is a roster the
   user has to select from by hand**, which is the thing the fan-out was supposed to do for them.

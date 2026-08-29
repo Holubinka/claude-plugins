@@ -28,6 +28,12 @@ That is the design, not a limitation. A plan step that only makes sense to someo
 | 8 | `review-lenses:review-diff` | the diff | one merged, verified findings table |
 | 9 | fix rounds | the findings, triaged | at most two rounds, then stop |
 
+**Not every request needs stage 1.** `spec-creator` classifies first and says so out loud: a
+feasibility question gets a Spike answer, a well-scoped change to a flow that already exists gets a
+short design in chat, and only an architectural request gets a spec file. **The ceremony scales with
+the request; the approval gate never does** — a bounded design is still returned for a human to
+approve before any code is written.
+
 **Stages 2 and 4 are people, and they are the point.** The spec exists so a human can approve requirements before anything is built; the plan exists so a human can approve an approach before code is written. `spec-creator` will never write `approved`, and nothing in this plugin commits, pushes, or opens a pull request.
 
 Typical use:
