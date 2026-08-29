@@ -24,7 +24,10 @@ svg { display: block; width: 100%; min-width: 34rem; height: auto; }
 .node text.part { fill: var(--ink-2); font-family: var(--mono); font-size: 11px; }
 .graph-tools { display: flex; align-items: center; gap: 1rem; margin-bottom: .5rem; flex-wrap: wrap; }
 .graph-tools .hint { font-size: .82rem; color: var(--muted); }
-.graph-tools button { font: inherit; font-size: .82rem; padding: .2rem .6rem; cursor: pointer;
+.graph-tools button {
+  font: inherit; font-size: .82rem; padding: .2rem .6rem; cursor: pointer;
+  background: none; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink);
+}
 .node { cursor: grab; }
 .node:active { cursor: grabbing; }
 .node a { cursor: pointer; }

@@ -144,7 +144,11 @@ export default function GraphCanvas(
         {dirty && <button type="button" onClick={reset}>{resetLabel}</button>}
       </div>
       <div class="scroll figure">
-        <svg ref={svgRef} viewBox={`0 0 ${graph.width} ${graph.height}`} role="img" aria-label={label}
+        {/* Not role="img": that collapses the whole diagram into one image for assistive
+            technology and hides every link inside it, so the boxes become unreachable by
+            keyboard and invisible to a screen reader. A labelled group keeps the caption
+            and leaves the links exposed. */}
+        <svg ref={svgRef} viewBox={`0 0 ${graph.width} ${graph.height}`} role="group" aria-label={label}
              onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
           <defs>
             {/* One marker per state, each with its own fill. A marker's contents inherit
@@ -160,6 +164,10 @@ export default function GraphCanvas(
               </marker>
             ))}
           </defs>
+          {/* Two passes, deliberately. An edge used to be one group holding its own path
+              and its own label, which meant a later edge's line painted straight over an
+              earlier edge's text — and no halo can survive being overdrawn by a sibling.
+              Every line is laid down first, every label second. */}
           <g class="edges">
             {graph.edges.map((edge) => {
               const geom = edgePath(edge);
@@ -169,6 +177,17 @@ export default function GraphCanvas(
               return (
                 <g class={`edge edge--${state}${routed ? ' edge--routed' : ''}`}>
                   <path d={geom.d} fill="none" stroke="currentColor" marker-end={`url(#arrow-${state})`} />
+                </g>
+              );
+            })}
+          </g>
+          <g class="edge-labels">
+            {graph.edges.map((edge) => {
+              const geom = edgePath(edge);
+              if (!geom) return null;
+              const state = !edge.constrained ? 'loose' : edge.resolvable ? 'ok' : 'broken';
+              return (
+                <g class={`edge edge--${state}`}>
                   <text x={geom.label.x} y={geom.label.y} text-anchor={geom.label.anchor}>{geom.label.text}</text>
                 </g>
               );
