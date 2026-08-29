@@ -159,10 +159,10 @@ export const install = {
 
 export const tokens = {
   always: 'Always',
-  alwaysNote: 'Carried in every turn while the plugin is enabled.',
+  alwaysNote: 'The description line alone. In context on every turn while the plugin is enabled — whether or not it ever fires.',
   onLoad: 'On load',
-  onLoadNote: 'Paid only when it fires.',
-  inlineTitle: 'Always in context / paid on load',
+  onLoadNote: 'The body of the file. Read only when this component actually fires. Reference files beside it load separately and are not counted here.',
+  inlineTitle: 'always = the description line, in context every turn · on load = the body, read only when it fires',
   inlineAlways: 'always',
   inlineOnLoad: '· on load',
 } as const;
