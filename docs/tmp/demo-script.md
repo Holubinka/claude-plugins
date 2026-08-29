@@ -112,21 +112,14 @@ claude plugin details sdd-engineering
 
 ## Сцена 4 — робочий workflow на 1.0.0 · ~3 хв
 
-Відкрити Claude Code у `luiverse` і **оголосити плагіни на рівні проєкту**, щоб їх отримав кожен,
-хто склонує репозиторій:
+Відкрити Claude Code у `luiverse`. Оголошувати плагіни на рівні проєкту тут **ще рано** — це
+сцена 5, і чому саме так, сказано там. Зараз вони доступні через user scope.
 
 ```sh
 cd ~/WebstormProjects/Lavego/luiverse
-claude plugin marketplace add Holubinka/claude-plugins --scope project
-claude plugin install sdd-engineering@dev-workbench --scope project
-git diff .claude/settings.json
 ```
 
-Показати доданий `extraKnownMarketplaces` із `{"source": "github", "repo": "Holubinka/claude-plugins"}`
-— **не локальний шлях**. Закомітити: це і є дедлайновий артефакт «commit у проєкті, де плагін
-встановлено».
-
-Далі — сам workflow. Дати `spec-creator` запит, у якому одна ціль навмисно без числа:
+Дати `spec-creator` запит, у якому одна ціль навмисно без числа:
 
 > Use the spec-creator agent to specify a "saved views" feature: a user can save the current
 > filter set under a name, share it by link, and the list of saved views should load fast enough
@@ -165,6 +158,26 @@ claude plugin update sdd-engineering
 ```
 /reload-plugins
 ```
+
+Тепер, коли `dev-workbench` знову вказує на GitHub, **оголосити плагіни на рівні проєкту**, щоб
+їх отримав кожен, хто склонує репозиторій:
+
+```sh
+cd ~/WebstormProjects/Lavego/luiverse
+claude plugin marketplace add Holubinka/claude-plugins --scope project
+claude plugin install sdd-engineering@dev-workbench --scope project
+git diff .claude/settings.json
+```
+
+Показати доданий `extraKnownMarketplaces` із `{"source": "github", "repo": "Holubinka/claude-plugins"}`
+— **не локальний шлях**. Закомітити: це і є дедлайновий артефакт «commit у проєкті, де плагін
+встановлено».
+
+**Чому саме тут, а не в сцені 4.** У сцені 3 user-scope `dev-workbench` вказує на `~/dw-stable`.
+Оголошення project-scope **мовчки перекриває** user-scope для того самого імені — перевірено:
+`marketplace list` після цього показує джерело з project, без жодного попередження. Тобто в
+сцені 4 команда або закомітила б локальний шлях, або поставила б 1.1.0 замість 1.0.0, який та
+сцена демонструє. Тут обидві пастки зникають.
 
 Повторити **той самий запит** зі сцени 4. Показати різницю:
 
@@ -225,7 +238,11 @@ claude plugin install sdd-engineering@dev-workbench
 - **Обидва канали звуться `dev-workbench`.** Разом вони не стоять — перед `add` завжди `remove`.
 - **`/reload-plugins` обов'язковий** після кожного `install` чи `update`, інакше на екрані стара
   поведінка при новому номері, і це виглядає як зламане оновлення.
-- **`--scope project` треба робити на живому каналі.** З `~/dw-stable` у коміт потрапить
-  локальний шлях, і в колеги він не резолвиться.
+- **`--scope project` треба робити на живому каналі** (тому воно в сцені 5, а не 4). Однакове
+  ім'я в двох scope не конфліктує й не попереджає — project просто виграє, тож із `~/dw-stable`
+  у коміт тихо потрапив би локальний шлях.
+- **`marketplace update` не полагодить зіпсоване джерело.** Воно освіжає з того, що записано в
+  `~/.claude/plugins/known_marketplaces.json`, а не з `settings.json`. Якщо `marketplace list`
+  показує не те джерело — рятує тільки `remove` і `add` наново.
 - **`jq` має бути в PATH** — на ньому тримається write-gate у `spec-creator`. Без нього агент
   відмовить на першому ж записі, і на відео це виглядатиме як баг плагіна.
