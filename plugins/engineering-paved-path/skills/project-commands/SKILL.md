@@ -1,6 +1,6 @@
 ---
 name: project-commands
-description: "Finds the command this repository actually uses to typecheck, lint or run its tests, instead of guessing one. Use when about to run a build, typecheck, lint, format or test command and the task did not spell it out; when choosing between npm, pnpm, yarn and bun; when a script name from another project comes to mind; or when writing a plan's gates section, a verify step, or a CI reproduction. Also use when a command failed with a missing-script error, and before reporting that a change could not be verified."
+description: "Finds which command this repository uses to typecheck, lint or run its tests, when the task did not name one. Use when a script name from another project comes to mind, when choosing between npm, pnpm, yarn and bun, when a command failed with a missing-script error, when writing the gates section of a plan, and before reporting that a change could not be verified automatically. It answers which command to run — not why a command behaves as it does, which is ordinary debugging and not this."
 metadata:
   version: "1.0.0"
 keywords: [commands, discovery, gates, package-manager, monorepo]

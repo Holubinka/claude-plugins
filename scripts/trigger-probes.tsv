@@ -1,0 +1,21 @@
+# expected-skill-or-dash	request
+#
+# Round 1 was 5/5 and 3/3, which per docs/evals.md §6.2 means the set was too easy rather
+# than that routing was proven. These negatives are adjacent on purpose: each sits next to a
+# skill it must not load, and several discriminate between two skills in the same plugin.
+#
+# --- positives
+test-discipline:testfix	The suite went red after my change — one assertion is failing and I am not sure which side is wrong.
+test-discipline:testwrite	I added a `taxFor` export this morning and there is nothing covering it. Sort that out before I commit.
+review-lenses:review-diff	Look over the changes on this branch before I open the pull request.
+engineering-paved-path:project-commands	What does this repository run to typecheck? I do not want to guess a script name.
+refactor-safely:refactor-triage	This function is 200 lines with a lot of duplication. Clean it up without changing behaviour.
+change-docs:pr-description	Write the pull request body for this branch.
+engineering-paved-path:severity-scale	Two reviewers graded the same problem differently — one says critical, one says minor. Which is right?
+# --- adjacent negatives: close to a skill above, must not load it
+-	What does this diff actually do? Just explain it, I am not asking for a review.
+-	What should I name this branch?
+-	Why is `npm run build` running out of memory on my laptop but not in CI?
+-	Is this function correct? I think the loop bounds are off by one.
+-	Explain what a characterisation test is.
+-	What is the difference between a shallow copy and a deep copy in JavaScript?
