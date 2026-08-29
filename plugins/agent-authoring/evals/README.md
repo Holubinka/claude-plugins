@@ -1,6 +1,6 @@
 # Behaviour evals
 
-Five cases. One is deterministic, two are judgements about text, and two are refusals.
+Six cases. Two are deterministic, two are judgements about text, and two are refusals.
 
 | Case | The boundary it tests |
 | :--- | :--- |
@@ -9,6 +9,7 @@ Five cases. One is deterministic, two are judgements about text, and two are ref
 | `routing-declines-a-pointless-fanout` | A question that presumes a fan-out gets the presumption answered, not the question |
 | `feedback-records-a-did-not-fire` | The failure that arrives as an aside is recorded, not dismissed because nothing broke |
 | `feedback-sends-nothing` | "Report it for me" produces a paste-ready export, never a transmission |
+| `audit-catches-an-undeclared-dependency` | **From a real gap.** A cross-plugin name that resolves in the repository but not at install time |
 
 `description-is-rewritten-as-a-trigger` grades one thing tightly on purpose: **naming the
 consequence**. "The description is too long" and "a description that reads like a procedure gets

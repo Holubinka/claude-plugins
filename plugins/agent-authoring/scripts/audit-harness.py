@@ -7,7 +7,8 @@ things that have each drifted in a real set at least once:
   A1  a description promises a roster the body never dispatches
   A2  a fan-out table lists lanes without saying when each one runs
   A3  a fan-out of two or more does not require a single-message dispatch
-  A4  a backticked `plugin:name` does not resolve to anything installed
+  A4  a backticked `plugin:name` does not resolve, or names a plugin the manifest
+      does not declare a dependency on
 
 Usage:
     audit-harness.py <path> [<path> ...]
@@ -22,6 +23,7 @@ a check that blocks on a judgement call gets disabled, and then it checks nothin
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from dataclasses import dataclass, field
@@ -60,6 +62,7 @@ class Component:
     path: Path
     description: str
     body: str
+    declares: frozenset[str] = frozenset()
 
     @property
     def qualified(self) -> str:
@@ -116,7 +119,26 @@ def collect(root: Path) -> list[Component]:
     """Find skills and agents under a plugins tree, a plugin, or a .claude directory."""
     found: list[Component] = []
 
-    def add(path: Path, kind: str, name: str, plugin: str | None) -> None:
+    def declared(base: Path) -> frozenset[str]:
+        """Which plugins this one's manifest says it depends on. A backticked cross-plugin
+        name is a promise it resolves at install time, and only a declared dependency keeps
+        that promise — co-presence in one repository does not."""
+        manifest = base / ".claude-plugin" / "plugin.json"
+        if not manifest.is_file():
+            return frozenset()
+        try:
+            data = json.loads(manifest.read_text(encoding="utf-8", errors="replace"))
+        except (OSError, json.JSONDecodeError):
+            return frozenset()
+        names = set()
+        for dep in data.get("dependencies") or []:
+            if isinstance(dep, str):
+                names.add(dep)
+            elif isinstance(dep, dict) and dep.get("name"):
+                names.add(str(dep["name"]))
+        return frozenset(names)
+
+    def add(path: Path, kind: str, name: str, plugin: str | None, declares: frozenset) -> None:
         fields, body = frontmatter_of(path.read_text(encoding="utf-8", errors="replace"))
         found.append(
             Component(
@@ -126,16 +148,18 @@ def collect(root: Path) -> list[Component]:
                 path=path,
                 description=fields.get("description", ""),
                 body=body,
+                declares=declares,
             )
         )
 
     def scan(base: Path, plugin: str | None) -> None:
+        deps = declared(base)
         for skill in sorted(base.glob("skills/*/SKILL.md")):
-            add(skill, "skill", skill.parent.name, plugin)
+            add(skill, "skill", skill.parent.name, plugin, deps)
         for agent in sorted(base.glob("agents/*.md")):
             if agent.name.upper() == "README.MD":
                 continue
-            add(agent, "agent", agent.stem, plugin)
+            add(agent, "agent", agent.stem, plugin, deps)
 
     if (root / "skills").is_dir() or (root / "agents").is_dir():
         plugin = root.name if (root / ".claude-plugin" / "plugin.json").exists() else None
@@ -188,6 +212,20 @@ def check(components: list[Component], report: Report) -> None:
         # `path:line` and `node:fs` are idioms, not references.
         for slash, plugin, name in set(NAMESPACED.findall(component.body)):
             if f"{plugin}:{name}" in known:
+                # It resolves in this set — but resolving here is not resolving at install
+                # time. Only a declared dependency makes the promise keepable.
+                if (
+                    component.plugin
+                    and plugin != component.plugin
+                    and plugin in plugins
+                    and plugin not in component.declares
+                ):
+                    report.fail(
+                        component.path, "A4",
+                        f"`{plugin}:{name}` is named, but {component.plugin}'s manifest declares "
+                        f"no dependency on '{plugin}'. It resolves in this repository and would "
+                        "not at install time",
+                    )
                 continue
             if plugin in plugins:
                 report.fail(

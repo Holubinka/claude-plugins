@@ -59,9 +59,11 @@ A path can be a marketplace's `plugins/` directory, a single plugin, or a projec
 | `A1` | A description promising a roster the body never dispatches — including a name that exists nowhere at all, listed beside ones that do |
 | `A2` | A fan-out table listing two or more lanes with no column saying **when each one runs**. A roster with no conditions is a roster the user has to pick from by hand |
 | `A3` | A fan-out of two or more that never requires a single-message dispatch — so the lanes run in series and the parallelism was imagined |
-| `A4` | A backticked `plugin:name` that does not resolve to anything in the set |
+| `A4` | A backticked `plugin:name` that does not resolve — **or that names a plugin the manifest declares no dependency on** |
 
 `A4` is the machine form of a rule worth stating on its own: **a backticked cross-plugin name is a promise that it resolves at install time.** If a component cannot make that promise, it names the role in prose instead. Every dependency edge in this marketplace is an application of that rule, and this check is what stops one from being forgotten.
+
+**Resolving inside the repository is not resolving at install time**, which is the half the check originally missed. A component naming another plugin's skill passed as long as both directories happened to sit side by side — and would have failed for anyone installing that plugin on its own. `A4` now reads the manifest, so the promise has to be backed by a declared dependency and not by co-location. `evals/fixtures/undeclared-edge` is a set with exactly that fault.
 
 **Warnings never fail the run.** `A3` is a warning because a serial fan-out is slow rather than wrong, and a check that blocks on a judgement call is a check that gets disabled — after which it checks nothing.
 

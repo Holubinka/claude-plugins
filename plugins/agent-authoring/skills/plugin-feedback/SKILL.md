@@ -43,6 +43,19 @@ not matching the work being done.
 Read `reread_ratio` while you are there. A multi-agent bill is re-reading context, not producing
 output, so an optimisation that cuts output and leaves re-reading alone has changed nothing.
 
+### What this is not
+
+**It does not run, replace, or call a retrospective on a single orchestrated run**, and the two read
+different files. This reads the main-session transcripts under `~/.claude/projects/`, many sessions
+at a time, and answers *which components fire and how often*. A retrospective reads one session's
+subagent output files and answers *what did this particular multi-agent run cost, agent by agent*.
+There is a skill for that elsewhere in this marketplace; it is named here in prose rather than in
+backticks, because this plugin declares no dependency on the one that owns it.
+
+Both print a `reread_ratio`, which is the only place they overlap and the reason they are worth
+telling apart: this one gives you the ambient figure across your real work, that one gives you a
+single run broken down by agent. Neither number belongs in the other's table.
+
 ## Then the manual half, for what a scan cannot see
 
 A scan knows a component fired. It does not know whether what it did was any good, and it cannot

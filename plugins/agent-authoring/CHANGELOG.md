@@ -63,6 +63,14 @@ First release. Three skills and two scripts. The authoring conventions and the a
   Writing outside the project uninvited would breach this marketplace's own security policy, and the
   constraint produced the better shape: the log is a staging area, and export is a deliberate act.
 
+- **`A4` reads the manifest, not just the directory.** The check's stated rule is that a backticked
+  cross-plugin name is a promise it resolves *at install time*, and it was only verifying that the
+  name resolved *in the audited directory*. Two plugins sitting side by side in one repository made
+  an undeclared edge look fine, and it would have broken for anyone installing either alone.
+
+  Found by asking whether one of this plugin's own skills could point at another plugin's
+  retrospective. It could, silently, and the audit had nothing to say about it.
+
 ### Changed from the source workflow
 
 - **The "when Claude may propose a new command" protocol did not come across.** It was a policy about
