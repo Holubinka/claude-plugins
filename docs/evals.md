@@ -43,7 +43,7 @@ Not aspirational — this is what `plugins/*/evals/` contains today.
 
 | Measurement | Value | Against |
 | :--- | ---: | :--- |
-| Cases | 43 | 20–50 recommended to start ✅ |
+| Cases | 45 | 20–50 recommended to start ✅ |
 | Negative cases | 19 (44%) | balance required; single-sided evals cause one-sided optimisation ✅ |
 | Numbered criteria | 183 | — |
 | Plausibly script-checkable | 29 (15%) | "deterministic where possible" ❌ |
@@ -51,7 +51,7 @@ Not aspirational — this is what `plugins/*/evals/` contains today.
 | Median trigger overlap (static) | 0.029 | — |
 | Trigger routing, behavioural | 7/7 recall · 6/6 precision | over 13 probes ⚠️ small |
 | Calibration examples | 0 | "a judge that doesn't agree with humans on a small labeled set is not a judge" ❌ |
-| Cases sourced from an observed failure | 3 | "drawn from real failures" ❌ |
+| Cases sourced from an observed failure | 5 | "drawn from real failures" ⚠️ |
 
 The two ❌ rows and the thin third are the work items at the end of this document.
 
@@ -212,7 +212,10 @@ Numbered by what unblocks what, not by size.
    15%.)*
 3. **Declare `pass@k` or `pass^k` per case**, and set `k ≥ 3` on all 19 refusal cases. *(3.1–3.2,
    currently undeclared.)*
-4. **Source the next ten cases from transcripts**, not from imagination. *(1.6, currently 3 of 43.)*
+4. **Source the next ten cases from transcripts**, not from imagination. *(1.6, currently 5 of 45 —
+   and the five are the only ones that have ever caught anything.)* **This item cannot be worked
+   through on demand: it is fed by using the plugins on real tasks, and inventing cases to close it
+   would produce exactly the kind §6.4 says to delete.**
 5. **Grow the probe set past 20**, weighted toward adjacent negatives, and source the requests from
    real sessions rather than from the author. `scripts/trigger-probe.sh` and
    `scripts/trigger-probes.tsv` exist and pass at 13 probes, which per §6.2 means they need to get
