@@ -1,6 +1,6 @@
 # engineering-paved-path
 
-Eleven engineering skills that more than one agent needs, packaged once so nothing has to copy them. Five other plugins in this marketplace depend on it; you can also install it on its own and invoke the skills by hand.
+Twelve engineering skills that more than one agent needs, packaged once so nothing has to copy them. Five other plugins in this marketplace depend on it; you can also install it on its own and invoke the skills by hand.
 
 ```sh
 /plugin install engineering-paved-path@dev-workbench
@@ -12,10 +12,11 @@ Eleven engineering skills that more than one agent needs, packaged once so nothi
 | :--- | :--- | ---: | ---: |
 | `project-commands` | What does *this* repository run to typecheck, lint or test? | 128 | 1 147 |
 | `severity-scale` | Is this finding `critical`, and what does that stop? | 123 | 1 075 |
-| `onion-architecture` | Which ring does this backend code sit in, and which way may it point? | 122 | 2 916 |
+| `backend-architecture` | Where does this backend file go  and how is it split? | 128 | 1 867 |
+| `onion-architecture` | Which ring does this backend code sit in  and which way may it point? | 122 | 2 916 |
 | `frontend-architecture` | Where does this frontend file go, and how is it split? | 117 | 1 951 |
 | `security` | What untrusted input does this touch, and what is the check? | 109 | 3 420 |
-| `typescript-expert` | How do I express this in the type system? | 96 | 3 827 |
+| `typescript-expert` | How do I express this in the type system? | 96 | 2 946 |
 | `mermaid-diagram` | Which diagram type, and how do I write it? | 63 | 1 798 |
 | `postgresql-table-design` | How should this table look — types  indexes  constraints? | 44 | 3 951 |
 | `scoped-change` | Am I building or changing more than was asked? | 123 | 1 008 |
@@ -24,7 +25,7 @@ Eleven engineering skills that more than one agent needs, packaged once so nothi
 
 **Always-on** is the `description` line, in tokens. It is in context for every session the plugin is enabled, because that line is how Claude decides whether the skill is relevant. **On invoke** is the body of `SKILL.md`, paid only when the skill fires. Reference files under each skill load on demand and are not counted here — that distinction is why a skill can carry a large reference tree without costing anything until it is used.
 
-Total always-on cost: **1143 tokens** across 11 skills.
+Total always-on cost: **1271 tokens** across 12 skills.
 
 ## Invoking them
 
@@ -33,6 +34,7 @@ Skills are namespaced by plugin:
 ```
 /engineering-paved-path:project-commands
 /engineering-paved-path:severity-scale
+/engineering-paved-path:backend-architecture
 /engineering-paved-path:onion-architecture
 /engineering-paved-path:frontend-architecture
 /engineering-paved-path:security
@@ -91,6 +93,10 @@ Where a gate exists, **the gate is the authority and the skill is commentary.** 
 The code samples inside these skills are shapes to recognise, not paths to open. They use plausible names drawn from one running subject so the structure is readable; none of them is a citation, and none of them describes a real repository.
 
 ## What each skill covers
+
+**`backend-architecture`** — where a Node or TypeScript file goes and how it is split: components at the top level with layers inside, the web boundary domain code may not cross, the utils/helpers/lib test shared with `frontend-architecture`, and the rule of three before any pattern. It opens by reading the repository for **what to reuse** — the slice most like the one you are adding, and the seams that already exist — because a structure invented alongside an existing one is worse than either.
+
+It records a disagreement rather than resolving it: Fowler and the DDD writers want behaviour on domain objects, Node's own best-practices list is comfortable with services holding the logic. The test it gives works for both — *can this object exist in a state its rules forbid?*
 
 **`onion-architecture`** — the five rings and the one rule that generates them all (dependencies point inward). A four-step placement procedure, eight rules, an escalation order for when the boundary gate fails, and three reference files: what goes in each file of a module, when a dependency needs a port, and which ring gets which test.
 

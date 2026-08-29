@@ -33,3 +33,9 @@ review-lenses:receiving-review	The reviewer says my error handling is wrong here
 -	Write me a commit message for this change.
 engineering-paved-path:scoped-change	Add a rate limiter to the upload endpoint. Make it configurable and flexible so we can swap strategies later.
 !engineering-paved-path:scoped-change	Refactor this module — it has three near-identical functions and I want them merged properly.
+# --- backend-architecture sits next to onion-architecture and frontend-architecture.
+engineering-paved-path:backend-architecture	I am adding a payments module to this Node service. Where do the files go and how should I split it?
+engineering-paved-path:backend-architecture	Where should this constant live? It is used by the invoice service and nothing else right now.
+engineering-paved-path:onion-architecture	Can my repository import the HTTP client directly, or does that break the dependency direction?
+!engineering-paved-path:backend-architecture	Where does this React component go — colocated with the route or in the shared folder?
+-	What is the difference between CommonJS and ESM?

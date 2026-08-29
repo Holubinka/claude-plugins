@@ -130,189 +130,53 @@ type Route = typeof routes[number]; // '/home' | '/about' | '/contact'
 - Configure `include`/`exclude` precisely
 - For monorepos: Use project references with `composite: true`
 
-## Real-World Problem Resolution
+## Generics — reach for one only when a caller decides the type
 
-### Complex Error Patterns
+A generic exists so that **the caller** chooses a type the function then preserves. That is the whole
+test, and most generics that go wrong fail it: nothing about the parameter varies per caller, and the
+`<T>` is decoration over a concrete type or an `any` in better clothes.
 
-**"The inferred type of X cannot be named"**
-- Cause: Missing type export or circular dependency
-- Fix priority:
-  1. Export the required type explicitly
-  2. Use `ReturnType<typeof function>` helper
-  3. Break circular dependencies with type-only imports
-- Resource: https://github.com/microsoft/TypeScript/issues/47663
+```ts
+// ✗ Nothing is preserved. T is decided here, not by the caller.
+function parseIds<T>(raw: string): T[] { return raw.split(",") as T[] }
 
-**Missing type declarations**
-- Quick fix with ambient declarations:
-```typescript
-// types/ambient.d.ts
-declare module 'some-untyped-package' {
-  const value: unknown;
-  export default value;
-  export = value; // if CJS interop is needed
-}
-```
-- For more details: [Declaration Files Guide](https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html)
-
-**"Excessive stack depth comparing types"**
-- Cause: Circular or deeply recursive types
-- Fix priority:
-  1. Limit recursion depth with conditional types
-  2. Use `interface` extends instead of type intersection
-  3. Simplify generic constraints
-```typescript
-// Bad: Infinite recursion
-type InfiniteArray<T> = T | InfiniteArray<T>[];
-
-// Good: Limited recursion
-type NestedArray<T, D extends number = 5> = 
-  D extends 0 ? T : T | NestedArray<T, [-1, 0, 1, 2, 3, 4][D]>[];
+// ✓ The caller's element type survives the call.
+function first<T>(items: readonly T[]): T | undefined { return items[0] }
 ```
 
-**Module Resolution Mysteries**
-- "Cannot find module" despite file existing:
-  1. Check `moduleResolution` matches your bundler
-  2. Verify `baseUrl` and `paths` alignment
-  3. For monorepos: Ensure workspace protocol (workspace:*)
-  4. Try clearing cache: `rm -rf node_modules/.cache .tsbuildinfo`
+**Ask a union first.** A closed set of known types is a union, not a generic — a generic says *any
+type the caller likes*, and a union says *one of these*. Reaching for `<T>` where the answer is
+`"csv" | "json"` gives up every exhaustiveness check the compiler could have run for you.
 
-**Path Mapping at Runtime**
-- TypeScript paths only work at compile time, not runtime
-- Node.js runtime solutions:
-  - ts-node: Use `ts-node -r tsconfig-paths/register`
-  - Node ESM: Use loader alternatives or avoid TS paths at runtime
-  - Production: Pre-compile with resolved paths
+**Constrain it, and constrain it to what you use.** A bare `<T>` accepts anything and can therefore
+do almost nothing with it. `<T extends { id: string }>` says what the function actually needs, and
+the error at a wrong call site names the missing property instead of pointing inside the function.
 
-### Migration Expertise
+**Prefer inference over annotation at the call site.** `first(rows)` reading `T` from `rows` is the
+generic working. `first<Row>(rows)` on every call is a signal the inference site is wrong — usually
+the parameter is not where `T` appears.
 
-**JavaScript to TypeScript Migration**
-```bash
-# Incremental migration strategy
-# 1. Enable allowJs and checkJs (merge into existing tsconfig.json):
-# Add to existing tsconfig.json:
-# {
-#   "compilerOptions": {
-#     "allowJs": true,
-#     "checkJs": true
-#   }
-# }
+**One type parameter is the common case, two is a design, three needs a reason.** Each one is
+something the reader must hold while reading the signature and something a caller can get wrong.
 
-# 2. Rename files gradually (.js → .ts)
-# 3. Add types file by file using AI assistance
-# 4. Enable strict mode features one by one
+**A conditional or mapped type is a last resort, not a flourish.** It moves an error message from the
+call site into the type, and the message gets longer as the type gets cleverer. `references/typescript-cheatsheet.md`
+has the forms; the question to answer before using one is what a wrong call will *print*.
 
-# Automated helpers (if installed/needed)
-# --sources takes the repository's own source roots, from tsconfig include/files.
-# There is no universal 'src/' — check before typing one.
-command -v ts-migrate >/dev/null 2>&1 && npx ts-migrate migrate . --sources '<roots>/**/*.js'
-command -v typesync >/dev/null 2>&1 && npx typesync  # Install missing @types packages
-```
+**`satisfies` where you want checking without widening** — a config object checked against a shape
+while keeping its literal types, which an annotation would erase.
 
-**Tool Migration Decisions**
+**And the counterweight, from the same shelf as this skill.** Node's own best-practices list argues
+for using TypeScript *sparingly*: sophisticated type-level code raises complexity, and complexity
+raises both bug count and time to fix. Type-level work is worth it where it makes an invalid state
+unrepresentable. It is not worth it to avoid writing a type out.
 
-| From | To | When | Migration Effort |
-|------|-----|------|-----------------|
-| ESLint + Prettier | Biome | Need much faster speed, okay with fewer rules | Low (1 day) |
-| TSC for linting | Type-check only | Have 100+ files, need faster feedback | Medium (2-3 days) |
-| Lerna | Nx/Turborepo | Need caching, parallel builds | High (1 week) |
-| CJS | ESM | Node 18+, modern tooling | High (varies) |
+## The longer material, on demand
 
-### Monorepo Management
-
-**Nx vs Turborepo Decision Matrix**
-- Choose **Turborepo** if: Simple structure, need speed, <20 packages
-- Choose **Nx** if: Complex dependencies, need visualization, plugins required
-- Performance: Nx often performs better on large monorepos (>50 packages)
-
-**TypeScript Monorepo Configuration**
-```json
-// Root tsconfig.json
-{
-  "references": [
-    { "path": "./packages/core" },
-    { "path": "./packages/ui" },
-    { "path": "./apps/web" }
-  ],
-  "compilerOptions": {
-    "composite": true,
-    "declaration": true,
-    "declarationMap": true
-  }
-}
-```
-
-## Modern Tooling Expertise
-
-### Biome vs ESLint
-
-**Use Biome when:**
-- Speed is critical (often faster than traditional setups)
-- Want single tool for lint + format
-- TypeScript-first project
-- Okay with 64 TS rules vs 100+ in typescript-eslint
-
-**Stay with ESLint when:**
-- Need specific rules/plugins
-- Have complex custom rules
-- Working with Vue/Angular (limited Biome support)
-- Need type-aware linting (Biome doesn't have this yet)
-
-### Type Testing Strategies
-
-**Vitest Type Testing (Recommended)**
-```typescript
-// in avatar.test-d.ts
-import { expectTypeOf } from 'vitest'
-import type { Avatar } from './avatar'
-
-test('Avatar props are correctly typed', () => {
-  expectTypeOf<Avatar>().toHaveProperty('size')
-  expectTypeOf<Avatar['size']>().toEqualTypeOf<'sm' | 'md' | 'lg'>()
-})
-```
-
-**When to Test Types:**
-- Publishing libraries
-- Complex generic functions
-- Type-level utilities
-- API contracts
-
-## Debugging Mastery
-
-### CLI Debugging Tools
-```bash
-# Debug TypeScript files directly (if tools installed)
-command -v tsx >/dev/null 2>&1 && npx tsx --inspect <path/to/file.ts>
-command -v ts-node >/dev/null 2>&1 && npx ts-node --inspect-brk <path/to/file.ts>
-
-# Trace module resolution issues
-<runner> tsc --traceResolution > resolution.log 2>&1
-grep "Module resolution" resolution.log
-
-# Debug type checking performance (use --incremental false for clean trace)
-<runner> tsc --generateTrace trace --incremental false
-# Analyze trace (if installed)
-command -v @typescript/analyze-trace >/dev/null 2>&1 && npx @typescript/analyze-trace trace
-
-# Memory usage analysis
-node --max-old-space-size=8192 node_modules/typescript/lib/tsc.js
-```
-
-### Custom Error Classes
-```typescript
-// Proper error class with stack preservation
-class DomainError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public statusCode: number
-  ) {
-    super(message);
-    this.name = 'DomainError';
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
-```
+- [`references/problem-resolution.md`](references/problem-resolution.md) — complex error patterns, strict-mode migration, monorepo project references.
+- [`references/tooling.md`](references/tooling.md) — type testing, and the CLI tools for a slow or confusing compile.
+- [`references/typescript-cheatsheet.md`](references/typescript-cheatsheet.md) — the conditional and mapped type forms.
+- [`references/tsconfig-strict.json`](references/tsconfig-strict.json), [`references/utility-types.ts`](references/utility-types.ts).
 
 ## Current Best Practices
 
@@ -336,12 +200,6 @@ class DomainError extends Error {
 - Use dynamic imports for CJS: `const pkg = await import('cjs-package')`
   - Note: `await import()` requires async function or top-level await in ESM
   - For CJS packages in ESM: May need `(await import('pkg')).default` depending on the package's export structure and your compiler settings
-
-### AI-Assisted Development
-- GitHub Copilot excels at TypeScript generics
-- Use AI for boilerplate type definitions
-- Validate AI-generated types with type tests
-- Document complex types for AI context
 
 ## Code Review Checklist
 
@@ -407,25 +265,6 @@ Slow builds? → Check bundler config, enable caching
 Slow tests? → Vitest with threads, avoid type checking in tests
 Slow language server? → Exclude node_modules, limit files in tsconfig
 ```
-
-## Expert Resources
-
-### Performance
-- [TypeScript Wiki Performance](https://github.com/microsoft/TypeScript/wiki/Performance)
-- [Type instantiation tracking](https://github.com/microsoft/TypeScript/pull/48077)
-
-### Advanced Patterns
-- [Type Challenges](https://github.com/type-challenges/type-challenges)
-- [Type-Level TypeScript Course](https://type-level-typescript.com)
-
-### Tools
-- [Biome](https://biomejs.dev) - Fast linter/formatter
-- [TypeStat](https://github.com/JoshuaKGoldberg/TypeStat) - Auto-fix TypeScript types
-- [ts-migrate](https://github.com/airbnb/ts-migrate) - Migration toolkit
-
-### Testing
-- [Vitest Type Testing](https://vitest.dev/guide/testing-types)
-- [tsd](https://github.com/tsdjs/tsd) - Standalone type testing
 
 Always validate changes don't break existing functionality before considering the issue resolved.
 

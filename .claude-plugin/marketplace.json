@@ -13,10 +13,11 @@
     {
       "name": "engineering-paved-path",
       "source": "./plugins/engineering-paved-path",
-      "description": "Eleven shared engineering skills \u2014 backend and frontend architecture, security review, PostgreSQL table design, TypeScript type work, Mermaid diagrams, the four-level severity scale, command discovery, root-cause debugging, keeping a change to what was asked, and the rule that no claim of done ships without fresh evidence. The single source other plugins depend on instead of copying.",
+      "description": "Twelve shared engineering skills \u2014 where backend and frontend code goes, ring placement and dependency direction, security review, PostgreSQL table design, TypeScript type work, Mermaid diagrams, the four-level severity scale, command discovery, root-cause debugging, keeping a change to what was asked, and the rule that no claim of done ships without fresh evidence. The single source other plugins depend on instead of copying.",
       "category": "development",
       "keywords": [
         "architecture",
+        "backend",
         "security",
         "typescript",
         "postgresql",

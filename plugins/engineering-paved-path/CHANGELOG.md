@@ -5,7 +5,49 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `engineering-paved-path--v<version>`.
 
-## [1.3.0] — 2026-08-29
+## [1.4.0] — 2026-08-29
+
+Backward compatible: a skill arrives, and the largest existing one gets smaller while covering more
+of what its own description promised.
+
+### Added
+
+- **`backend-architecture`** — where a Node or TypeScript file goes and how it is split. The
+  backend twin of `frontend-architecture`, and deliberately not `onion-architecture`: that one
+  answers which ring and which way dependencies may point, this one answers what the folders are
+  called and what lives in each.
+
+  It opens by reading the repository for **what to reuse** — the top-level shape, the slice most like
+  the one being added, the seams that already exist, and whether a boundary is enforced. A structure
+  invented alongside an existing one is worse than either, because now there are two.
+
+  It records a disagreement rather than resolving it. Fowler and the DDD writers want behaviour on
+  domain objects and call the alternative anemic; Node's own best-practices list is comfortable with
+  services holding the rules. The test it offers works either way — *can this object exist in a state
+  its rules forbid?* — because a skill that picks a winner asserts more than its sources support.
+
+  `references.md` carries every source grouped by the question it answers, including three gaps named
+  as gaps rather than left quietly unresearched.
+
+### Changed
+
+- **`typescript-expert` finally covers generics**, which its description has promised since it was
+  imported and its body never delivered — six mentions, none of them about when to reach for one. The
+  new section is built on one test: **a generic exists so the caller chooses a type the function then
+  preserves.** Most generics that go wrong fail it. It also asks the question most generics advice
+  skips — whether a union was the right answer — and closes with the counterweight from Node's own
+  best-practices list, that sophisticated type-level code raises complexity and complexity raises
+  both bug count and fix time.
+
+- **Three sections its description never promised are gone**: a Biome-versus-ESLint comparison, a
+  link list, and an "AI-Assisted Development" section advising that Copilot is good at generics —
+  which is odd guidance to leave in a file read by a model.
+
+- **The long-form material moved to reference files** that load on demand: error patterns, strict
+  migration and monorepo project references to `references/problem-resolution.md`, type testing and
+  the CLI tools to `references/tooling.md`. The body went from 15.8 KB to 12.2 KB while gaining the
+  generics section, and nothing was deleted — it is one hop away instead of always loaded.
+
 
 Backward compatible: one skill arrives, carrying the half of a well-known set of principles that a
 plugin can actually hold.

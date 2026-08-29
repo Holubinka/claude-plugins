@@ -1,6 +1,6 @@
 # Behaviour evals
 
-Seven cases, one per boundary this plugin's shared rules depend on. Three are refusals, and they are the ones that matter most.
+Eight cases, one per boundary this plugin's shared rules depend on. Four are refusals, and they are the ones that matter most.
 
 | Case | The boundary it tests |
 | :--- | :--- |
@@ -9,6 +9,7 @@ Seven cases, one per boundary this plugin's shared rules depend on. Three are re
 | `severity-keeps-a-deterministic-finding` | A failing command outranks a read of the code, and neither erases the other |
 | `project-commands-refuses-to-invent-a-gate` | A gate that does not exist is reported missing, never green |
 | `verification-reports-not-run` | Silent output is not a pass — a check that looked at nothing is its own outcome |
+| `backend-architecture-reads-before-proposing` | A consistent tree is followed, even where the skill would have chosen differently |
 | `scoped-change-refuses-unrequested-flexibility` | A request that asks for flexibility gets one question, not an architecture |
 | `debugging-refuses-without-a-symptom` | **From a routing probe.** No observed failure means review, not a root-cause investigation |
 
