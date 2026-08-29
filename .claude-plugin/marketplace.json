@@ -65,6 +65,58 @@
         "agents",
         "ears"
       ]
+    },
+    {
+      "name": "test-discipline",
+      "source": "./plugins/test-discipline",
+      "description": "Tests for the change in front of you, in the framework this repository already uses \u2014 discovered from the nearest sibling test rather than assumed. Two skills and an agent, holding one rule: when a test and the code disagree, decide which of them is wrong before touching either.",
+      "category": "development",
+      "keywords": [
+        "testing",
+        "tests",
+        "regression",
+        "discovery",
+        "skills"
+      ]
+    },
+    {
+      "name": "change-docs",
+      "source": "./plugins/change-docs",
+      "description": "Everything a change needs after it works \u2014 annotated screenshots taken from the running page, a pull request description with a fixed shape and an explicit never-include list, and an agent that fixes the sentences a change made false rather than rewriting the documentation around them.",
+      "category": "development",
+      "keywords": [
+        "documentation",
+        "screenshots",
+        "pull-request",
+        "drift",
+        "agent"
+      ]
+    },
+    {
+      "name": "agent-authoring",
+      "source": "./plugins/agent-authoring",
+      "description": "Conventions for writing skills and agents, and a static audit that checks a set of them still agrees with itself \u2014 that every fan-out declares when each lane runs, that no description promises a roster the body never dispatches, and that every name in backticks resolves to something installed.",
+      "category": "development",
+      "keywords": [
+        "authoring",
+        "skills",
+        "agents",
+        "audit",
+        "routing"
+      ]
+    },
+    {
+      "name": "hook-guardrails",
+      "source": "./plugins/hook-guardrails",
+      "description": "Two shell hooks that close two mistakes a prompt cannot reliably prevent \u2014 a push that lands on a protected branch, including the bare push whose upstream silently resolves to one, and a whole-repository format run triggered by editing a single file.",
+      "category": "development",
+      "keywords": [
+        "hooks",
+        "git",
+        "safety",
+        "lint",
+        "formatting"
+      ]
     }
   ],
   "renames": {}

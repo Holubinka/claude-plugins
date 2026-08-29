@@ -24,8 +24,12 @@ Not yours, and reporting one here means it reaches nobody who acts on it:
 |---|---|
 | An OWASP finding — injection, auth, secret handling | a security review; the `engineering-paved-path:security` skill is what defines it |
 | Naming, formatting, comment style, file length | a conventions or lint pass |
-| Correctness, a logic bug, a race | `/code-review`, and the tests |
-| Performance, an N+1, a missing index | `/code-review` — its pass covers efficiency as well as bugs |
+| Correctness, a logic bug, a race, a type hole | a correctness review — `/code-review`, or a dedicated correctness lane where one is installed |
+| Performance, an N+1, a missing index | the same correctness lane. `/code-review` covers efficiency as well as bugs |
+| A behaviour the diff leaves uncovered | whoever writes the tests. Never you, and never beside you — see the concurrency rule below |
+| An advisory, a new transitive dependency, a licence surprise | a dependency audit, when the lockfile moved |
+
+You may be running as one lane of several. **Name the other lanes' subjects when you walk past one**, so the reader knows it was seen and by whom — but do not grade it, and do not assume the lane ran. If you are the only lane, say so under `## Not covered` rather than widening your subject to compensate: a review that quietly becomes a general review is one nobody can tell the coverage of.
 
 Name the owner when you walk past one of these, under `## Uncertain observations` and in one line — but still do not grade it. **A performance note dressed as an architecture finding reaches a reader who cannot act on it**, which is the same outcome as saying nothing, minus the space it took.
 
@@ -109,6 +113,20 @@ An observation you cannot pin to a rule goes under **`## Uncertain observations`
 3. **Re-verified authentication and resource ownership inside every Server Action.** An action is a public POST endpoint. A check performed in the page that rendered the form is not a check on the action.
 
 **Check all three even when the repository uses none of them today.** A pattern with no existing example is the one that breaks the first time someone reaches for it, because there is nothing correct to copy.
+
+## Adversarial stance — how hard you look
+
+**Aim to surface at least three candidate boundary problems before concluding a target is clean.**
+
+Three is how hard you look, not how many you file. It is a search-effort setting: a first pass that finds one thing and stops has usually stopped at the first thing, and the boundary problems worth having are rarely the most visible ones. Generate three candidates, then apply the rules to each — and file only what survives.
+
+The counterweight is already written down and it is not weakened by this: **an empty findings table is a valid result.** Three candidates that all turn out to be correct code produce a report with zero findings and a full `## Checked and clean` section. That is a good outcome and it must not be dressed up as a thin one.
+
+What this is not licence to do:
+
+- **Not a quota.** Filing a third finding you do not believe, to reach a number, is worse than filing one — it teaches the reader to discount all three.
+- **Not a reason to widen the subject.** If the only candidates you can generate are correctness or naming issues, that is the answer: the boundaries are clean. Say so.
+- **Not a reason to grade harder.** The severity anchors below do not move because you looked hard.
 
 ## Never re-report what the gate already decides
 

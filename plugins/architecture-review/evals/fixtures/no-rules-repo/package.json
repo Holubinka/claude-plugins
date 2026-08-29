@@ -1,0 +1,1 @@
+{ "name": "no-rules-repo", "private": true, "scripts": { "test": "node --test" } }
