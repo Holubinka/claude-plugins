@@ -49,11 +49,19 @@ Each model-produced `critical` goes to one `finding-verifier`, whose job is to *
 
 | Verdict | Effect |
 | :--- | :--- |
-| refuted, **or uncertain** | drops out of the blocking set, into `## Attempted and refuted` with the reasoning |
+| refuted, **or uncertain after reading the code** | drops out of the blocking set, into `## Attempted and refuted` with the reasoning |
 | stands, trigger not reproduced | demoted to `major` |
 | stands, trigger reproduced by reading | stays `critical`, marked *survived verification* |
+| **not examined** — the anchor did not resolve | keeps the severity it arrived with, marked unverified. **Not a refutation** |
 
-**Uncertain counting as refuted is the load-bearing rule.** The alternative — an uncertain verdict leaving the critical in place — makes the stage decorative: it could only ever agree, and a check that cannot say no is not a check.
+**The last row exists because the first one is dangerous without it.** "Uncertain" and "could not
+look" feel the same and mean opposite things — a check that ran and did not settle, against a check
+that never ran. Collapsed, a finding gets dropped for lack of *access* rather than lack of *merit*,
+and that happens precisely on the findings whose evidence is hardest to reach, which are not a random
+sample. So the orchestrator resolves the anchor before dispatching, and a verifier that cannot read
+its anchor returns `examined: false` rather than a verdict.
+
+**Uncertain-after-reading counting as refuted is the load-bearing rule.** The alternative — an uncertain verdict leaving the critical in place — makes the stage decorative: it could only ever agree, and a check that cannot say no is not a check.
 
 It is safe because it is scoped to *blocking*. A refuted finding is not deleted; it stays in the report where a human can disagree with it.
 

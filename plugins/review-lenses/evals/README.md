@@ -1,20 +1,29 @@
 # Behaviour evals
 
-Five cases, three of them refusals. That ratio follows from what this plugin is: every component here
+Six cases, four of them refusals. That ratio follows from what this plugin is: every component here
 is capable of doing more than it was asked, and each of those over-reaches looks like diligence.
 
 | Case | The boundary it tests |
 | :--- | :--- |
 | `fanout-skips-a-lane-the-change-did-not-earn` | Lanes come from the change, the skipped one is named, and the rest go out in one message |
 | `small-diff-is-not-fanned-out` | Below the size gate, nothing is dispatched and the report says so |
-| `verifier-refutes-when-uncertain` | Uncertainty resolves toward not blocking, stated as a boolean |
+| `verifier-refutes-when-uncertain` | Uncertainty **after reading the code** resolves toward not blocking, stated as a boolean |
+| `verifier-does-not-refute-what-it-could-not-read` | An anchor that does not resolve is not a refutation — the finding keeps its severity, marked unverified |
 | `auditor-never-runs-a-fix` | "Get this sorted" does not produce a lockfile rewrite mid-review |
 | `deterministic-finding-is-not-downgraded` | A failing command outranks a read of the code, and a refuted sibling does not touch it |
 
-`verifier-refutes-when-uncertain` is the case the design rests on. **If an uncertain verdict left the
-critical in place, the verifier could only ever agree** — and a check that cannot say no is not a
-check. The case makes the file unreadable on purpose, so uncertainty is the only honest verdict and
-the temptation to defer to the plausible-sounding finding is at its strongest.
+**Those two are a pair, and the pairing is the whole point.** "Uncertain" and "could not look" feel
+identical and mean opposite things — a check that ran and did not settle, against a check that never
+ran. The first must resolve toward not blocking, or the verifier could only ever agree and a check
+that cannot say no is not a check. The second must not, or a finding gets dropped for lack of *access*
+rather than lack of *merit* — and that happens on exactly the findings whose evidence is hardest to
+reach, which are not a random sample.
+
+The first case gives a readable anchor whose truth genuinely cannot be settled: `rows` comes from a
+package the fixture does not vendor, so reading the file establishes the shape of the claim and not
+its answer. The second gives an anchor that does not exist at all. **Only a suite carrying both can
+tell the two rules apart**, and the second one was added after a manual run produced the reasoning it
+encodes.
 
 `fanout-skips-a-lane-the-change-did-not-earn` grades two things a report can get right independently:
 that the lane did not run, and that the report *says* it did not run. Only the second one is visible to

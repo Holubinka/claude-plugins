@@ -43,10 +43,25 @@ refute by reading is a `critical` that survives.
 | Outcome | Effect on the finding |
 | :--- | :--- |
 | **Refuted** — the invariant does not hold, or the path is unreachable, or a guard already covers it | Dropped from the findings, recorded under *attempted and refuted* so the work stays visible |
-| **Uncertain** — it could not establish either way | **Treated as refuted.** See below |
+| **Uncertain** — it read the code and could not establish either way | **Treated as refuted.** See below |
 | **Stands** | Keeps `critical` if the trigger was reproduced by reading; demoted to `major` if the invariant holds but the concrete input could not be confirmed |
+| **Not examined** — the file does not exist, cannot be read, or the anchor does not resolve | **Not a verdict at all.** The finding keeps the severity it arrived with, marked unverified |
 
-**Uncertain counts as refuted, and this is the load-bearing rule.** Verification exists to raise
+**The last row is the one most easily lost, and losing it is expensive.** "Uncertain" and "could not
+look" produce the same feeling and opposite facts: the first is a check that ran and did not settle,
+the second is a check that never ran. Collapse them and a finding gets dropped *for lack of access
+rather than for lack of merit* — and it happens precisely on the findings whose evidence is hardest
+to reach, which are not a random sample.
+
+It is the same distinction a diagnostic needs between "found nothing" and "scanned nothing". A
+verification that did not happen is not a verification that failed, and a caller reading a report
+cannot tell the difference unless it is written down.
+
+**Where an anchor cannot be resolved, the honest move is not to dispatch a verifier at all.** A
+verifier handed an unreadable anchor can only return not-examined, so the dispatch buys nothing and
+risks laundering "nobody looked" into "investigated and dismissed".
+
+**Uncertain-after-reading counts as refuted, and this is the load-bearing rule.** Verification exists to raise
 the bar for blocking, so ambiguity has to resolve toward *not blocking*. The alternative — an
 uncertain verdict leaving the `critical` in place — makes the pass decorative: it can only ever
 agree, and a check that cannot say no is not a check.

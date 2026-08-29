@@ -40,6 +40,23 @@ First release. One skill and three agents, generalised from a private monorepo's
 
 ### Notes
 
+- **"Could not examine" is not "refuted", and the verifier now says which.** Uncertainty *after reading
+  the code* resolves toward not blocking; an anchor that does not resolve is a check that never ran,
+  and the finding keeps the severity it arrived with, marked unverified. The orchestrator resolves the
+  anchor before dispatching, because a verifier handed an unreadable one can only return
+  `examined: false`.
+
+  Found by running the case rather than reading it. The run declined to dispatch the verifier at all,
+  with the reason: *dispatching it would have laundered "I couldn't find the file" into "this bug was
+  investigated and found not real."* Collapsing the two states drops findings for lack of **access**
+  rather than lack of **merit** — on exactly the findings whose evidence is hardest to reach, which are
+  not a random sample. It is the same distinction a diagnostic needs between *found nothing* and
+  *scanned nothing*, and it had been applied to `ts_diagnostic.py` in this marketplace and not here.
+
+- **Diff anchoring is skipped rather than assumed when there is no diff.** `merging.md` step 6 demoted
+  any finding whose line was "not in the diff", which with no diff present is unestablished — the same
+  laundering by another route. Surfaced by the same run, which refused the demotion for that reason.
+
 - **The inline read holds the same lane discipline as the correctness lane**, stated explicitly in the
   skill. Found by running the skill against a two-file, thirteen-line tidy-up: the size gate worked and
   no agents were dispatched, but the inline read then filed a naming preference as a finding — which

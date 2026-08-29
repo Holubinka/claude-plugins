@@ -54,8 +54,13 @@ evidence is a command's exit code — a failing typecheck, an advisory — wins 
 and the model-produced finding is kept beside it rather than folded into it. Between two model-produced
 findings the higher severity survives, carrying that one's verification outcome.
 
-**6 — Diff-anchor before sorting.** Any model-produced finding whose line is not in the diff drops to
-`note`, marked pre-existing.
+**6 — Diff-anchor before sorting**, *when the diff is available*. Any model-produced finding whose
+line is not in the diff drops to `note`, marked pre-existing.
+
+**Where the diff cannot be resolved, do not apply the demotion.** "Not in the diff" is a fact about a
+diff you have read; with no diff, it is unestablished, and demoting on it launders *could not check*
+into *checked and found pre-existing*. Leave the severity alone and say the anchoring step did not
+run — the same distinction step 5 draws between a finding that was examined and one that was not.
 
 **7 — Sort deterministically:**
 

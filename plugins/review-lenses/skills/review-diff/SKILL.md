@@ -90,9 +90,15 @@ it honest: it cannot trade one finding against another.
 
 | Verdict | Effect |
 | :--- | :--- |
-| refuted, **or uncertain** | drops out of the blocking set, into `## Attempted and refuted` with the reasoning |
+| refuted, **or uncertain after reading the code** | drops out of the blocking set, into `## Attempted and refuted` with the reasoning |
 | stands, trigger not reproduced | demoted to `major` |
 | stands, trigger reproduced by reading | stays `critical`, marked *survived verification* |
+| **not examined** — the anchor did not resolve | **keeps the severity it arrived with**, marked unverified. Not a refutation |
+
+**Do not dispatch a verifier for an anchor you cannot resolve yourself.** Check the file exists and the
+line is readable before you send it. A verifier handed an unreadable anchor can only return
+not-examined, so the dispatch buys nothing — and reporting that as a refutation launders *nobody
+looked* into *investigated and dismissed*, on exactly the findings whose evidence is hardest to reach.
 
 **A deterministic finding — one whose evidence is a command's exit code — skips this step entirely and
 may not be downgraded.**
@@ -134,6 +140,7 @@ as full coverage, and that is the one way this skill can mislead someone who tru
 | Dispatching lanes in separate messages | They run in series. One message, or there is no fan-out |
 | Letting a model-produced critical block without verification | The first unreproducible refusal is when people start bypassing the gate |
 | Treating an uncertain verdict as "keep the critical" | Then the verifier can only ever agree, and a check that cannot say no is not a check |
+| Treating "could not read the file" as a refutation | That is a check that never ran. The finding keeps its severity, marked unverified |
 | Fanning out over a two-file change | Three context loads for one small answer |
 | Letting the bar drop when the fan-out does | The inline read holds the same lane discipline. A naming preference is not a finding on either path |
 | Omitting the skipped lanes from the report | It reads as full coverage |
