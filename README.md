@@ -106,6 +106,8 @@ plugin root, then register it in `.claude-plugin/marketplace.json`.
 | [docs/plugin-structure.md](docs/plugin-structure.md) | Directory layout, manifest schema, dependency requirements |
 | [docs/security.md](docs/security.md) | What a plugin may do, secrets policy, reviewing scripts and MCP servers |
 | [docs/releasing.md](docs/releasing.md) | SemVer, tags, how updates reach users, rollback, renames |
+| [docs/measuring.md](docs/measuring.md) | Whether a component works on real tasks — what to measure, and which metrics reward the wrong thing |
+| [docs/COST-BASELINE.md](docs/COST-BASELINE.md) | What a run costs, and the gate a prompt optimisation must pass |
 
 > **Only `plugin.json` belongs in `.claude-plugin/`.** `skills/`, `agents/`,
 > `commands/` and `hooks/` go at the plugin root. Nesting them under `.claude-plugin/`
