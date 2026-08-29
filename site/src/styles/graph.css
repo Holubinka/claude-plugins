@@ -1,5 +1,13 @@
 /* Styles for the GraphCanvas island.
  *
+ * Contrast note, measured rather than eyeballed. A diagram's outlines and arrows are
+ * non-text graphics and need 3:1 against what they sit on. --rule-2 gives 3.02:1 in the
+ * light theme and 1.65:1 in the dark one, where the box fill is itself 1.08:1 against the
+ * page — which is how the whole graph came out as a black rectangle with text floating in
+ * it. --muted is 4.93:1 light and 5.79:1 dark, so the boxes and edges use that. The fill
+ * stays --surface: no token in the palette separates a panel from the page background in
+ * dark mode, so a box is defined by its outline, and the outline now carries it.
+ *
  * These cannot live in graph.astro's <style>: Astro scopes a page's styles with an
  * attribute it adds only to elements it renders itself, and nothing inside a framework
  * island carries it. A scoped rule for .node rect therefore matches nothing, and every
@@ -8,8 +16,8 @@
 
 .figure { padding: 1.25rem 1rem; }
 svg { display: block; width: 100%; min-width: 34rem; height: auto; }
-.node rect { fill: var(--surface); stroke: var(--rule-2); stroke-width: 1; }
-.node line { stroke: var(--rule); stroke-width: 1; }
+.node rect { fill: var(--surface); stroke: var(--muted); stroke-width: 1; }
+.node line { stroke: var(--muted); stroke-width: 1; opacity: .45; }
 .node text.title { fill: var(--ink); font-family: var(--mono); font-size: 13px; font-weight: 500; }
 .node text.sub { fill: var(--muted); font-family: var(--mono); font-size: 9.5px; }
 .node text.kind { fill: var(--accent); font-family: var(--mono); font-size: 11px; }
@@ -25,9 +33,9 @@ svg { display: block; width: 100%; min-width: 34rem; height: auto; }
 .edge path { fill: none; stroke-width: 1.25; }
 .edge--routed path { stroke-dasharray: none; opacity: 0.85; }
 .edge text { font-family: var(--mono); font-size: 9px; }
-.edge--ok     { color: var(--rule-2); }
-.edge--ok path     { stroke: var(--rule-2); }
-.edge--ok text     { fill: var(--muted); }
+.edge--ok     { color: var(--muted); }
+.edge--ok path     { stroke: var(--muted); }
+.edge--ok text     { fill: var(--ink-2); }
 .edge--loose  { color: var(--warn); }
 .edge--loose path  { stroke: var(--warn); stroke-dasharray: 4 3; }
 .edge--loose text  { fill: var(--warn); }
