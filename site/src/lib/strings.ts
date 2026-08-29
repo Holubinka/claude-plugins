@@ -267,6 +267,8 @@ export const bundle = {
 } as const;
 
 export const graph = {
+  dragHint: 'Drag a box to rearrange. Click a name to open it.',
+  resetLayout: 'Reset layout',
   title: 'Dependency graph',
   description: 'Which plugins depend on which, and which of those dependencies cannot resolve.',
   eyebrow: 'Graph',
