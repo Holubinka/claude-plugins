@@ -124,7 +124,7 @@ export default function GraphCanvas(
           `L${xb + r} ${laneY}`, `Q${xb} ${laneY} ${xb} ${laneY - r}`,
           `L${xb} ${y2 + r}`, `Q${xb} ${y2} ${xb - r} ${y2}`,
           `L${x2 + 9} ${y2}`].join(' '),
-      label: { x: (xa + xb) / 2, y: laneY - 4, anchor: 'middle' as const,
+      label: { x: xb + 8, y: laneY - 4, anchor: 'start' as const,
                text: `${edge.from} → ${edge.to} ${edge.range ?? 'latest'}` },
     };
   };
@@ -141,9 +141,18 @@ export default function GraphCanvas(
         <svg ref={svgRef} viewBox={`0 0 ${graph.width} ${graph.height}`} role="img" aria-label={label}
              onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
           <defs>
-            <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
-              <path d="M0 0 L8 4 L0 8 z" fill="currentColor" />
-            </marker>
+            {/* One marker per state, each with its own fill. A marker's contents inherit
+                from the marker's own ancestors — not from the element referencing it — so
+                `currentColor` here resolves against the document's default text colour and
+                not against the edge's stroke. That is why every arrowhead came out black
+                whatever colour its line was. */}
+            {['ok', 'loose', 'broken'].map((state) => (
+              <marker id={`arrow-${state}`} viewBox="0 0 8 8" refX="7" refY="4"
+                      markerWidth="7" markerHeight="7" orient="auto"
+                      class={`arrowhead arrowhead--${state}`}>
+                <path d="M0 0 L8 4 L0 8 z" fill="currentColor" />
+              </marker>
+            ))}
           </defs>
           <g class="edges">
             {graph.edges.map((edge) => {
@@ -153,7 +162,7 @@ export default function GraphCanvas(
               const routed = edge.lane !== null && edge.lane !== undefined;
               return (
                 <g class={`edge edge--${state}${routed ? ' edge--routed' : ''}`}>
-                  <path d={geom.d} marker-end="url(#arrow)" />
+                  <path d={geom.d} fill="none" marker-end={`url(#arrow-${state})`} />
                   <text x={geom.label.x} y={geom.label.y} text-anchor={geom.label.anchor}>{geom.label.text}</text>
                 </g>
               );

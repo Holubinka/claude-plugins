@@ -30,15 +30,22 @@ svg { display: block; width: 100%; min-width: 34rem; height: auto; }
 .node a { cursor: pointer; }
 .node a text { text-decoration: none; }
 .node a:hover text, .node a:focus text { text-decoration: underline; }
-.edge path { fill: none; stroke-width: 1.25; }
+.edge path { stroke-width: 1.4; }   /* fill="none" is a presentation attribute on the element */
+
+/* Arrowheads are filled by their own rule rather than by currentColor: marker contents
+   inherit from the marker's ancestors, never from the element that references it. */
+.arrowhead--ok     { color: var(--muted); }
+.arrowhead--loose  { color: var(--warn); }
+.arrowhead--broken { color: var(--danger); }
 .edge--routed path { stroke-dasharray: none; opacity: 0.85; }
 .edge text { font-family: var(--mono); font-size: 9px; }
-.edge--ok     { color: var(--muted); }
-.edge--ok path     { stroke: var(--muted); }
-.edge--ok text     { fill: var(--ink-2); }
-.edge--loose  { color: var(--warn); }
-.edge--loose path  { stroke: var(--warn); stroke-dasharray: 4 3; }
-.edge--loose text  { fill: var(--warn); }
-.edge--broken { color: var(--danger); }
-.edge--broken path { stroke: var(--danger); }
-.edge--broken text { fill: var(--danger); }
+/* stroke is an inherited SVG property, so the group carries it and the path picks it up.
+   One selector instead of two, and nothing depends on a descendant match reaching the
+   path — which is the kind of dependency that fails quietly and takes the diagram with it. */
+.edge--ok     { stroke: var(--muted); }
+.edge--ok text     { fill: var(--ink-2); stroke: none; }
+.edge--loose  { stroke: var(--warn); }
+.edge--loose path  { stroke-dasharray: 4 3; }
+.edge--loose text  { fill: var(--warn); stroke: none; }
+.edge--broken { stroke: var(--danger); }
+.edge--broken text { fill: var(--danger); stroke: none; }
