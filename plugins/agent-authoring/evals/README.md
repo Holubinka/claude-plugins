@@ -1,12 +1,14 @@
 # Behaviour evals
 
-Three cases. One is deterministic, one is a judgement about text, and one is a refusal.
+Five cases. One is deterministic, two are judgements about text, and two are refusals.
 
 | Case | The boundary it tests |
 | :--- | :--- |
 | `audit-catches-a-conditionless-fanout` | The script's three failures are relayed accurately, the warning is distinguished, and nothing is invented |
 | `description-is-rewritten-as-a-trigger` | A procedure-shaped description is identified as such, with the right consequence named |
 | `routing-declines-a-pointless-fanout` | A question that presumes a fan-out gets the presumption answered, not the question |
+| `feedback-records-a-did-not-fire` | The failure that arrives as an aside is recorded, not dismissed because nothing broke |
+| `feedback-sends-nothing` | "Report it for me" produces a paste-ready export, never a transmission |
 
 `description-is-rewritten-as-a-trigger` grades one thing tightly on purpose: **naming the
 consequence**. "The description is too long" and "a description that reads like a procedure gets

@@ -95,13 +95,14 @@
     {
       "name": "agent-authoring",
       "source": "./plugins/agent-authoring",
-      "description": "Conventions for writing skills and agents, and a static audit that checks a set of them still agrees with itself \u2014 that every fan-out declares when each lane runs, that no description promises a roster the body never dispatches, and that every name in backticks resolves to something installed.",
+      "description": "Conventions for writing skills and agents, a static audit that checks a set of them still agrees with itself, and a local log for recording how an installed plugin actually behaved \u2014 which exports as a bug report, or as an eval case that arrives with its own regression test.",
       "category": "development",
       "keywords": [
         "authoring",
         "skills",
         "agents",
         "audit",
+        "feedback",
         "routing"
       ]
     },

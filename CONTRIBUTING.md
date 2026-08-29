@@ -121,6 +121,12 @@ rule the dependency graph is built on**: a backticked cross-plugin name is a pro
 resolves at install time, and this is the only check that catches one with no edge behind
 it.
 
+`build-index.py --check` also enforces a **search-payload budget**: it warns over 150 KB gzipped and
+fails over 400 KB. It sits at 149 KB, and the headroom went to three `sdd-engineering` agent bodies
+of 28, 27 and 20 KB — well past the 10 KB this repository budgets per agent. When the warning fires,
+the fix is to move prose out of those three into reference files they read on demand, **not** to
+delete it and **not** to trim a doc that is a fraction of the total.
+
 The self-tests belong to plugins whose behaviour is a shell script rather than a prompt.
 They are the whole of what is checkable for those, and they have already caught two real
 bugs that reading the scripts did not.

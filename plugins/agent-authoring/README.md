@@ -1,6 +1,8 @@
 # agent-authoring
 
-Conventions for writing skills and agents, and a static audit that checks a set of them still agrees with itself.
+Conventions for writing skills and agents, a static audit that checks a set of them still agrees with itself, and a local log for recording how an installed plugin actually behaved.
+
+**The log works for every plugin in this marketplace, not only this one.** It is here because this is where the question *how do you know your components are any good* already lives.
 
 ```sh
 /plugin install agent-authoring@dev-workbench
@@ -12,6 +14,7 @@ Conventions for writing skills and agents, and a static audit that checks a set 
 | :--- | :--- | ---: | ---: |
 | `authoring` (skill) | Why does this skill never fire — or fire on everything? | 109 | 1 143 |
 | `model-routing` (skill) | Which tier, how much effort, and is this fan-out worth it? | 115 | 1 250 |
+| `plugin-feedback` (skill) | That went wrong — how do I record it now and send it later? | 115 | 1 120 |
 | `scripts/audit-harness.py` | Do these files still say true things about each other? | — | — |
 
 ## The rule the authoring skill exists for
@@ -76,6 +79,33 @@ python3 scripts/audit-harness.py evals/fixtures/
 | Run, dispatch or evaluate anything | It is a parser. Behaviour is measured by running the thing, which is what an eval suite is for |
 | Check bare names | Only the namespaced `plugin:name` form is treated as a promise. A bare `researcher` in prose is a role, and roles are how a component refers to something it does not depend on |
 | Rewrite a description for you | The four tests are for a person to apply. A description rewritten by the thing being triggered is not a test of anything |
+
+## The feedback log
+
+The failures worth reporting happen mid-task, when nobody intends to stop and write a bug report — and by the evening the detail that made it reproducible is gone. So `plugin-feedback` records it in one line now and leaves the decision to send it for later.
+
+```sh
+scripts/feedback.sh record <plugin> <verdict>   # worked | misfired | did-not-fire
+scripts/feedback.sh list
+scripts/feedback.sh export-issue <id>           # a body for the GitHub issue form
+scripts/feedback.sh export-case <id> <dir>      # prompt.md + graders/criteria.md, for a pull request
+```
+
+**Nothing touches the network.** The log is local and moves only when someone exports an entry and pastes it themselves. Adding telemetry to prose-ware would breach [docs/security.md](../../docs/security.md) and would deserve an uninstall.
+
+Two of the three verdicts exist for reasons that are easy to miss:
+
+**`did-not-fire` is the one to bother with.** Nobody reports it spontaneously — nothing visibly breaks, you do the work yourself and move on — so from a maintainer's seat it is indistinguishable from success. It is also the expensive failure: a component that never fires is pure always-on cost.
+
+**`worked` is not flattery.** It is the only evidence a component earns its cost. Without it the log is a list of complaints, and a list of complaints argues for deleting everything.
+
+**`export-case` is what closes the loop.** It writes the case skeleton straight into this marketplace's layout, so a report can arrive as a pull request carrying its own regression test — which is a thing a maintainer would otherwise have to write themselves, from a description of something they cannot see.
+
+### Where it lives, and the catch
+
+Default is `${CLAUDE_PLUGIN_DATA}`, which Claude Code **deletes when the plugin is uninstalled from its last scope** — so the log explaining why someone uninstalled something vanishes exactly when they uninstall it. Set `PLUGIN_FEEDBACK_DIR` to a path you own, or export before uninstalling.
+
+The default stays there anyway, because writing outside the project uninvited is what [docs/security.md](../../docs/security.md) forbids. The constraint produced the better design: the log is a staging area and export is a deliberate act.
 
 ## Dependencies
 

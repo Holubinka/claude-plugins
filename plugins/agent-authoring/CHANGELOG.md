@@ -7,7 +7,7 @@ Releases are tagged `agent-authoring--v<version>`.
 
 ## [1.0.0] — 2026-08-29
 
-First release. Two skills and an audit script, generalised from a private monorepo's `.claude/` set.
+First release. Three skills and two scripts. The authoring conventions and the audit are generalised from a private monorepo's `.claude/` set; the feedback log is new.
 
 ### Added
 
@@ -44,6 +44,24 @@ First release. Two skills and an audit script, generalised from a private monore
 
   No YAML library, deliberately — a frontmatter reader that needs a dependency does not run in the
   environments this script is most useful in.
+
+- **`plugin-feedback`** and `scripts/feedback.sh` — a local log of how an installed plugin behaved,
+  which exports as a bug report or as an eval case.
+
+  It exists because of an asymmetry in what people report. Nobody files an issue saying a skill
+  correctly stayed quiet, and **nobody reports the skill that should have loaded and did not** —
+  nothing visibly breaks, they do the work themselves and move on. From a maintainer's seat that is
+  indistinguishable from success, and it is the expensive failure, so it gets its own verdict and the
+  skill asks for it by name.
+
+  `worked` is a verdict for the same reason in reverse: it is the only evidence a component earns its
+  always-on cost, and a log holding only complaints argues for deleting everything.
+
+  Nothing touches the network. The default lives in `${CLAUDE_PLUGIN_DATA}`, which is deleted on
+  uninstall — so the log explaining why someone uninstalled something vanishes when they do. That is
+  named in the skill and the README rather than hidden, with `PLUGIN_FEEDBACK_DIR` as the way out.
+  Writing outside the project uninvited would breach this marketplace's own security policy, and the
+  constraint produced the better shape: the log is a staging area, and export is a deliberate act.
 
 ### Changed from the source workflow
 
