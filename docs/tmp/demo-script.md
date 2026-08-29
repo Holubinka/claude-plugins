@@ -2,8 +2,18 @@
 
 Шість сцен, ~12 хвилин. Кожна має видиму зміну на екрані — не «повірте, воно спрацювало».
 
-Цільовий проєкт: `~/WebstormProjects/Lavego/luiverse`.
-Каталог: <https://holubinka.github.io/claude-plugins/>
+**Демо ходить між двома теками — тримайте два термінали, по одному на кожну.**
+
+| | Тека | Що там робиться |
+| :--- | :--- | :--- |
+| **A** | `~/WebstormProjects/claude-plugins` | маркетплейс: валідація, лінтер, теги |
+| **B** | `~/WebstormProjects/Lavego/luiverse` | цільовий проєкт: workflow, project-scope коміт |
+
+Команди `claude plugin …` працюють із будь-якої теки — вони змінюють конфіг машини, а не
+проєкту. Виняток один: усе з `--scope project` пише в ту теку, з якої запущено, тож для них
+термінал **B** обов'язковий.
+
+Каталог у браузері: <https://holubinka.github.io/claude-plugins/>
 
 ---
 
@@ -43,9 +53,12 @@ git clone --depth 1 --branch sdd-engineering--v1.0.0 \
 - `plugins/` — чотири теки, у кожної свій `.claude-plugin/plugin.json`, `README.md`.
 - Вкладка **Tags** — десять тегів виду `{plugin}--v{version}`. Сказати: проти них резолвляться констрейнти залежностей; нетегований реліз не можна взяти в залежність.
 
-**У терміналі:**
+**У терміналі A** — обидві команди йдуть із кореня маркетплейсу: крапка в `validate .` це
+тека з `.claude-plugin/marketplace.json`, а лінтер лежить у тому ж репозиторії. З іншої теки
+буде `✘ Validation failed · error: no .claude-plugin/marketplace.json`.
 
 ```sh
+cd ~/WebstormProjects/claude-plugins
 claude plugin validate .
 python3 scripts/lint-structure.py
 ```
@@ -78,7 +91,7 @@ python3 scripts/lint-structure.py
 ## Сцена 3 — встановлення sdd-engineering@1.0.0 · ~2 хв
 
 Живий канал зараз віддав би 1.1.0, а нам потрібна саме 1.0.0 — тож ставимо зі **stable-каналу,
-пришпиленого до тега релізу**.
+пришпиленого до тега релізу**. Термінал будь-який — далі зручно лишитись в **A**.
 
 ```sh
 claude plugin marketplace remove dev-workbench
@@ -112,11 +125,12 @@ claude plugin details sdd-engineering
 
 ## Сцена 4 — робочий workflow на 1.0.0 · ~3 хв
 
-Відкрити Claude Code у `luiverse`. Оголошувати плагіни на рівні проєкту тут **ще рано** — це
-сцена 5, і чому саме так, сказано там. Зараз вони доступні через user scope.
+**Термінал B.** Оголошувати плагіни на рівні проєкту тут **ще рано** — це сцена 5, і чому саме
+так, сказано там. Зараз вони доступні через user scope, тобто в кожному проєкті на машині.
 
 ```sh
 cd ~/WebstormProjects/Lavego/luiverse
+claude          # відкрити Claude Code саме тут
 ```
 
 Дати `spec-creator` запит, у якому одна ціль навмисно без числа:
@@ -137,7 +151,8 @@ cd ~/WebstormProjects/Lavego/luiverse
 
 ## Сцена 5 — update до 1.1.0 · ~2 хв
 
-Спершу показати, що **оновлення каталогу і оновлення плагіна це різні речі**:
+Спершу показати, що **оновлення каталогу і оновлення плагіна це різні речі**. Термінал
+будь-який:
 
 ```sh
 claude plugin marketplace remove dev-workbench
@@ -160,7 +175,8 @@ claude plugin update sdd-engineering
 ```
 
 Тепер, коли `dev-workbench` знову вказує на GitHub, **оголосити плагіни на рівні проєкту**, щоб
-їх отримав кожен, хто склонує репозиторій:
+їх отримав кожен, хто склонує репозиторій. **Обов'язково термінал B** — `--scope project` пише в
+теку, з якої запущено:
 
 ```sh
 cd ~/WebstormProjects/Lavego/luiverse
