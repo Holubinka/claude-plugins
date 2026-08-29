@@ -22,6 +22,15 @@ fan out at all.** Read it yourself, report what you find, and say that is what y
 change does not need makes that change worse, not safer — it costs a context load and returns a
 report the reader has to skim to discover it says nothing.
 
+**The inline read is a lane, not a free-form opinion.** It holds exactly the discipline the
+correctness lane holds, because the reader cannot tell which path produced a finding:
+
+- **Every finding names a concrete input that breaks it.** If you cannot, it is not a finding.
+- **No naming preferences, no formatting, no style.** A better name for a symbol is not a
+  correctness finding, and filing one here is how a small change acquires a long report.
+- **A clean read is the result**, stated as one. Six findings on a twelve-line tidy-up usually means
+  the bar dropped when the fan-out did.
+
 Escalate out of that regardless of size when the diff touches authentication, authorization,
 cryptography, money, or the handling of personal data. Those are cheap to review and expensive to get
 wrong.
@@ -126,4 +135,5 @@ as full coverage, and that is the one way this skill can mislead someone who tru
 | Letting a model-produced critical block without verification | The first unreproducible refusal is when people start bypassing the gate |
 | Treating an uncertain verdict as "keep the critical" | Then the verifier can only ever agree, and a check that cannot say no is not a check |
 | Fanning out over a two-file change | Three context loads for one small answer |
+| Letting the bar drop when the fan-out does | The inline read holds the same lane discipline. A naming preference is not a finding on either path |
 | Omitting the skipped lanes from the report | It reads as full coverage |

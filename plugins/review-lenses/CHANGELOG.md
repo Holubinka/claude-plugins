@@ -38,6 +38,14 @@ First release. One skill and three agents, generalised from a private monorepo's
   automatic upgrade from inside a review rewrites the lockfile, so every later lane describes a tree
   nobody chose.
 
+### Notes
+
+- **The inline read holds the same lane discipline as the correctness lane**, stated explicitly in the
+  skill. Found by running the skill against a two-file, thirteen-line tidy-up: the size gate worked and
+  no agents were dispatched, but the inline read then filed a naming preference as a finding — which
+  the correctness agent forbids in its own `## Never` list and which nothing had said about the path
+  that skips it. A reader cannot tell which path produced a finding, so the bar cannot differ.
+
 ### Changed from the source workflow
 
 - **The findings file is gone, and nothing is written during a review.** In the original, reviewers
