@@ -94,16 +94,21 @@ In `multi-agent`, dispatch it **per package as that package lands**, not once at
 
 ## 6. Stage 4 — review
 
-Two reviews, both read-only, dispatched together in one message:
+**Invoke `/review-lenses:review-diff`** and hand it the diff base. It sizes the change, picks only the lanes the change earned, dispatches them in one message, and puts every model-produced `critical` through an adversary before it is allowed to block anything.
 
-| Dispatch | For | Note |
-|---|---|---|
-| **`/code-review`** | the logic — bugs, correctness, efficiency | Built into Claude Code. Use `high` on a feature |
-| **`architecture-review:architecture-reviewer`** | the boundaries, given the diff or the modules touched | Runs on `sonnet` |
+| Lane | Runs when |
+|---|---|
+| correctness | any diff touching executable code — and it carries the security obligation itself |
+| boundaries — `architecture-review:architecture-reviewer` | a boundary is crossed, an import edge changes, or a composition root, route or adapter is touched |
+| dependencies | a lockfile or a manifest dependency block is in the diff |
 
-**Nothing else in this pipeline hunts bugs.** The architecture reviewer routes correctness and performance away by its own *Subject* section, and no test-writing agent is in this pipeline at all. Leave `/code-review` out and a logic error passes every stage with a clean report at each one.
+**Below two files and thirty lines it does not fan out at all**, which is the ordinary outcome on a work package and is not a stage that was skipped.
 
-Read the architecture reviewer's `critical` and `major` as *"look at this"* rather than as a grade. That axis is the least reproducible thing it produces — the same finding scored `major` on one run and `minor` on the next — which is why nothing is allowed to threshold on it.
+**`/code-review` is still worth running beside it on a feature**, at `high`. It is built into Claude Code, it is a different reader, and two independent passes over the same diff disagree usefully. Dispatch it in the same message.
+
+Read a severity as *"look at this"* rather than as a grade. That axis is the least reproducible thing a reviewer produces — the same finding scored `major` on one run and `minor` on the next — which is why nothing here is allowed to threshold on it. What `review-diff` adds is that a `critical` has to survive an adversary that tries to refute it, where **uncertain counts as refuted**, before it blocks.
+
+**Read the `## Lanes` section of what comes back.** It says which lanes did not run and why. A report without it reads as full coverage.
 
 ## 7. Stage 5 — the fix rounds
 
@@ -143,6 +148,8 @@ Where the repository has its own pre-PR review or gate command, that is the huma
 ## 11. What is deliberately not here
 
 **A test-writing stage.** The tests a plan asks for are the implementer's — it ships them beside the code, and `## Tests` is a section of the plan it executes. What is lost is only *gap coverage*: code that shipped without a test and that nobody has since asked to cover. That gap is real and it grows quietly, so cover it by hand when a module has drifted — and never beside anything else.
+
+There is a plugin in this marketplace for that gap-coverage pass, with an agent that does it properly. It is **deliberately not a dependency here**, because a dependency reads as permission to dispatch it, and §10 forbids exactly that. Run it on its own, between runs of this skill.
 
 **`spec-creator` and `implementation-planner`.** Dispatched by hand, before this skill runs.
 

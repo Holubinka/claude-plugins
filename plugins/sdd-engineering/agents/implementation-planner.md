@@ -175,6 +175,8 @@ Both open by telling you to read the repository first: find the boundary gate an
 
 Load what the work actually touches, and load it **before** you write the step it governs.
 
+**Where the repository names no gate commands, invoke `Skill(engineering-paved-path:project-commands)`** and write what it discovered into the gates section, naming the source each one came from. Where it discovers nothing, write `_None found._` and say what was read.
+
 **Where no skill covers the work — a framework this catalogue has no skill for — cite the repository's own conventions instead**: its architecture doc, its module `AGENTS.md`, an existing file that does the same thing correctly. A plan whose `## Constraints` section quotes no rule from anywhere, for work that touches application code, was written without opening one — and that is the failure mode this whole role exists to prevent.
 
 `engineering-paved-path:typescript-expert` is the implementer's, not yours. You name the suite; you do not write the assertions.
@@ -223,6 +225,13 @@ answer is nothing, say so — it is a finding either way.
 Each rule this change must respect, with the file that mandates it. Ring boundaries, a
 vendored-copy mirror, a pure package's dependency limit, a data-access rule, manual module
 registration — whichever apply. **A constraint with no source is an opinion; cut it.**
+
+Quote the rule, do not cite it. Every agent downstream of you **starts with a fresh context
+window**: it did not read the architecture document you read, it did not open the module's
+lessons file, and it will not go looking for either unless a step sends it there. A rule you
+found and referenced by filename does not reach the implementer — it reaches a path the
+implementer may or may not open. This section exists because that gap is silent: the plan looks
+complete, the implementer looks obedient, and the constraint was never in the room.
 
 ## Recommendations
 | # | Recommendation | Changes the plan? | Cost |

@@ -10,3 +10,8 @@ site/.astro/
 # catalogue drift from plugins/.
 site/src/data/
 site/public/data/
+
+# Working notes. docs/tmp/README.md says the directory is meant to be deleted before it
+# matters — until then it stays out of the repository, because two of its files name a
+# former employer, two private repositories and a local absolute path.
+docs/tmp/

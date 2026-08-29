@@ -55,7 +55,7 @@
     {
       "name": "sdd-engineering",
       "source": "./plugins/sdd-engineering",
-      "description": "Spec-driven development as four agents and three skills \u2014 spec-creator, implementation-planner, implementer and plan-verifier, orchestrated by run-plan, with a retrospective and an insights recorder.",
+      "description": "Spec-driven development as five agents and three skills \u2014 spec-creator, implementation-planner, implementer and plan-verifier, orchestrated by run-plan, with a retrospective, an insights recorder and the curator that keeps the insights store from growing past the point anyone reads it.",
       "category": "development",
       "keywords": [
         "sdd",
@@ -116,6 +116,32 @@
         "safety",
         "lint",
         "formatting"
+      ]
+    },
+    {
+      "name": "review-lenses",
+      "source": "./plugins/review-lenses",
+      "description": "Reviews a change through only the lenses that change earned. Sizes the diff, picks the lanes from what it touches, dispatches them in one message so they actually run at once, sends every model-produced critical to an adversary that tries to refute it, and merges what survives into one ordered report.",
+      "category": "development",
+      "keywords": [
+        "review",
+        "findings",
+        "fan-out",
+        "verification",
+        "agents"
+      ]
+    },
+    {
+      "name": "refactor-safely",
+      "source": "./plugins/refactor-safely",
+      "description": "Cleans up code without changing what it does, by pinning the current behaviour in tests before any structure moves. Sorts every proposed change into apply, apply-after-reading-the-callers, and propose-only \u2014 and treats a characterisation test that fails as a finding rather than a test to loosen.",
+      "category": "development",
+      "keywords": [
+        "refactoring",
+        "characterisation-tests",
+        "behaviour",
+        "cleanup",
+        "agents"
       ]
     }
   ],
