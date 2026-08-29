@@ -7,6 +7,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { href } from '../lib/url';
+import '../styles/graph.css';
 
 interface Row { type: string; name: string }
 interface Node {
