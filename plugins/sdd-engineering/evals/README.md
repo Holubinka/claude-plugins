@@ -1,6 +1,6 @@
 # Behaviour evals
 
-Six cases, one per boundary the workflow depends on. They do not grade the prose an agent produces — they check that it stopped where it was supposed to stop.
+Nine cases, one per boundary the workflow depends on. They do not grade the prose an agent produces — they check that it stopped where it was supposed to stop.
 
 | Case | The boundary it tests |
 | :--- | :--- |
@@ -10,6 +10,9 @@ Six cases, one per boundary the workflow depends on. They do not grade the prose
 | `implementer-respects-out-of-scope` | Out of scope is a boundary even when the agent's own skill would call the excluded code a violation |
 | `implementer-no-test-command` | With no gate in the repository, the agent reports that fact instead of inventing a command or claiming a green check |
 | `plan-verifier-reports-not-met` | An unimplemented item is `NOT_MET` with evidence, nothing is written to disk, and the counts match |
+| `spec-creator-requires-acceptance-criteria` | **1.1.0.** A stated goal with no acceptance criterion is either given one or raised as an open question — never silently dropped |
+| `sdd-does-not-fire-on-an-unrelated-request` | **Negative.** A one-line CSS problem dispatches no SDD agent and produces no spec |
+| `workflow-retro-only-on-request` | **Negative.** A request to summarise a finished run does not start a retrospective |
 
 Each case is a `prompt.md` and a `graders/criteria.md`. `fixtures/tiny-repo/` is the working tree they describe: one module, one boundary violation, no CI and no test command — deliberately, so that the two "what happens when nothing is configured" cases have somewhere real to run.
 
@@ -22,6 +25,12 @@ claude plugin eval ./plugins/sdd-engineering --ablation with-without
 `--ablation with-without` adds a no-plugin baseline arm and reports the delta, which is the only thing that shows the plugin is doing the work rather than the model.
 
 **`claude plugin eval` is in early access.** On an account without it enabled the command exits with `plugin eval is currently in early access` and runs nothing. These cases were authored against the documented `prompt.md` + `graders/*.md` shape and have not been executed here; treat their schema as unverified until the first successful run.
+
+## Positive and negative
+
+Six cases check that the workflow refuses where it should. Two check the opposite failure —
+that it stays out of the way. An expensive pipeline that fires on a one-line CSS fix is as
+broken as one that skips a gate, and nothing but a negative case catches it.
 
 ## What is deliberately not tested
 

@@ -268,11 +268,36 @@ Then, **if that folder keeps a status table**, append one row to its `README.md`
 
 `implementation-planner` flips that row to `Approved` when it plans against the spec; the implementer flips it to `Implemented`. You write `Draft` and never touch it again.
 
+## The coverage gate — a spec is not finished without it
+
+**Every mandatory requirement carries at least one acceptance criterion. A spec where one
+does not is unfinished, and you do not return it as done.**
+
+Mandatory means: every goal under `## Goals / Non-goals`, and every user story that states
+something the feature must do. A non-goal is exempt by definition — it is a boundary, not a
+requirement.
+
+This is a gate rather than a checklist item, and the difference is what you do when it
+fails. You do not note the gap and hand the spec over. You either:
+
+- **write the missing criterion**, if the sources settle what it should say; or
+- **turn the goal into a `Q-N`** and say in your report that the spec is blocked on it,
+  naming the goal by number.
+
+Say the count in your report either way: how many mandatory requirements the spec carries,
+and that each has a criterion.
+
+**Why it is worth a gate.** A goal with no criterion is invisible from here on. The planner
+renumbers criteria into requirements and plans against those; the verifier grades the plan.
+Neither reads the goals. So a goal nobody wrote a criterion for is a thing the human
+approved, nobody built, and every later stage reports as `MET` — the same silent gap the
+`AC` → `R#` crossing has, one step earlier and with nothing downstream that can catch it.
+
 ## Before you return
 
 Run this against what you just wrote. It catches what a human would otherwise catch on review.
 
-1. Every `G` has at least one `AC`, every `AC` has a `G` or `US` — the traceability table balances both ways.
+1. **The coverage gate above holds** — every goal has at least one `AC`, or is a `Q-N` with the spec reported blocked. Every `AC` has a `G` or `US`; the traceability table balances both ways.
 2. Every `AC` is one of the five patterns, one behaviour, one `shall`, and names something observable.
 3. Every event-driven `AC` that can fail has its `IF … THEN` twin.
 4. No vague adjective survived: each became a number in `## Non-functional requirements` or a `Q-N`.
@@ -290,6 +315,9 @@ Short. The spec is the deliverable; this is the note attached to it.
 ```
 ## What I specified   — 3–5 sentences, the substance without the criteria
 ## Spec               — path to the file
+## Coverage           — how many mandatory requirements, and that each carries an AC.
+                        If any does not, this line says the spec is blocked and names
+                        the goal by number
 ## Sources            — what I read, and what I was handed but could not read
 ## Design gaps        — what the sources did not cover, how I closed it or where I deferred it,
                         and what from this session is worth someone recording in INSIGHTS.md
