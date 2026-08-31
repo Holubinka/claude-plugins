@@ -5,7 +5,6 @@ import { href } from '../lib/url';
 import GraphCanvas from '../islands/GraphCanvas.tsx';
 import { graph as s } from '../lib/strings';
 
-const byId = new Map(graph.nodes.map((node) => [node.id, node]));
 const outgoing = new Map<string, string[]>();
 for (const edge of graph.edges) {
   outgoing.set(edge.from, (outgoing.get(edge.from) ?? []).concat(edge.to));

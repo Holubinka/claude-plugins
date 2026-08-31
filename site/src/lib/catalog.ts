@@ -1,5 +1,5 @@
-/** Types for what scripts/build-index.py writes. This mirrors the data contract in
- *  docs/tmp/site.md; if the two disagree, the Python side is authoritative. */
+/** Types for what scripts/build-index.py writes. If the two disagree, the Python side is
+ *  authoritative — these are a description of its output, not a schema it is held to. */
 
 import raw from '../data/catalog.json';
 
@@ -112,8 +112,16 @@ export interface GraphNode {
 export interface GraphEdge {
   from: string; to: string; range: string | null;
   constrained: boolean; resolvable: boolean; external: boolean;
+  /** How many columns the edge crosses. */
+  span: number;
+  /** Which routing lane it was given, or `null` for a short edge that needs none. */
+  lane: number | null;
 }
-export interface Graph { nodes: GraphNode[]; edges: GraphEdge[]; width: number; height: number }
+export interface Graph {
+  nodes: GraphNode[]; edges: GraphEdge[]; width: number; height: number;
+  /** Where the routing lanes begin, how far apart they sit, and how many there are. */
+  laneTop: number; laneGap: number; laneCount: number;
+}
 
 export interface CollisionSide { id: string; plugin: string | null; name: string; description: string }
 export interface Collision { score: number; a: CollisionSide; b: CollisionSide }

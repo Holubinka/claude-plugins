@@ -9,21 +9,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { href } from '../lib/url';
 import '../styles/graph.css';
 
-interface Row { type: string; name: string }
-interface Node {
-  id: string; label: string; depth: number; x: number; y: number;
-  width: number; height: number; version: string | null;
-  typeColumn: number; rows: Row[]; more: number;
-}
-interface Edge {
-  from: string; to: string; range: string | null;
-  constrained: boolean; resolvable: boolean; external: boolean;
-  span: number; lane: number | null;
-}
-interface Graph {
-  nodes: Node[]; edges: Edge[]; width: number; height: number;
-  laneTop: number; laneGap: number; laneCount: number;
-}
+// Type-only, and it has to stay that way: catalog.ts imports the whole catalogue JSON, so
+// a value import from here would drag it into the client bundle and through the budget.
+// These were redeclared locally once, which is how the page and the island came to
+// disagree about the same object — the mismatch only surfaced in `astro check`.
+import type { Graph, GraphNode, GraphEdge } from '../lib/catalog';
 
 type Point = { x: number; y: number };
 const CLICK_SLOP = 4;          // a pointer that moved less than this was a click, not a drag
@@ -74,7 +64,7 @@ export default function GraphCanvas(
     return { x: (event.clientX - box.left) / scale, y: (event.clientY - box.top) / scale };
   };
 
-  const onDown = (event: PointerEvent, node: Node) => {
+  const onDown = (event: PointerEvent, node: GraphNode) => {
     if (event.button !== 0) return;
     const p = toCanvas(event);
     drag.current = {
@@ -107,7 +97,7 @@ export default function GraphCanvas(
 
   const reset = () => { setMoved({}); try { localStorage.removeItem(STORE); } catch { /* nothing stored */ } };
 
-  const edgePath = (edge: Edge) => {
+  const edgePath = (edge: GraphEdge) => {
     const from = byId.get(edge.from); const to = byId.get(edge.to);
     if (!from || !to) return null;
     const siblings = outgoing.get(edge.from) ?? [];
