@@ -141,9 +141,16 @@ bugs that reading the scripts did not.
 git config core.hooksPath .githooks
 ```
 
-Once per clone. `.githooks/pre-push` then runs all five before anything leaves the
-machine — about a second in total, so there is no reason to reach for `--no-verify`. The
-full site build stays in CI, and so do the behaviour evals.
+Once per clone. `.githooks/pre-push` then runs all six before anything leaves the
+machine — about five seconds in total, so there is no reason to reach for `--no-verify`.
+The full site build stays in CI, and so do the behaviour evals.
+
+The sixth is `astro check`, and it is the slowest by an order of magnitude. It is here
+because a type error in a site island reached CI unchallenged: the site jobs were skipped
+on every pull request for weeks, and `npm run build` does not type-check, so nothing local
+would have caught it either. Both site checks skip with a message when `site/node_modules`
+or the generated `site/src/data/catalog.json` is missing — `build-index.py --check`
+validates the catalogue without writing it, so a fresh clone needs one plain run first.
 
 The probes are the least obvious of them. `site/tests/queries.json` holds
 natural-language questions and the artifact each must return; the docs are the search

@@ -4,9 +4,14 @@
 # Enable once per clone:   git config core.hooksPath .githooks
 # Skip deliberately:       git push --no-verify
 #
-# Kept to the fast checks — about a second in total — so there is never a reason to
+# Kept to the fast checks — about five seconds in total — so there is never a reason to
 # reach for --no-verify out of impatience. The full site build stays in CI, and so do
 # the behaviour evals, which call a model and cost money.
+#
+# `astro check` is here because it earned it: the site jobs were skipped on every pull
+# request for weeks, so a type error in an island reached CI unchallenged and nothing
+# local would have caught it either. It is the slowest check here by an order of
+# magnitude and still worth its three seconds.
 
 set -e
 root=$(git rev-parse --show-toplevel)
@@ -32,11 +37,19 @@ run "plugin-set audit"         python3 plugins/agent-authoring/scripts/audit-har
 run "hook self-tests"          sh -c 'for s in plugins/*/scripts/selftest.sh; do [ -x "$s" ] || continue; bash "$s" || exit 1; done'
 
 
-# The probe suite needs the site's dependencies; a fresh clone has not installed them.
-if [ -d site/node_modules ]; then
-  run "search probes"          sh -c 'cd site && node tests/search.test.mjs'
-else
+# Both site checks need the dependencies installed, and the type check also needs the
+# generated catalogue: catalog.ts imports it, so TypeScript infers the data's types from
+# the file itself and its absence reads as a type error rather than a missing input.
+# `build-index.py --check` above validates the catalogue without writing it.
+if [ ! -d site/node_modules ]; then
+  printf '  %-34sskipped (run npm install in site/)\n' "astro check"
   printf '  %-34sskipped (run npm install in site/)\n' "search probes"
+elif [ ! -f site/src/data/catalog.json ]; then
+  printf '  %-34sskipped (run scripts/build-index.py)\n' "astro check"
+  printf '  %-34sskipped (run scripts/build-index.py)\n' "search probes"
+else
+  run "astro check"            sh -c 'cd site && npx astro check'
+  run "search probes"          sh -c 'cd site && node tests/search.test.mjs'
 fi
 
 if [ "$fail" -ne 0 ]; then
