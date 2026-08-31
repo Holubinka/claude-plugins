@@ -104,6 +104,25 @@ check "lint: left the generated file alone" 0 "$?"
 grep -q 'const z   =   3' "$tmp/lint/node_modules/pkg/index.js"
 check "lint: left the vendored file alone" 0 "$?"
 
+# The same happy path again, with timeout(1) on PATH. Whether that binary exists changes
+# how the hook invokes the formatter, and a stock macOS has no coreutils — so every case
+# above ran the branch CI does not, and the branch CI does ran no formatter at all. A
+# stub keeps both reachable from either machine.
+mkdir -p "$tmp/bin"
+cat > "$tmp/bin/timeout" <<'STUB'
+#!/usr/bin/env bash
+shift                                           # the duration
+exec "$@"
+STUB
+chmod +x "$tmp/bin/timeout"
+
+printf 'const w   =    4\n' > "$tmp/lint/src/b.ts"
+echo "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"$tmp/lint/src/b.ts\"}}" \
+  | PATH="$tmp/bin:$PATH" bash "$lint_hook" >/dev/null 2>&1
+check "lint: exits 0 with timeout(1) present" 0 "$?"
+[ "$(cat "$tmp/lint/src/b.ts")" = "const w = 4" ]
+check "lint: formatted the file with timeout(1) present" 0 "$?"
+
 echo
 printf '%s passed, %s failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

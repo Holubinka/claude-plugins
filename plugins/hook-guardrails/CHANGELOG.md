@@ -32,13 +32,23 @@ First release. Two hooks, generalised from a private monorepo's `.claude/` set.
   `engineering-paved-path:project-commands`. If none resolves it exits silently — a formatter invented
   on the spot reformats a file to a style the repository does not use.
 
-- **`scripts/selftest.sh`** — eighteen cases in a throwaway repository, covering both hooks.
+  The 20-second guard on each formatter is applied to the binary, not to the shell function that
+  picks it. `timeout` is an external command and cannot execute a function, so `timeout 20 run
+  prettier` resolved nothing — and because the hook fails open by design, it exited 0 having
+  formatted nothing, on every machine that has coreutils.
 
-  It found two real bugs during development, and both are the reason it ships rather than being run
-  once: the formatter went through the package runner in a project where only the `.bin` shim existed,
-  and the project root fell back to the working directory outside a git repository — which would have
-  formatted a file to the rules of whatever project the session happened to be in. Neither was
-  visible by reading the script.
+- **`scripts/selftest.sh`** — twenty cases in a throwaway repository, covering both hooks.
+
+  It found three real bugs, and all three are the reason it ships rather than being run once: the
+  formatter went through the package runner in a project where only the `.bin` shim existed; the
+  project root fell back to the working directory outside a git repository — which would have
+  formatted a file to the rules of whatever project the session happened to be in; and the timeout
+  wrapper above. None was visible by reading the script.
+
+  The last one only surfaced in CI, so the suite now stubs `timeout` and runs the happy path twice.
+  **A case that only one operating system can reach is not a case.** A stock macOS has no coreutils,
+  so every assertion here ran the branch Linux does not — and passed while the hook did nothing at
+  all there.
 
 ### Changed from the source workflow
 

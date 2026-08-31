@@ -57,52 +57,58 @@ elif [ -f "$root/bun.lockb" ] || [ -f "$root/bun.lock" ]; then runner=(bun x)
 elif [ -f "$root/package-lock.json" ]; then runner=(npx --no-install)
 fi
 
+# A formatter that hangs must not hang the turn. The wrapper is built once here and
+# applied to the BINARY inside run(), not around run() itself: `timeout` is an external
+# command and cannot execute a shell function, so wrapping the function meant that every
+# machine with coreutils — every Linux box — ran no formatter at all and exited 0 saying
+# nothing. Absent (a stock macOS), the array is empty and the binary is called directly.
+tmo=()
+command -v timeout >/dev/null 2>&1 && tmo=(timeout 20)
+
 run() { # run a tool, preferring the project-local install, and never install anything
   local tool="$1"; shift
   # The .bin shim IS the local install — execute it directly. Going through the package
   # runner resolves the package rather than the shim, and fails where only the shim is
   # present, which is exactly the case this branch is trying to serve.
   if [ -x "$root/node_modules/.bin/$tool" ]; then
-    "$root/node_modules/.bin/$tool" "$@" >/dev/null 2>&1 || true
+    ${tmo[@]+"${tmo[@]}"} "$root/node_modules/.bin/$tool" "$@" >/dev/null 2>&1 || true
     return 0
   fi
   if [ ${#runner[@]} -gt 0 ] && [ -d "$root/node_modules/$tool" ]; then
-    "${runner[@]}" "$tool" "$@" >/dev/null 2>&1 || true
+    ${tmo[@]+"${tmo[@]}"} "${runner[@]}" "$tool" "$@" >/dev/null 2>&1 || true
     return 0
   fi
   command -v "$tool" >/dev/null 2>&1 || return 1
-  "$tool" "$@" >/dev/null 2>&1 || true
+  ${tmo[@]+"${tmo[@]}"} "$tool" "$@" >/dev/null 2>&1 || true
 }
-
-with_timeout() { if command -v timeout >/dev/null 2>&1; then timeout 20 "$@"; else "$@"; fi; }
 
 case "$file" in
   *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs|*.mts|*.cts|*.vue|*.svelte|*.json|*.css|*.scss|*.md)
     if   [ -f "$root/biome.json" ] || [ -f "$root/biome.jsonc" ]; then
-      with_timeout run biome check --write -- "$file"
+      run biome check --write -- "$file"
     else
       # ESLint and Prettier are separate decisions: a repository may have either.
       for config in eslint.config.js eslint.config.mjs eslint.config.cjs eslint.config.ts .eslintrc .eslintrc.js .eslintrc.cjs .eslintrc.json .eslintrc.yml; do
-        [ -f "$root/$config" ] && { with_timeout run eslint --fix -- "$file"; break; }
+        [ -f "$root/$config" ] && { run eslint --fix -- "$file"; break; }
       done
       for config in .prettierrc .prettierrc.json .prettierrc.js .prettierrc.cjs .prettierrc.yml .prettierrc.yaml prettier.config.js prettier.config.mjs prettier.config.cjs; do
-        [ -f "$root/$config" ] && { with_timeout run prettier --write -- "$file"; break; }
+        [ -f "$root/$config" ] && { run prettier --write -- "$file"; break; }
       done
     fi
     ;;
   *.py)
     if [ -f "$root/ruff.toml" ] || [ -f "$root/.ruff.toml" ] || grep -qs '\[tool\.ruff' "$root/pyproject.toml"; then
-      with_timeout run ruff check --fix -- "$file"
-      with_timeout run ruff format -- "$file"
+      run ruff check --fix -- "$file"
+      run ruff format -- "$file"
     elif grep -qs '\[tool\.black' "$root/pyproject.toml"; then
-      with_timeout run black -q -- "$file"
+      run black -q -- "$file"
     fi
     ;;
   *.rs)
-    [ -f "$root/Cargo.toml" ] && with_timeout run rustfmt -- "$file"
+    [ -f "$root/Cargo.toml" ] && run rustfmt -- "$file"
     ;;
   *.go)
-    [ -f "$root/go.mod" ] && with_timeout run gofmt -w -- "$file"
+    [ -f "$root/go.mod" ] && run gofmt -w -- "$file"
     ;;
 esac
 

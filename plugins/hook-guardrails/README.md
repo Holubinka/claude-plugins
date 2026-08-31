@@ -53,9 +53,11 @@ The project root is resolved **from the edited file**, walking up to the git roo
 bash scripts/selftest.sh
 ```
 
-Eighteen cases in a throwaway repository it creates and removes: the explicit pushes it must refuse, the ones it must let through (including `echo "git push origin main"`, which a naive substring match refuses), **the bare push whose upstream resolves to `main`**, and every skip rule in the formatter with a stand-in binary so the happy path is exercised rather than assumed.
+Twenty cases in a throwaway repository it creates and removes: the explicit pushes it must refuse, the ones it must let through (including `echo "git push origin main"`, which a naive substring match refuses), **the bare push whose upstream resolves to `main`**, and every skip rule in the formatter with a stand-in binary so the happy path is exercised rather than assumed.
 
-Two of the cases exist because the self-test found real bugs during development: the formatter went through the package runner where only the `.bin` shim existed, and the project root fell back to the working directory outside a git repository. Both were caught by running it, and neither would have been caught by reading it.
+Three of the cases exist because the self-test found real bugs: the formatter went through the package runner where only the `.bin` shim existed, the project root fell back to the working directory outside a git repository, and the 20-second timeout wrapped the shell function that picks a formatter rather than the formatter itself — which meant no formatter ran at all on any machine with coreutils. All three were caught by running it, and none would have been caught by reading it.
+
+The last one ran green on macOS for as long as it was only run there, so the suite stubs `timeout` and repeats the happy path with it on `PATH`. **A case only one operating system can reach is not a case.**
 
 ## What it will not do
 
