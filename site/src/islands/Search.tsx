@@ -141,20 +141,46 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
   );
 
   const counts = useMemo(() => {
+    // Every facet is tallied over the results already narrowed by the OTHER facets, so a
+    // number says what that option would actually return if it were clicked next.
+    // Tallying the whole pool instead offered `documentation 59` beside a single hook,
+    // and eleven of the twelve options on screen led to "nothing matches those filters".
+    //
+    // A facet never narrows its own tally: within one facet the values are alternatives
+    // (skill OR agent), so counting `agent` against a chosen `skill` would zero out every
+    // sibling and put multi-select out of reach.
+    const passes = (r: SearchResult, except: (typeof FACET_KEYS)[number]) =>
+      FACET_KEYS.every(
+        (key) => key === except || facets[key].size === 0 || facets[key].has(String(r[key])),
+      );
+
     const tally = (key: (typeof FACET_KEYS)[number]) => {
       const out = new Map<string, number>();
       for (const r of results) {
+        if (!passes(r, key)) continue;
         const value = r[key] as string | null;
         if (value) out.set(value, (out.get(value) ?? 0) + 1);
       }
+      // A chosen value stays on screen at zero — it is the only way to switch it off.
+      for (const value of facets[key]) if (!out.has(value)) out.set(value, 0);
       return [...out].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
     };
     return { type: tally('type'), plugin: tally('plugin'), category: tally('category') };
-  }, [results]);
+  }, [results, facets]);
 
   const ready = docs !== null;
   const chosen = FACET_KEYS.some((key) => facets[key].size > 0);
   const activeTotal = FACET_KEYS.reduce((n, key) => n + facets[key].size, 0);
+  // An option that would return nothing is not a choice — it goes. Unless it is the one
+  // currently on, which stays at zero because hiding it would strand the filter.
+  const visible = (key: (typeof FACET_KEYS)[number]) =>
+    counts[key].filter(([value, n]) => n > 0 || facets[key].has(value));
+  // What clearing `type` would leave, rather than the size of the whole catalogue.
+  const allCount = counts.type.reduce((n, [, c]) => n + c, 0);
+  // Which rows still offer a choice. Narrow enough and none of them do — one hook has
+  // one plugin and one category — and then the disclosure would open on nothing, so the
+  // button that opens it goes too.
+  const moreRows = MORE_KEYS.filter((key) => visible(key).length > 1 || facets[key].size > 0);
   const hiddenActive = MORE_KEYS.reduce((n, key) => n + facets[key].size, 0);
   // Either a query or a facet puts the island in charge of what is on screen.
   const filtering = searching || chosen;
@@ -268,9 +294,9 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
                 aria-pressed={facets.type.size === 0}
                 onClick={() => setFacets((current) => ({ ...current, type: new Set() }))}
               >
-                {s.facetAll} <span class="n">{results.length}</span>
+                {s.facetAll} <span class="n">{allCount}</span>
               </button>
-              {counts.type.map(([value, n]) => (
+              {visible('type').map(([value, n]) => (
                 <label class="filters__opt" key={value} data-on={facets.type.has(value) ? 'true' : 'false'}>
                   {/* The checkbox stays in the DOM and keeps the keyboard and screen
                       reader behaviour; only its own rendering is dropped. */}
@@ -292,6 +318,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
                   {s.clearAll}<span aria-hidden="true"> ×</span>
                 </button>
               )}
+              {moreRows.length > 0 && (
               <button
                 type="button"
                 class="filters__more"
@@ -305,17 +332,16 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
                     reason the result count is small. */}
                 {hiddenActive > 0 && <span class="filters__badge">{hiddenActive}</span>}
               </button>
+              )}
             </div>
           </div>
 
-          {showMore && (
+          {showMore && moreRows.length > 0 && (
             <div class="filters__panel" id="more-filters">
-              {MORE_KEYS.map((key) => {
-                // A facet with one value filters nothing — except when it is the one
-                // already chosen, which must stay on screen to be switched off again.
-                if (counts[key].length <= 1 && facets[key].size === 0) return null;
-                const shown = counts[key].slice(0, FACET_LIMIT);
-                const hidden = counts[key].length - shown.length;
+              {moreRows.map((key) => {
+                const live = visible(key);
+                const shown = live.slice(0, FACET_LIMIT);
+                const hidden = live.length - shown.length;
                 return (
                   <div class="filters__row" key={key}>
                     <span class="filters__label">{legend[key]}</span>
