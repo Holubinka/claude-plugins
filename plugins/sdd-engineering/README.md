@@ -1,12 +1,12 @@
 # sdd-engineering
 
-Spec-driven development as a pipeline: **a specification, then a plan, then code, then a check that the code is what the plan asked for.** Four agents, three skills, and one rule holding it together — every stage reads what the previous stage wrote to disk, never the conversation.
+Spec-driven development as a pipeline: **a specification, then a plan, then code, then a check that the code is what the plan asked for.** Five agents, three skills, and one rule holding it together — every stage reads what the previous stage wrote to disk, never the conversation.
 
 ```sh
 /plugin install sdd-engineering@dev-workbench
 ```
 
-Installing this pulls in `engineering-paved-path`, `research-tools` and `architecture-review`.
+Installing this pulls in `engineering-paved-path`, `research-tools`, `architecture-review` and `review-lenses`.
 
 ## Why the artefacts are files
 
@@ -25,8 +25,14 @@ That is the design, not a limitation. A plan step that only makes sense to someo
 | 5 | `run-plan` | the plan path | orchestrates 6 through 9 |
 | 6 | `implementer` | the plan, or one work package | code, and gate output it pastes |
 | 7 | `plan-verifier` | the plan and the branch | item-by-item verdicts with evidence |
-| 8 | `/code-review` + `architecture-reviewer` | the diff | findings |
+| 8 | `review-lenses:review-diff` | the diff | one merged, verified findings table |
 | 9 | fix rounds | the findings, triaged | at most two rounds, then stop |
+
+**Not every request needs stage 1.** `spec-creator` classifies first and says so out loud: a
+feasibility question gets a Spike answer, a well-scoped change to a flow that already exists gets a
+short design in chat, and only an architectural request gets a spec file. **The ceremony scales with
+the request; the approval gate never does** — a bounded design is still returned for a human to
+approve before any code is written.
 
 **Stages 2 and 4 are people, and they are the point.** The spec exists so a human can approve requirements before anything is built; the plan exists so a human can approve an approach before code is written. `spec-creator` will never write `approved`, and nothing in this plugin commits, pushes, or opens a pull request.
 
@@ -52,6 +58,10 @@ The rule that earns its place: **every acceptance criterion in the spec must bec
 
 **`implementer`** — executes the plan and stops at its boundary. It does not design, review, commit or push. It runs the gates the plan lists, character for character, and pastes real output. A refactor it decided was necessary is a finding, not a task.
 
+**`insight-curator`** — the deliberate pruning pass over the insights store. It **proposes and stops**, writing nothing until a human approves: duplicates, entries the code now contradicts, lessons that have outgrown the file and belong in a skill or a convention file.
+
+Its rule is *verify before calling anything stale*, and it exists because the alternative has been measured. A command was cited in a repository's own conventions file and in an agent's prompt while existing in no manifest; a false claim about which test framework a repository used spread to five files before anyone opened a test. **A claim repeated in several places is not corroborated — it is copied.** And where an entry is now wrong it proposes a *dated correction beneath it*, never an edit to it: the fact that it was once true is what made it a lesson.
+
 **`plan-verifier`** — grades the branch against the plan, item by item. It enumerates every item verbatim *before* opening any code, decomposes compound criteria into one row each, answers each with a `path:line` or pasted command output, and then adversarially re-checks everything it was about to call `MET`. It writes nothing, and it never touches the status row it is grading.
 
 ## The skills
@@ -66,6 +76,8 @@ Two of its rules are worth knowing before you use it:
 **`/sdd-engineering:workflow-retro`** — what the orchestration cost, from the transcripts it left. A bundled script reads the billed `usage` figures; the judgement is yours. Its most useful output is not a number but a sentence: **what a resume said**, because that sentence belonged in the first brief.
 
 **`/sdd-engineering:engineering-insights`** — records what a session learned into the nearest `INSIGHTS.md`, so the next session starts with it. An insight is a record, not a rule; promoting one to the other is a separate, deliberate act.
+
+It is **append-only on purpose**: the session that finds an entry inconvenient is the one least qualified to remove it. `insight-curator` is what makes that safe — without a pruner, append-only becomes unbounded, and a file long enough that nobody reads to the end has the same effect as an empty one at a higher cost.
 
 ## Configuration
 
@@ -111,20 +123,28 @@ This is the case the plugin is built for, so it is worth stating exactly:
 ## Dependencies
 
 ```
-sdd-engineering@1.0.0
-├── engineering-paved-path@^1.0.0     6 skills the agents route to
+sdd-engineering@1.2.0
+├── engineering-paved-path@^1.0.0     8 skills the agents route to
 ├── research-tools@^1.0.0             the researcher spec-creator dispatches
-└── architecture-review@^1.0.0        the reviewer run-plan dispatches at stage 4
-    └── engineering-paved-path@^1.0.0
+├── architecture-review@^1.0.0        the boundary reviewer
+└── review-lenses@^1.0.0              the conditional fan-out run-plan invokes at stage 4
+    ├── engineering-paved-path@^1.1.0
+    └── architecture-review@^1.1.0
 ```
 
-Cross-plugin references are namespaced: `engineering-paved-path:onion-architecture`, `research-tools:researcher`, `architecture-review:architecture-reviewer`.
+Four levels, and the shape is honest rather than accidental: `run-plan` orchestrates a reviewer that orchestrates reviewers that read one shared severity definition. Flattening it means copying that definition into three plugins, which is the duplication `engineering-paved-path` exists to prevent. The cost is worth naming: installing this now pulls five plugins, and every enabled plugin's skill descriptions are always-on context.
+
+The `architecture-review` range stays `^1.0.0` here and resolves to 1.1.0 or newer by intersection with `review-lenses`. Tightening it directly would be a major bump under [docs/releasing.md](../../docs/releasing.md)'s own rules, for what is prose.
+
+Cross-plugin references are namespaced: `engineering-paved-path:onion-architecture`, `research-tools:researcher`, `architecture-review:architecture-reviewer`, `review-lenses:review-diff`.
+
+**`test-discipline` is deliberately not a dependency**, even though `run-plan` names it in prose. §10 of that skill forbids dispatching a test writer from the pipeline at all — it holds a deliberate defect in the tree between mutating a file and reverting it, so anything reading files beside it measures the mutation. **A dependency reads as permission**, and declaring one on a plugin the skill is forbidden to dispatch is a contradiction in the manifest.
 
 `/code-review` is built into Claude Code and is not a dependency.
 
 ## Evals
 
-Six behaviour cases under `evals/`, one per boundary the workflow depends on — all of them refusals rather than quality judgements. See [evals/README.md](evals/README.md), including the note that `claude plugin eval` is currently early access.
+Eleven behaviour cases under `evals/`, one per boundary the workflow depends on — almost all of them refusals rather than quality judgements. See [evals/README.md](evals/README.md), including the note that `claude plugin eval` is currently early access.
 
 ## Requirements
 
@@ -135,5 +155,7 @@ Six behaviour cases under `evals/`, one per boundary the workflow depends on —
 ## What is deliberately not here
 
 **A test-writing stage.** The tests a plan asks for are the implementer's, shipped beside the code. What is lost is gap coverage for code that shipped untested and that nobody has since asked to cover — cover it by hand, and never beside another agent: a test writer that proves a test can fail leaves a deliberate defect in the tree between mutating a file and reverting it, so anything reading files or running gates in that window measures the mutation.
+
+There is a plugin in this marketplace for that pass, and it is deliberately not a dependency here for the reason above.
 
 **Anything that commits, pushes or opens a pull request.** Ending a run with a commit nobody asked for makes a stage's output irreversible before it has been read.

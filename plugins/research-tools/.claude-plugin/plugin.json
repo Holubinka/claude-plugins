@@ -1,9 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "research-tools",
-  "description": "A read-only researcher agent that answers how something works in this repository, or what the outside world says about a technology — with every claim addressed to a path:line or a URL it opened.",
-  "version": "1.1.0",
+  "description": "Two read-only agents for questions that need a checkable answer — a researcher that reports how something works or what the outside world says, with every claim addressed to a path:line or a URL it opened, and a cheap investigator that traces what connects to what.",
+  "version": "1.2.0",
   "author": { "name": "Vitalii Holubinka" },
   "license": "MIT",
-  "keywords": ["research", "read-only", "investigation", "evidence", "agent"]
+  "keywords": ["research", "read-only", "investigation", "tracing", "evidence", "agent"]
 }

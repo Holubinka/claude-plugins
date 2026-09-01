@@ -87,7 +87,9 @@ Write entries in the language the rest of the repository is written in. Where th
 
 ## Append only
 
-Add entries; never rewrite or delete one. A rewrite mid-session erases someone else's lesson and causes merge conflicts on a shared file. If an entry is now wrong, append a dated correction beneath it and leave the original standing. Pruning is a separate, deliberate human pass — not your job during a session.
+Add entries; never rewrite or delete one. A rewrite mid-session erases someone else's lesson and causes merge conflicts on a shared file. If an entry is now wrong, append a dated correction beneath it and leave the original standing.
+
+**Pruning is a separate, deliberate pass and not your job during a session.** The session that finds an entry inconvenient is the one least qualified to remove it. `sdd-engineering:insight-curator` is that pass: it verifies against the code before calling anything stale, proposes duplicates, corrections, promotions and deletions, and stops without writing until a human approves. Run it monthly, or when the file gets long enough that nobody reads to the end — because append-only without a pruner eventually produces a file with the same effect as an empty one, at a higher cost.
 
 ## Limits
 

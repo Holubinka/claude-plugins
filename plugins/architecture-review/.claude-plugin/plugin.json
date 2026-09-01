@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "architecture-review",
   "description": "An agent that reviews boundaries and nothing else — ring placement, dependency direction, ports and adapters, and the Server/Client line. Reads the repository's own architecture rules first and works where the automated gate cannot reach.",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "author": { "name": "Vitalii Holubinka" },
   "license": "MIT",
   "keywords": ["architecture", "review", "boundaries", "dependency-direction", "agent"],

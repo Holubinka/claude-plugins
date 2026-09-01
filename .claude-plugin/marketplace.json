@@ -13,26 +13,29 @@
     {
       "name": "engineering-paved-path",
       "source": "./plugins/engineering-paved-path",
-      "description": "Six shared engineering skills \u2014 backend and frontend architecture, security review, PostgreSQL table design, TypeScript type work and Mermaid diagrams. The single source other plugins depend on instead of copying.",
+      "description": "Twelve shared engineering skills \u2014 where backend and frontend code goes, ring placement and dependency direction, security review, PostgreSQL table design, TypeScript type work, Mermaid diagrams, the four-level severity scale, command discovery, root-cause debugging, keeping a change to what was asked, and the rule that no claim of done ships without fresh evidence. The single source other plugins depend on instead of copying.",
       "category": "development",
       "keywords": [
         "architecture",
+        "backend",
         "security",
         "typescript",
         "postgresql",
         "mermaid",
+        "severity",
         "skills"
       ]
     },
     {
       "name": "research-tools",
       "source": "./plugins/research-tools",
-      "description": "A read-only researcher agent that answers how something works in this repository, or what the outside world says about a technology \u2014 with every claim addressed to a path:line or a URL it opened.",
+      "description": "Two read-only agents for questions that need a checkable answer \u2014 a researcher that reports how something works or what the outside world says, with every claim addressed to a path:line or a URL it opened, and a cheap investigator that traces what connects to what.",
       "category": "development",
       "keywords": [
         "research",
         "read-only",
         "investigation",
+        "tracing",
         "evidence",
         "agent"
       ]
@@ -53,7 +56,7 @@
     {
       "name": "sdd-engineering",
       "source": "./plugins/sdd-engineering",
-      "description": "Spec-driven development as four agents and three skills \u2014 spec-creator, implementation-planner, implementer and plan-verifier, orchestrated by run-plan, with a retrospective and an insights recorder.",
+      "description": "Spec-driven development as five agents and three skills \u2014 spec-creator, implementation-planner, implementer and plan-verifier, orchestrated by run-plan, with a retrospective, an insights recorder and the curator that keeps the insights store from growing past the point anyone reads it.",
       "category": "development",
       "keywords": [
         "sdd",
@@ -62,6 +65,85 @@
         "orchestration",
         "agents",
         "ears"
+      ]
+    },
+    {
+      "name": "test-discipline",
+      "source": "./plugins/test-discipline",
+      "description": "Tests for the change in front of you, in the framework this repository already uses \u2014 discovered from the nearest sibling test rather than assumed. Two skills and an agent, holding one rule: when a test and the code disagree, decide which of them is wrong before touching either.",
+      "category": "development",
+      "keywords": [
+        "testing",
+        "tests",
+        "regression",
+        "discovery",
+        "skills"
+      ]
+    },
+    {
+      "name": "change-docs",
+      "source": "./plugins/change-docs",
+      "description": "Everything a change needs after it works \u2014 annotated screenshots taken from the running page, a pull request description with a fixed shape and an explicit never-include list, and an agent that fixes the sentences a change made false rather than rewriting the documentation around them.",
+      "category": "development",
+      "keywords": [
+        "documentation",
+        "screenshots",
+        "pull-request",
+        "drift",
+        "agent"
+      ]
+    },
+    {
+      "name": "agent-authoring",
+      "source": "./plugins/agent-authoring",
+      "description": "Conventions for writing skills and agents, a static audit that checks a set of them still agrees with itself, and a local log for recording how an installed plugin actually behaved \u2014 which exports as a bug report, or as an eval case that arrives with its own regression test.",
+      "category": "development",
+      "keywords": [
+        "authoring",
+        "skills",
+        "agents",
+        "audit",
+        "feedback",
+        "routing"
+      ]
+    },
+    {
+      "name": "hook-guardrails",
+      "source": "./plugins/hook-guardrails",
+      "description": "Two shell hooks that close two mistakes a prompt cannot reliably prevent \u2014 a push that lands on a protected branch, including the bare push whose upstream silently resolves to one, and a whole-repository format run triggered by editing a single file.",
+      "category": "development",
+      "keywords": [
+        "hooks",
+        "git",
+        "safety",
+        "lint",
+        "formatting"
+      ]
+    },
+    {
+      "name": "review-lenses",
+      "source": "./plugins/review-lenses",
+      "description": "Reviews a change through only the lenses that change earned \u2014 sizing the diff, picking the lanes from what it touches, dispatching them in one message, and sending every model-produced critical to an adversary that tries to refute it. Also covers the receiving end: what an author owes a finding before implementing it.",
+      "category": "development",
+      "keywords": [
+        "review",
+        "findings",
+        "fan-out",
+        "verification",
+        "agents"
+      ]
+    },
+    {
+      "name": "refactor-safely",
+      "source": "./plugins/refactor-safely",
+      "description": "Cleans up code without changing what it does, by pinning the current behaviour in tests before any structure moves. Sorts every proposed change into apply, apply-after-reading-the-callers, and propose-only \u2014 and treats a characterisation test that fails as a finding rather than a test to loosen.",
+      "category": "development",
+      "keywords": [
+        "refactoring",
+        "characterisation-tests",
+        "behaviour",
+        "cleanup",
+        "agents"
       ]
     }
   ],

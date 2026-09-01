@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "refactor-safely",
+  "description": "Cleans up code without changing what it does, by pinning the current behaviour in tests before any structure moves. Sorts every proposed change into apply, apply-after-reading-the-callers, and propose-only — and treats a characterisation test that fails as a finding rather than a test to loosen.",
+  "version": "1.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["refactoring", "characterisation-tests", "behaviour", "cleanup", "agents"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.3.0" },
+    { "name": "test-discipline", "version": "^1.0.0" }
+  ]
+}

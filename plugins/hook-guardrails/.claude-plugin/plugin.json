@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "hook-guardrails",
+  "description": "Two shell hooks that close two mistakes a prompt cannot reliably prevent — a push that lands on a protected branch, including the bare push whose upstream silently resolves to one, and a whole-repository format run triggered by editing a single file.",
+  "version": "1.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["hooks", "git", "safety", "lint", "formatting"]
+}

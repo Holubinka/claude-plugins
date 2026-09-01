@@ -66,7 +66,7 @@ python3 scripts/build-index.py --check
 `claude plugin eval ./plugins/<name>` scores eval cases from `plugins/<name>/evals/`
 against a no-plugin baseline. `claude plugin details <name>` reports the token cost.
 
-## The three checks
+## The free checks
 
 `claude plugin validate` covers JSON syntax, manifest fields, skill frontmatter, and
 version drift between a marketplace entry and a manifest.
@@ -107,20 +107,94 @@ things that leave a plugin installable but unfindable, or findable but unreadabl
 
 All three run in CI on every pull request. Errors fail the build; warnings do not.
 
+Two more run in the same job, and both are free because neither calls a model:
+
+```sh
+python3 plugins/agent-authoring/scripts/audit-harness.py plugins/
+for s in plugins/*/scripts/selftest.sh; do bash "$s"; done
+```
+
+The audit checks whether the plugins still say true things about each other — a fan-out
+table with no per-lane condition, a description promising a roster the body never
+dispatches, a `plugin:name` in backticks that resolves to nothing. **That last one is the
+rule the dependency graph is built on**: a backticked cross-plugin name is a promise it
+resolves at install time, and this is the only check that catches one with no edge behind
+it.
+
+`build-index.py --check` also enforces a **search-payload budget**: it warns over 150 KB gzipped and
+fails over 400 KB. **W108 is firing now, at exactly 150 KB.** CI stays green — it is a warning — but
+it is a real item rather than noise.
+
+The headroom went to three `sdd-engineering` agent bodies of 28, 27 and 20 KB, against the 10 KB this
+repository budgets per agent. The fix is to move prose out of those three into reference files they
+read on demand — **not** to delete it, and **not** to trim a doc, since all 39 doc sections together
+are 29 KB of a 324 KB corpus. It is a behaviour change to three shipped agents and belongs in its own
+pass with its own verification, not bundled into whatever change happens to cross the line.
+
+The self-tests belong to plugins whose behaviour is a shell script rather than a prompt.
+They are the whole of what is checkable for those, and they have already caught two real
+bugs that reading the scripts did not.
+
 ## Run them before you push
 
 ```sh
 git config core.hooksPath .githooks
 ```
 
-Once per clone. `.githooks/pre-push` then runs the two linters and the search probes
-before anything leaves the machine — under a second in total, so there is no reason to
-reach for `--no-verify`. The full site build stays in CI.
+Once per clone. `.githooks/pre-push` then runs all six before anything leaves the
+machine — about five seconds in total, so there is no reason to reach for `--no-verify`.
+The full site build stays in CI, and so do the behaviour evals.
 
-The probes are the least obvious of the three. `site/tests/queries.json` holds
+The sixth is `astro check`, and it is the slowest by an order of magnitude. It is here
+because a type error in a site island reached CI unchallenged: the site jobs were skipped
+on every pull request for weeks, and `npm run build` does not type-check, so nothing local
+would have caught it either. Both site checks skip with a message when `site/node_modules`
+or the generated `site/src/data/catalog.json` is missing — `build-index.py --check`
+validates the catalogue without writing it, so a fresh clone needs one plain run first.
+
+The probes are the least obvious of them. `site/tests/queries.json` holds
 natural-language questions and the artifact each must return; the docs are the search
 corpus, so editing a doc can move the ranking and break one. That has already happened
-once.
+twice — the second time when twenty components landed at once and a probe that was
+passing at exactly its limit had no room left.
+
+## The evals, which are not free
+
+Every plugin carries behaviour cases under `evals/` — a `prompt.md` and a
+`graders/criteria.md` per case, checking that a component stops where it is supposed to
+stop rather than grading its prose.
+
+```sh
+scripts/run-evals.sh                            # every plugin that has cases
+scripts/run-evals.sh review-lenses              # one
+scripts/run-evals.sh --case 'verifier-*' review-lenses
+scripts/run-evals.sh --changed-since origin/main
+```
+
+These call a model, so they live in their own workflow — `.github/workflows/evals.yml`,
+triggered by hand from the Actions tab, or automatically on a pull request **for the
+plugins that pull request touched**. Running every plugin's suite on every push costs
+real money for changes that cannot have affected them.
+
+It needs an `ANTHROPIC_API_KEY` repository secret. Without one — on a fork's pull request,
+for instance — the job says so and runs the free self-tests instead. That is not a
+failure.
+
+**`claude plugin eval` is currently in early access.** On an account without it the
+command exits 1 with `plugin eval is currently in early access`, which is indistinguishable
+from a failing suite by exit code alone. `scripts/run-evals.sh` reads the message and
+reports those plugins as *gated* rather than failed, because a red check nobody can turn
+green teaches people to ignore the check.
+
+Until access lands, the way to exercise a case is by hand:
+
+```sh
+claude --plugin-dir ./plugins/<name> -p "$(cat plugins/<name>/evals/<case>/prompt.md)" \
+       --permission-mode plan --output-format text < /dev/null
+```
+
+then read the answer against that case's `graders/criteria.md`. Three cases run that way
+so far, and each one found a real defect.
 
 ## Releasing
 

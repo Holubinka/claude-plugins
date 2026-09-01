@@ -121,10 +121,19 @@ export const search = {
   facetType: 'type',
   facetPlugin: 'plugin',
   facetCategory: 'category',
-  facetKeyword: 'keyword',
-  /** Shown under the keyword row when the tail is hidden — see FACET_LIMIT. */
+  /** Shown when a facet row is capped — see FACET_LIMIT. Keyword is not a facet at all:
+   *  it is a search field, because 102 values is a vocabulary and not a set of choices. */
   facetMore: (n: number) => `+${n} more, reachable by searching`,
-  browsing: (n: number) => `Browsing ${n} artifacts. Type to search, or filter below.`,
+  /** The type row is a segmented control; this is its no-filter segment. */
+  facetAll: 'all',
+  facetAllLabel: 'Filter by type',
+  /** The disclosure holding plugin and category. */
+  moreOpen: 'More filters',
+  moreClose: 'Fewer filters',
+  moreActive: (n: number) => `${n} on`,
+  clearAll: 'Clear filters',
+  activeCount: (n: number) => `${n} ${n === 1 ? 'filter' : 'filters'} active`,
+  browsing: (n: number) => `Browsing ${n} artifacts. Type to search, or pick a filter.`,
   emptyTitle: 'No artifact in this marketplace matches that.',
   askForIt: 'Ask for it',
   emptyAside:
@@ -159,10 +168,10 @@ export const install = {
 
 export const tokens = {
   always: 'Always',
-  alwaysNote: 'Carried in every turn while the plugin is enabled.',
+  alwaysNote: 'The description line alone. In context on every turn while the plugin is enabled — whether or not it ever fires.',
   onLoad: 'On load',
-  onLoadNote: 'Paid only when it fires.',
-  inlineTitle: 'Always in context / paid on load',
+  onLoadNote: 'The body of the file. Read only when this component actually fires. Reference files beside it load separately and are not counted here.',
+  inlineTitle: 'always = the description line, in context every turn · on load = the body, read only when it fires',
   inlineAlways: 'always',
   inlineOnLoad: '· on load',
 } as const;
@@ -273,6 +282,8 @@ export const bundle = {
 } as const;
 
 export const graph = {
+  dragHint: 'Drag a box to rearrange. Click a name to open it.',
+  resetLayout: 'Reset layout',
   title: 'Dependency graph',
   description: 'Which plugins depend on which, and which of those dependencies cannot resolve.',
   eyebrow: 'Graph',

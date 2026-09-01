@@ -654,6 +654,7 @@ GRAPH_PAD = 14
 GRAPH_GUTTER = 118
 GRAPH_ROW_GAP = 26
 GRAPH_MAX_ROWS = 7
+GRAPH_LANE_GAP = 21   # vertical spacing between lanes: enough for a 10.5px label plus its halo
 
 
 def _text_w(text: str, size: float) -> float:
@@ -751,24 +752,43 @@ def build_graph(plugins: list[dict], artifacts: list[dict]) -> dict:
     edges = []
     for plugin in plugins:
         for dep in plugin["dependencies"]:
+            span = depth.get(plugin["name"], 0) - depth.get(dep["name"], 0)
             edges.append(
                 {
                     "from": plugin["name"], "to": dep["name"], "range": dep["range"],
                     "constrained": dep["constrained"], "resolvable": dep["resolvable"],
                     "external": dep["name"] not in by_name,
+                    "span": span,
                 }
             )
 
-    width = round(cursor - GRAPH_GUTTER + 16, 1) if layers else 0
-    height = round(
-        16 + max(
-            (sum(sizes[n][1] for n in names) + GRAPH_ROW_GAP * (len(names) - 1)
-             for names in layers.values()),
-            default=0,
-        ) + 16,
-        1,
+    # An edge between adjacent columns crosses only a gutter and can be drawn straight.
+    # One that skips a column would otherwise sweep through the boxes standing in between,
+    # which is what made the picture unreadable — so those get a lane of their own below
+    # the diagram and travel there instead. Longest first, so the widest arcs sit lowest
+    # and the lanes nest rather than cross.
+    long_edges = sorted(
+        (e for e in edges if e["span"] > 1),
+        key=lambda e: (-e["span"], e["from"], e["to"]),
     )
-    return {"nodes": nodes, "edges": edges, "width": width, "height": height}
+    for index, edge in enumerate(long_edges):
+        edge["lane"] = index
+    for edge in edges:
+        edge.setdefault("lane", None)
+
+    width = round(cursor - GRAPH_GUTTER + 16, 1) if layers else 0
+    tallest = max(
+        (sum(sizes[n][1] for n in names) + GRAPH_ROW_GAP * (len(names) - 1)
+         for names in layers.values()),
+        default=0,
+    )
+    lanes = len(long_edges)
+    height = round(16 + tallest + (GRAPH_LANE_GAP * lanes + 16 if lanes else 0) + 16, 1)
+    return {
+        "nodes": nodes, "edges": edges, "width": width, "height": height,
+        "laneTop": round(16 + tallest + 16, 1), "laneGap": GRAPH_LANE_GAP,
+        "laneCount": lanes,
+    }
 
 
 # --------------------------------------------------------------------------- build

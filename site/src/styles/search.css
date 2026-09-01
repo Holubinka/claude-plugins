@@ -27,24 +27,103 @@
 .search__keys kbd { margin-right: .1rem; }
 .search__count { font-family: var(--mono); font-size: .74rem; color: var(--muted); }
 
-.facets { display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; }
-.facets fieldset { border: 0; margin: 0; padding: 0; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
-.facets legend {
-  float: left; margin-inline-end: .5rem;
+/* ---------- filters ----------
+   Four equal rows of checkboxes put twenty-eight native tick-boxes above the results.
+   In dark mode those render as solid white squares and became the loudest thing on the
+   page. The inputs are still here — only their own rendering is dropped, so the label
+   carries the state and the keyboard and screen reader behaviour is unchanged. */
+
+.filters { display: flex; flex-direction: column; gap: .55rem; }
+.filters__bar {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: .6rem 1rem;
+}
+
+/* One object with internal divisions, rather than four things that happen to be near
+   each other — the segments share a border so the group reads as a single control. */
+.filters__seg {
+  display: flex; flex-wrap: wrap;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface); overflow: hidden;
+}
+.filters__opt {
+  display: inline-flex; align-items: baseline; gap: .35rem;
+  font-family: var(--mono); font-size: .74rem; line-height: 1;
+  margin: 0; padding: .45rem .75rem;
+  border: 0; border-left: 1px solid var(--rule);
+  background: none; color: var(--ink-2);
+  cursor: pointer;
+}
+.filters__opt:first-child { border-left: 0; }
+.filters__opt:hover { background: var(--surface-2); color: var(--ink); }
+.filters__opt[data-on='true'] { background: var(--accent-bg); color: var(--accent); }
+.filters__opt:focus-visible,
+.filters__opt:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+.filters__opt .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+.filters__opt[data-on='true'] .n { color: inherit; opacity: .7; }
+
+.filters__tools { display: flex; align-items: center; gap: .4rem; }
+.filters__active { font-family: var(--mono); font-size: .7rem; color: var(--muted); }
+.filters__more, .filters__clear {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-family: var(--mono); font-size: .72rem; line-height: 1;
+  padding: .4rem .6rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: none; color: var(--ink-2); cursor: pointer;
+}
+.filters__more:hover, .filters__clear:hover { border-color: var(--accent); color: var(--accent); }
+.filters__clear { border-color: transparent; color: var(--muted); }
+
+.filters__chevron { display: inline-block; color: var(--muted); transition: transform .12s ease; }
+.filters__chevron[data-open='true'] { transform: rotate(90deg); }
+
+/* Collapsed filters still filter, so the count travels with the closed disclosure. */
+.filters__badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.1rem; height: 1.1rem; padding: 0 .22rem;
+  border-radius: 999px; background: var(--accent); color: var(--bg);
+  font-size: .62rem; font-variant-numeric: tabular-nums;
+}
+
+.filters__panel {
+  display: flex; flex-direction: column; gap: .5rem;
+  padding: .75rem .9rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface);
+}
+/* A column for the labels, so three rows of values start on the same line. The old
+   float:left legend left every row starting at a different x. */
+.filters__row { display: grid; grid-template-columns: 5.25rem 1fr; gap: .5rem; align-items: baseline; }
+.filters__label {
   font-family: var(--mono); font-size: .66rem; letter-spacing: .12em;
   text-transform: uppercase; color: var(--muted);
 }
-.facet {
-  display: inline-flex; align-items: center; gap: .3rem;
-  font-family: var(--mono); font-size: .74rem; color: var(--ink-2);
-  border: 1px solid var(--rule); border-radius: 3px;
-  padding: .1rem .45rem; cursor: pointer;
+.filters__values { display: flex; flex-wrap: wrap; gap: .3rem; align-items: baseline; }
+.filters__tail { font-family: var(--mono); font-size: .7rem; color: var(--muted); align-self: center; }
+
+.filters__tag {
+  display: inline-flex; align-items: baseline; gap: .3rem;
+  font-family: var(--mono); font-size: .72rem; line-height: 1;
+  padding: .32rem .5rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  color: var(--ink-2); cursor: pointer;
 }
-.facet:hover { border-color: var(--rule-2); }
-.facet input { margin: 0; accent-color: var(--accent); }
-.facet[data-on='true'] { border-color: var(--accent); color: var(--accent); }
-.facet span.n { color: var(--muted); font-variant-numeric: tabular-nums; }
-.facet__more { font-size: .74rem; color: var(--muted); align-self: center; }
+.filters__tag:hover { border-color: var(--rule-2); color: var(--ink); }
+.filters__tag[data-on='true'] { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+.filters__tag:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 1px; }
+.filters__tag .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+.filters__tag[data-on='true'] .n { color: inherit; opacity: .7; }
+
+/* Present to every reader that is not the eye. */
+.filters .vh {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .filters__row { grid-template-columns: 1fr; gap: .2rem; }
+}
 
 .results { display: flex; flex-direction: column; gap: .6rem; list-style: none; margin: 0; padding: 0; }
 .result {

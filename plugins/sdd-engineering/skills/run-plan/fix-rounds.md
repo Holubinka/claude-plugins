@@ -1,6 +1,6 @@
 # Fix rounds — what to do with what the reviews returned
 
-Stage 5 of [SKILL.md](SKILL.md). Two reviews have returned findings; this file says which of them become work, who does that work, and when the loop stops.
+Stage 5 of [SKILL.md](SKILL.md). The review has returned findings; this file says which of them become work, who does that work, and when the loop stops.
 
 ## Where the brief goes, and why it must be there
 
@@ -18,17 +18,24 @@ If the repository has no such gate, the directory still belongs outside version 
 
 `NOT_MET` and `PARTIAL` rows from `plan-verifier` do not enter here at all. The plan asked for them, so they are unfinished work: they go straight into the brief.
 
+**What arrives from stage 4 is already merged and already verified.** `/review-lenses:review-diff` returns one table with lane-prefixed ids, deduplicated across lanes, ordered deterministically, and with every model-produced `critical` either confirmed by an adversary or dropped into `## Attempted and refuted`. You are triaging a report, not reconciling several.
+
+Two consequences for this stage:
+
+- **A `critical` that reached you has survived a refutation attempt.** Treat it as such — it is not a candidate, it is a finding that someone tried and failed to break.
+- **A finding under `## Attempted and refuted` does not enter triage at all.** It is recorded so a human can disagree with it. Pulling it back in because it sounds plausible undoes the only stage that was trying to be wrong on purpose.
+
 Everything a *review* returned passes these three:
 
 ### 1. `pre-existing` → not this branch's
 
-`architecture-reviewer` tags every finding with that axis itself, deciding it from `git diff` against the base rather than from intuition about which code looks newer. A `pre-existing` finding goes into the final report as backlog and no further: fixing it widens a diff that is about to be reviewed for what it *changed*, and it buries the findings that are about this work.
+Every reviewer tags its findings with that axis itself, deciding it from `git diff` against the base rather than from intuition about which code looks newer — and the shared severity scale demotes a model finding on an untouched line to `note` before it ever reaches you. A `pre-existing` finding goes into the final report as backlog and no further: fixing it widens a diff that is about to be reviewed for what it *changed*, and it buries the findings that are about this work.
 
 ### 2. Below `major` → not this round
 
 Collect `minor` and `note`; act on neither. A fix is new code, and new code is what a review is for — so a round spent on cosmetics buys itself another round. **Refactor after the pull request is open, not between rounds.**
 
-`architecture-reviewer`'s own severity anchors make the cut easy to apply. `minor` there means "broken in one place while the same slice already does it right somewhere else" — which is exactly the class that batches well and blocks nothing.
+The severity anchors the reviewers share make the cut easy to apply. `minor` there means "broken in one place while the same slice already does it right somewhere else" — which is exactly the class that batches well and blocks nothing.
 
 ### 3. Needs a decision, not an edit → not the implementer's
 

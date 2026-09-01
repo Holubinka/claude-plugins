@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "drifted-set",
+  "description": "A deliberately broken fixture set, one file per failure the audit exists to catch.",
+  "version": "0.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["fixture", "audit"]
+}

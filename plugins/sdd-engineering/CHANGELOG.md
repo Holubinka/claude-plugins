@@ -4,6 +4,98 @@ All notable changes to `sdd-engineering`. This project follows [SemVer](https://
 
 Releases are tagged `sdd-engineering--v<version>`.
 
+## [1.3.0] — 2026-08-29
+
+Backward compatible in artefacts: an architectural request produces the same spec it always did.
+What changes is that two other kinds of request now get served instead of turned away.
+
+### Changed
+
+- **`spec-creator` classifies the request out loud before its first question**, and says which of
+  three paths it is taking, so whoever dispatched it can overrule the classification before anything
+  has been spent. A classification made silently is a decision nobody got to see.
+
+  | Path | Returns | File |
+  | :--- | :--- | :--- |
+  | Spike | the question restated and what it would try, in two or three sentences | none |
+  | Bounded | the clarifying questions that matter, then a short design in chat | none |
+  | Architectural | the full specification | the spec |
+
+  **The ceremony scales with the request; the approval gate never does.** A bounded design is
+  returned and the agent stops — implementation begins when a human says yes, exactly as after a
+  spec. That is the half worth stating, because a lighter path invites a lighter gate and the gate is
+  the point of the pipeline.
+
+  Previously a small request was refused with "someone makes the change and runs that module's
+  gates", which is accurate and unhelpful: the workflow was all-or-nothing, and a one-file fix had to
+  choose between a full specification and nothing at all.
+
+  **Bounded means the flow being changed already exists in the repository to read.** Knowing what
+  kind of application it is does not qualify — if there is no existing flow, it is architectural,
+  however small the diff turns out to be.
+
+## [1.2.0] — 2026-08-29
+
+Backward compatible: a fifth agent arrives, stage 4 gains a better reviewer, and two agents gain
+paragraphs that were missing. No artefact shape changed, so a plan or a report from 1.1.0 still reads.
+
+### Added
+
+- **`insight-curator`** — the deliberate pruning pass `engineering-insights` has always assumed. That
+  skill is append-only on purpose, because the session that finds an entry inconvenient is the one
+  least qualified to remove it; **without a pruner, append-only becomes unbounded**, and a file long
+  enough that nobody reads to the end has the same effect as an empty one at a higher cost.
+
+  It proposes and stops, writing nothing until a human approves. Its rule is *verify before calling
+  anything stale*, and it exists because the alternative has been measured: a command was cited in a
+  repository's own conventions file and in an agent's prompt while existing in no manifest, and a false
+  claim about a test framework spread to five files before anyone opened a test. **A claim repeated in
+  several places is not corroborated — it is copied.**
+
+- **`## Keep command output out of your context` in `implementer`.** One lint run over a large module
+  returned 1 372 lines and four of them mattered. Redirect a gate to a file, read back the verdict.
+
+  The rule that earns the section: **never pipe a gate through `tail`.** A pipeline's exit status is
+  the last command's, and `tail` always succeeds — so `<gate> | tail -20` reports success with
+  plausible-looking failure output underneath it. **The exit code is the verdict.**
+
+- **The reason constraints are carried forward, in `implementation-planner`.** Every agent downstream
+  starts with a fresh context window: a rule referenced by filename does not reach the implementer, it
+  reaches a path the implementer may or may not open. That gap is silent — the plan looks complete, the
+  implementer looks obedient, and the constraint was never in the room.
+
+### Changed
+
+- **Stage 4 now invokes `review-lenses:review-diff`** instead of dispatching two fixed reviewers. It
+  picks only the lanes the change earned, and below two files and thirty lines it does not fan out at
+  all. Every model-produced `critical` goes through an adversary first, where uncertain counts as
+  refuted — so what reaches the fix rounds is one merged, ordered table of findings that survived a
+  refutation attempt.
+
+  `/code-review` is still worth running beside it on a feature. Two independent readers of one diff
+  disagree usefully.
+
+- **`fix-rounds.md` triages a report rather than reconciling several.** A finding under
+  `## Attempted and refuted` does not enter triage at all — pulling one back in because it sounds
+  plausible undoes the only stage that was trying to be wrong on purpose.
+
+- **Gate discovery moved to `engineering-paved-path:project-commands`.** It was written twice here, in
+  two different wordings, and three more components needed it. An agent prompt is paid on every
+  dispatch; a skill body only when it fires.
+
+### Dependencies
+
+- **Added `review-lenses@^1.0.0`.** The graph is now four levels deep, and the shape is honest: this
+  skill orchestrates a reviewer that orchestrates reviewers that read one shared severity definition.
+
+- **`test-discipline` is deliberately not a dependency**, though `run-plan` §11 now names it in prose.
+  §10 forbids dispatching a test writer from this pipeline, and **a dependency reads as permission** —
+  declaring one on a plugin the skill may not dispatch is a contradiction in the manifest.
+
+- **No existing range was tightened.** `architecture-review` stays at `^1.0.0` and resolves to 1.1.0 or
+  newer by intersection through `review-lenses`. Tightening it directly is a major bump under this
+  repository's own rules, for what is prose.
+
 ## [1.1.0] — 2026-08-29
 
 Backward compatible: nothing was removed or renamed, and no dependency range moved. A spec

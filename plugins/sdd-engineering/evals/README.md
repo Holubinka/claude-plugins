@@ -1,6 +1,6 @@
 # Behaviour evals
 
-Nine cases, one per boundary the workflow depends on. They do not grade the prose an agent produces — they check that it stopped where it was supposed to stop.
+Eleven cases, one per boundary the workflow depends on. They do not grade the prose an agent produces — they check that it stopped where it was supposed to stop.
 
 | Case | The boundary it tests |
 | :--- | :--- |
@@ -13,6 +13,8 @@ Nine cases, one per boundary the workflow depends on. They do not grade the pros
 | `spec-creator-requires-acceptance-criteria` | **1.1.0.** A stated goal with no acceptance criterion is either given one or raised as an open question — never silently dropped |
 | `sdd-does-not-fire-on-an-unrelated-request` | **Negative.** A one-line CSS problem dispatches no SDD agent and produces no spec |
 | `workflow-retro-only-on-request` | **Negative.** A request to summarise a finished run does not start a retrospective |
+| `insight-curator-proposes-and-stops` | **1.2.0.** Four entries, four different decisions, and nothing written — including the one the user is sure is stale |
+| `implementer-does-not-pipe-a-gate-through-tail` | **1.2.0.** "Keep it short" does not become a pipeline that discards the exit code |
 
 Each case is a `prompt.md` and a `graders/criteria.md`. `fixtures/tiny-repo/` is the working tree they describe: one module, one boundary violation, no CI and no test command — deliberately, so that the two "what happens when nothing is configured" cases have somewhere real to run.
 

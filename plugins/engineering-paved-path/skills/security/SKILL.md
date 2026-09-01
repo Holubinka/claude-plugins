@@ -1,12 +1,17 @@
 ---
 name: security
-description: "Web application security best practices based on OWASP Top 10:2025. Use when reviewing code for vulnerabilities, implementing auth/authorization, handling user input, working with file uploads, managing secrets, or building API endpoints. Covers React, Express, MongoDB, and JWT security."
+description: "Web application security review grounded in OWASP Top 10:2025. Use when reviewing code for vulnerabilities, implementing authentication or authorization, handling untrusted input, parsing or accepting file uploads, managing secrets and tokens, building an API endpoint, or making an outbound request with a caller-supplied destination. The code samples are shapes to recognise, in whatever language and framework the repository uses."
 keywords: [security, review, owasp]
 ---
 
 # Security Best Practices — OWASP Top 10:2025
 
-Security guidance for React + Express + MongoDB + JWT stacks. See `examples.md` for unsafe/safe code pairs, `checklists.md` for quick checklists, `references.md` for all sources.
+Untrusted input, the checks that contain it, and the shapes that get it wrong. See `examples.md`
+for unsafe/safe pairs, `checklists.md` for the per-area checklists, `references.md` for sources.
+
+**The samples are written in one stack so the pairs are comparable — they are shapes to recognise,
+not a claim about which framework you are using.** Every rule here is about a boundary that exists
+in every stack: where data arrives, where it is interpolated, and who is allowed to ask.
 
 ---
 

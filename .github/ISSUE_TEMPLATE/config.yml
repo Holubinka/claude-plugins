@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Something else
+    url: https://github.com/Holubinka/claude-plugins/issues/new
+    about: Anything that is not a component behaving wrongly — packaging, docs, an idea.

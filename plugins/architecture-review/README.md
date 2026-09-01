@@ -76,9 +76,23 @@ Give it a diff, a module or a path. If the target resolves to no files, or "this
 
 It writes nothing to disk. `Write` and `Edit` are absent from its tool list; the rest of the restraint is a rule it keeps rather than a wall.
 
-## One scheduling constraint
+## How hard it looks before calling something clean
 
-**Do not run it beside an agent that mutates the working tree.** A test-writing agent that proves a test can fail leaves a deliberate defect in the tree between mutating a file and reverting it, so any file read or gate run inside that window describes the mutation rather than the branch. The agent cannot detect a sibling from the inside; if the tree shifts under it, it reports that under `## Not covered` instead of reporting what it saw.
+It aims to surface **at least three candidate boundary problems** before concluding a target is clean. Three is how hard it looks, not how many it files: a first pass that finds one thing and stops has usually stopped at the first thing, and the boundary problems worth having are rarely the most visible ones.
+
+The counterweight matters as much as the stance. **An empty findings table is a valid result** and is returned as one, with `## Checked and clean` filled in so you can see what was covered. Three candidates that all turn out to be correct code produce a clean report, not a thin one — and the agent will not file a third finding it does not believe to reach a number, widen its subject until something turns up, or grade harder because it looked harder.
+
+## Running it as one lane of several
+
+It reviews alone or beside other reviewers. Two rules make that safe, and both live in the agent rather than in your head:
+
+**It names another lane's subject when it walks past one, and never grades it.** A performance note dressed as an architecture finding reaches a reader who cannot act on it — the same outcome as saying nothing, minus the space it took. Where it is the only lane running, it says so under `## Not covered` instead of widening its subject to compensate, because a review that quietly becomes a general review is one nobody can tell the coverage of.
+
+**It must not run beside anything that mutates the working tree.** This is the one scheduling constraint, and it is a hard one. A test-writing agent proving a test can fail holds a deliberate defect in the tree between mutating a file and reverting it — so a file read, or a gate run, inside that window describes the mutation rather than the branch. It cannot detect a sibling from the inside; if the tree shifts under it mid-review, it records that under `## Not covered` rather than reporting what it saw. Reviewers that only read are safe to run beside it, and running three of them concurrently is the intended shape.
+
+## Evals
+
+Three behaviour cases under `evals/`, two of them refusals. See [evals/README.md](evals/README.md), including the note that `claude plugin eval` is currently early access.
 
 ## Dependencies
 

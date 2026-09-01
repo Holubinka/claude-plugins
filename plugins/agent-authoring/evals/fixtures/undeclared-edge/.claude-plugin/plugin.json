@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "undeclared-edge",
+  "description": "A fixture whose skill names a component in another plugin without declaring a dependency on it.",
+  "version": "0.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["fixture", "audit"]
+}

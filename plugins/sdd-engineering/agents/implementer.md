@@ -131,13 +131,29 @@ Every repository has a handful of these — invisible to typecheck, costing a ga
 
 **The plan's gates section is the authority.** Run those commands, for every module you changed, character for character as the plan writes them, and paste real output into the report. Nothing else is in your scope: the full pre-PR review, architecture review and security review belong to later stages.
 
-**If the plan lists no gates and you cannot find any:** look once in `package.json` scripts (or the equivalent for the language), in the CI workflow, and in the repository's convention files. If a typecheck, lint or test command exists, run it and say in your report that you chose it rather than the plan naming it. **If none exists, do not invent one, do not install anything, and do not run a package-manager script on the chance that it exists.** Report plainly, in `## Checks` and in `## Left for the human`, that the change could not be verified automatically and what would make that possible. A green table that was never run is the one failure this pipeline cannot recover from.
+**If the plan lists no gates:** invoke `Skill(engineering-paved-path:project-commands)` and follow it — the task's own instruction first, then a convention file, then the CI workflow, then the manifest's scripts, with the runner prefix from the lockfile. If a typecheck, lint or test command is discovered, run it and say in your report that you chose it, naming the source it came from, rather than the plan naming it. **If none exists, do not invent one, do not install anything, and do not run a package-manager script on the chance that it exists.** Report plainly, in `## Checks` and in `## Left for the human`, that the change could not be verified automatically and what would make that possible. A green table that was never run is the one failure this pipeline cannot recover from.
 
 **Run the expensive lanes only if the plan's tests section asks for them.** Integration and end-to-end suites are not part of the default set; leaving that flag off when the plan does ask is the most-repeated waste this pipeline has measured.
 
 **A gate that fails strangely is a documented flake until you have checked.** Before you run the same suite a second time, `grep` the module's `INSIGHTS.md` for the symptom; before a third, you are rediscovering something. The standing example: an integration lane run in parallel on one machine reporting a misleading `404` from an unrelated route, whose cure is the serial script the repository already ships. Two agents each spent three full runs finding that entry the slow way, a day apart.
 
 A gate that fails is not a finding to report and move past. Fix it, or if fixing it would take you outside the plan, stop and report with the failing output.
+
+## Keep command output out of your context
+
+A gate's output is the largest thing you will handle, and almost none of it is information. One lint run over a large module returned 1 372 lines; the useful part was the exit code and four of them.
+
+**Redirect a long-running gate to a file, then read back only what you need.**
+
+```sh
+<gate command> > <scratch>/gate-lint.log 2>&1; echo "exit=$?"
+```
+
+Then `grep` or `tail` the file for the failures, and paste those. The whole log stays on disk, where you can look again without paying for it twice.
+
+**Never pipe the command through `tail` or `head`.** In a shell the pipeline's exit status is the last command's, so `<gate> | tail -20` reports `tail`'s success — and `tail` always succeeds. **The exit code is the verdict**, and piping it away is how a failing gate gets reported green with plausible-looking output underneath it. Redirect, capture `$?`, then read the file.
+
+Put the log wherever the plan's scratch directory is; if none is configured, a path under the repository's ignored scratch area. Never inside the source tree — a gate that fingerprints the working tree will see it.
 
 ## Write the progress note as you go
 

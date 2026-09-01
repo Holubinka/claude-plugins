@@ -113,6 +113,12 @@ jobs:
   probes:
     name: Search ranking
     needs: index
+    # A skip propagates through `needs`. `tags` is skipped on every pull request, and
+    # `index` survives it only because of its `if: always()` — but a downstream job with
+    # no `if:` of its own inherits the skip transitively, however well its own dependency
+    # did. So this never ran on a pull request: the site was built and probed on `main`
+    # alone, which is after review rather than during it.
+    if: always() && needs.index.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -142,6 +148,12 @@ jobs:
   site:
     name: Site build
     needs: index
+    # A skip propagates through `needs`. `tags` is skipped on every pull request, and
+    # `index` survives it only because of its `if: always()` — but a downstream job with
+    # no `if:` of its own inherits the skip transitively, however well its own dependency
+    # did. So this never ran on a pull request: the site was built and probed on `main`
+    # alone, which is after review rather than during it.
+    if: always() && needs.index.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

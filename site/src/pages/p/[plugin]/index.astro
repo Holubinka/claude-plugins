@@ -43,6 +43,7 @@ const author = authorName(plugin.author);
 
   <section class="block">
     <h2>{s.components}</h2>
+    <p class="lede small">Two numbers per component. <b>always</b> is the description line, which sits in context on every turn while the plugin is enabled — that is the standing cost of having it installed. <b>on load</b> is the body, read only when the component fires.</p>
     {own.length === 0 ? (
       <p class="lede">{s.noComponents} <a href={href('/docs/plugin-structure/')}>{s.noComponentsLink}</a>.</p>
     ) : (
@@ -127,6 +128,7 @@ const author = authorName(plugin.author);
 </Base>
 
 <style>
+  .small { font-size: .88rem; max-width: 62ch; }
   .head { display: flex; flex-direction: column; gap: .7rem; }
   .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .8rem 1.5rem; margin: .5rem 0 0; padding-top: 1rem; border-top: 1px solid var(--rule); }
   .meta div { display: flex; flex-direction: column; gap: .1rem; }

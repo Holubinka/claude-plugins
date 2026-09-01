@@ -2,7 +2,7 @@
 
 Structural rules specific to the App Router: what belongs in `app/`, where the Server/Client boundary falls, and where server-side data access and mutations live. Applies principles 1 and 6 from [SKILL.md](SKILL.md).
 
-This file owns the **placement consequences**. For framework mechanics — what `loading.tsx` does, caching semantics, hydration errors — use the `next-best-practices` skill.
+This file owns the **placement consequences** only. Framework mechanics — what `loading.tsx` does, caching semantics, hydration errors — belong to the framework's own documentation, or to a framework skill if one is installed.
 
 ## Contents
 
@@ -38,7 +38,7 @@ This file owns the **placement consequences**. For framework mechanics — what 
 
 Private folders are **not required** for colocation, but use them anyway. Next.js lists the reasons: separating UI from routing logic, consistent organization across the ecosystem, grouping in editors, and — the one that actually bites — avoiding collisions with future reserved file conventions.
 
-Reserved names (`page`, `layout`, `loading`, `error`, `not-found`, `route`, `template`, `default`) and their render hierarchy belong to `next-best-practices`.
+Reserved names (`page`, `layout`, `loading`, `error`, `not-found`, `route`, `template`, `default`) and their render hierarchy are framework mechanics, not placement — look them up rather than inferring them from a folder.
 
 ## The `'use client'` boundary
 

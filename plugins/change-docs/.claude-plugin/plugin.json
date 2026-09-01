@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "change-docs",
+  "description": "Everything a change needs after it works — annotated screenshots taken from the running page, a pull request description with a fixed shape and an explicit never-include list, and an agent that fixes the sentences a change made false rather than rewriting the documentation around them.",
+  "version": "1.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["documentation", "screenshots", "pull-request", "drift", "agent"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.0.0" }
+  ]
+}

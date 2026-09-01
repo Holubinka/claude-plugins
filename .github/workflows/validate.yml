@@ -57,3 +57,24 @@ jobs:
       # built and deployed by pages.yml.
       - name: Check catalogue metadata
         run: python3 scripts/build-index.py --check
+
+      # Whether the plugins still say true things about each other: a fan-out table with
+      # no per-lane condition, a description promising a roster the body never dispatches,
+      # a `plugin:name` in backticks that resolves to nothing. Static, no model, instant —
+      # and it is the only check that catches a cross-plugin promise with no dependency
+      # edge behind it.
+      - name: Audit the plugin set
+        run: python3 plugins/agent-authoring/scripts/audit-harness.py plugins/
+
+      # Bundled self-tests. These need no key and no model, so they belong in the free
+      # job — a plugin whose behaviour is a shell script is still checkable when the
+      # model-graded suite in evals.yml is not.
+      - name: Bundled self-tests
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for script in plugins/*/scripts/selftest.sh; do
+            echo "::group::${script}"
+            bash "${script}"
+            echo "::endgroup::"
+          done

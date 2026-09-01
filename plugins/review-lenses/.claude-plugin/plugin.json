@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "review-lenses",
+  "description": "Reviews a change through only the lenses that change earned — sizing the diff, picking the lanes from what it touches, dispatching them in one message, and sending every model-produced critical to an adversary that tries to refute it. Also covers the receiving end: what an author owes a finding before implementing it.",
+  "version": "1.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["review", "findings", "fan-out", "verification", "agents"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.2.0" },
+    { "name": "architecture-review", "version": "^1.1.0" }
+  ]
+}

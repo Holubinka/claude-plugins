@@ -1,0 +1,65 @@
+/* Styles for the GraphCanvas island.
+ *
+ * Contrast note, measured rather than eyeballed. A diagram's outlines and arrows are
+ * non-text graphics and need 3:1 against what they sit on. --rule-2 gives 3.02:1 in the
+ * light theme and 1.65:1 in the dark one, where the box fill is itself 1.08:1 against the
+ * page — which is how the whole graph came out as a black rectangle with text floating in
+ * it. --muted is 4.93:1 light and 5.79:1 dark, so the boxes and edges use that. The fill
+ * stays --surface: no token in the palette separates a panel from the page background in
+ * dark mode, so a box is defined by its outline, and the outline now carries it.
+ *
+ * These cannot live in graph.astro's <style>: Astro scopes a page's styles with an
+ * attribute it adds only to elements it renders itself, and nothing inside a framework
+ * island carries it. A scoped rule for .node rect therefore matches nothing, and every
+ * box falls back to the default fill — which is black. search.css and palette.css exist
+ * for the same reason. */
+
+.figure { padding: 1.25rem 1rem; }
+svg { display: block; width: 100%; min-width: 34rem; height: auto; }
+.node rect { fill: var(--surface); stroke: var(--muted); stroke-width: 1; }
+.node line { stroke: var(--muted); stroke-width: 1; opacity: .45; }
+.node text.title { fill: var(--ink); font-family: var(--mono); font-size: 13px; font-weight: 500; }
+.node text.sub { fill: var(--muted); font-family: var(--mono); font-size: 9.5px; }
+.node text.kind { fill: var(--accent); font-family: var(--mono); font-size: 11px; }
+.node text.part { fill: var(--ink-2); font-family: var(--mono); font-size: 11px; }
+.graph-tools { display: flex; align-items: center; gap: 1rem; margin-bottom: .5rem; flex-wrap: wrap; }
+.graph-tools .hint { font-size: .82rem; color: var(--muted); }
+.graph-tools button {
+  font: inherit; font-size: .82rem; padding: .2rem .6rem; cursor: pointer;
+  background: none; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink);
+}
+.node { cursor: grab; }
+.node:active { cursor: grabbing; }
+.node a { cursor: pointer; }
+.node a text { text-decoration: none; }
+.node a:hover text, .node a:focus text { text-decoration: underline; }
+.edge path { stroke-width: 1.4; }   /* fill="none" is a presentation attribute on the element */
+
+/* Arrowheads are filled by their own rule rather than by currentColor: marker contents
+   inherit from the marker's ancestors, never from the element that references it. */
+.arrowhead--ok     { color: var(--muted); }
+.arrowhead--loose  { color: var(--warn); }
+.arrowhead--broken { color: var(--danger); }
+.edge--routed path { stroke-dasharray: none; opacity: 0.85; }
+/* A label sits on top of the line it belongs to, so it is painted with a halo in the page
+   background colour first and its fill second. Without it the stroke runs straight through
+   the glyphs and neither the label nor the line is readable where they meet. 9px was also
+   simply too small to read at any contrast. */
+.edge text {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
+/* The path carries stroke="currentColor" as an attribute and takes its colour from the
+   group's `color`. Whether an edge is visible at all should not depend on a selector
+   reaching the path — that dependency has now failed twice on this diagram. */
+.edge--ok     { color: var(--muted); }
+.edge--ok text     { fill: var(--ink-2); }
+.edge--loose  { color: var(--warn); }
+.edge--loose path  { stroke-dasharray: 4 3; }
+.edge--loose text  { fill: var(--warn); }
+.edge--broken { color: var(--danger); }
+.edge--broken text { fill: var(--danger); }

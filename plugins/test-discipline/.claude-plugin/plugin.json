@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "test-discipline",
+  "description": "Tests for the change in front of you, in the framework this repository already uses — discovered from the nearest sibling test rather than assumed. Two skills and an agent, holding one rule: when a test and the code disagree, decide which of them is wrong before touching either.",
+  "version": "1.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["testing", "tests", "regression", "discovery", "skills"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.3.0" }
+  ]
+}

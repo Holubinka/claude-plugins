@@ -3,6 +3,11 @@
 What an SDD run costs, measured rather than estimated, so that a change to the prompts can be
 shown to have made it cheaper — or shown not to have.
 
+This answers *did a change make a run cheaper without breaking it*.
+[measuring.md](measuring.md) answers the prior question — **does a component do its job on real
+work, and how would you know if it stopped.** Run that one first: there is no point optimising
+the cost of something that is not yet known to work.
+
 **Status: the protocol below is fixed; no run has been recorded yet.** The table is empty on
 purpose. An invented saving is worse than no baseline, because it is quoted later.
 

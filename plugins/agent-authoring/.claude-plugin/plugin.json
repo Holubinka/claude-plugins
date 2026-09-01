@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "agent-authoring",
+  "description": "Conventions for writing skills and agents, a static audit that checks a set of them still agrees with itself, and a local log for recording how an installed plugin actually behaved — which exports as a bug report, or as an eval case that arrives with its own regression test.",
+  "version": "1.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["authoring", "skills", "agents", "audit", "feedback", "routing"]
+}
