@@ -121,13 +121,13 @@ export const search = {
   facetType: 'type',
   facetPlugin: 'plugin',
   facetCategory: 'category',
-  facetKeyword: 'keyword',
-  /** Shown under the keyword row when the tail is hidden — see FACET_LIMIT. */
+  /** Shown when a facet row is capped — see FACET_LIMIT. Keyword is not a facet at all:
+   *  it is a search field, because 102 values is a vocabulary and not a set of choices. */
   facetMore: (n: number) => `+${n} more, reachable by searching`,
   /** The type row is a segmented control; this is its no-filter segment. */
   facetAll: 'all',
   facetAllLabel: 'Filter by type',
-  /** The disclosure holding plugin, category and keyword. */
+  /** The disclosure holding plugin and category. */
   moreOpen: 'More filters',
   moreClose: 'Fewer filters',
   moreActive: (n: number) => `${n} on`,

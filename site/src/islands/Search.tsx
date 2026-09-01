@@ -58,19 +58,21 @@ function excerpt(text: string, terms: string[], radius = 90): string {
   return (start > 0 ? '…' : '') + flat.slice(start, end).trim() + (end < flat.length ? '…' : '');
 }
 
-type Facets = { type: Set<string>; plugin: Set<string>; category: Set<string>; keyword: Set<string> };
+type Facets = { type: Set<string>; plugin: Set<string>; category: Set<string> };
 
-const FACET_KEYS = ['type', 'plugin', 'category', 'keyword'] as const;
+const FACET_KEYS = ['type', 'plugin', 'category'] as const;
 
 /** `type` has four values and answers the question people actually arrive with —
- *  "show me the skills". `keyword` has over a hundred. Giving all four the same row
- *  spent the space above the results on the three nobody opens with, so `type` is a
- *  segmented control that is always on screen and the rest live behind a disclosure. */
-const MORE_KEYS = ['plugin', 'category', 'keyword'] as const;
+ *  "show me the skills", so it is a segmented control that is always on screen and
+ *  the other two live behind a disclosure. */
+const MORE_KEYS = ['plugin', 'category'] as const;
 
-/** 32 keywords across 15 components is a useful search vocabulary and a useless facet
- *  row, so the row shows the commonest and says how many it left out. The tail stays
- *  reachable by typing the word — keywords are a boosted field. */
+/** Keyword is deliberately not a facet. 102 values across 100 artifacts is a search
+ *  vocabulary rather than a set of choices: any row short enough to read hides most of
+ *  it, and the hidden tail cannot be reached by clicking. It stays a boosted search
+ *  field, which is the control that actually fits the data — type the word.
+ *
+ *  This caps the rows that remain, for a marketplace that outgrows them. */
 const FACET_LIMIT = 12;
 
 function readUrl(): { q: string; facets: Facets } {
@@ -80,13 +82,13 @@ function readUrl(): { q: string; facets: Facets } {
     q: params.get('q') ?? '',
     facets: {
       type: split('type'), plugin: split('plugin'),
-      category: split('category'), keyword: split('keyword'),
+      category: split('category'),
     },
   };
 }
 
 const legend: Record<(typeof FACET_KEYS)[number], string> = {
-  type: s.facetType, plugin: s.facetPlugin, category: s.facetCategory, keyword: s.facetKeyword,
+  type: s.facetType, plugin: s.facetPlugin, category: s.facetCategory,
 };
 
 export default function Search({ docsUrl, base, issueUrl }: Props) {
@@ -94,7 +96,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
   const [failed, setFailed] = useState(false);
   const [raw, setRaw] = useState('');
   const [facets, setFacets] = useState<Facets>({
-    type: new Set(), plugin: new Set(), category: new Set(), keyword: new Set(),
+    type: new Set(), plugin: new Set(), category: new Set(),
   });
   const [active, setActive] = useState(0);
   const [showMore, setShowMore] = useState(false);
@@ -133,32 +135,21 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
         (r) =>
           (facets.type.size === 0 || facets.type.has(r.type as string)) &&
           (facets.plugin.size === 0 || facets.plugin.has(String(r.plugin))) &&
-          (facets.category.size === 0 || facets.category.has(String(r.category))) &&
-          (facets.keyword.size === 0 ||
-            ((r.keywords as string[]) ?? []).some((k) => facets.keyword.has(k))),
+          (facets.category.size === 0 || facets.category.has(String(r.category))),
       ),
     [results, facets],
   );
 
   const counts = useMemo(() => {
     const tally = (key: (typeof FACET_KEYS)[number]) => {
-      // The facet is named for what a reader picks — one keyword — while the document
-      // field holds the list. Getting this wrong tallies nothing and fails silently:
-      // the row simply does not render.
-      const field = key === 'keyword' ? 'keywords' : key;
       const out = new Map<string, number>();
       for (const r of results) {
-        const value = r[field] as string | string[] | null;
-        for (const one of Array.isArray(value) ? value : [value]) {
-          if (one) out.set(one, (out.get(one) ?? 0) + 1);
-        }
+        const value = r[key] as string | null;
+        if (value) out.set(value, (out.get(value) ?? 0) + 1);
       }
       return [...out].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
     };
-    return {
-      type: tally('type'), plugin: tally('plugin'),
-      category: tally('category'), keyword: tally('keyword'),
-    };
+    return { type: tally('type'), plugin: tally('plugin'), category: tally('category') };
   }, [results]);
 
   const ready = docs !== null;
@@ -232,7 +223,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
   }
 
   function clearAll() {
-    setFacets({ type: new Set(), plugin: new Set(), category: new Set(), keyword: new Set() });
+    setFacets({ type: new Set(), plugin: new Set(), category: new Set() });
   }
 
   return (
