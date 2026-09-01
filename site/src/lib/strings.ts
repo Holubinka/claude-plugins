@@ -124,7 +124,16 @@ export const search = {
   facetKeyword: 'keyword',
   /** Shown under the keyword row when the tail is hidden — see FACET_LIMIT. */
   facetMore: (n: number) => `+${n} more, reachable by searching`,
-  browsing: (n: number) => `Browsing ${n} artifacts. Type to search, or filter below.`,
+  /** The type row is a segmented control; this is its no-filter segment. */
+  facetAll: 'all',
+  facetAllLabel: 'Filter by type',
+  /** The disclosure holding plugin, category and keyword. */
+  moreOpen: 'More filters',
+  moreClose: 'Fewer filters',
+  moreActive: (n: number) => `${n} on`,
+  clearAll: 'Clear filters',
+  activeCount: (n: number) => `${n} ${n === 1 ? 'filter' : 'filters'} active`,
+  browsing: (n: number) => `Browsing ${n} artifacts. Type to search, or pick a filter.`,
   emptyTitle: 'No artifact in this marketplace matches that.',
   askForIt: 'Ask for it',
   emptyAside:

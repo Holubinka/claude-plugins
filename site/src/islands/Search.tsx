@@ -62,6 +62,12 @@ type Facets = { type: Set<string>; plugin: Set<string>; category: Set<string>; k
 
 const FACET_KEYS = ['type', 'plugin', 'category', 'keyword'] as const;
 
+/** `type` has four values and answers the question people actually arrive with —
+ *  "show me the skills". `keyword` has over a hundred. Giving all four the same row
+ *  spent the space above the results on the three nobody opens with, so `type` is a
+ *  segmented control that is always on screen and the rest live behind a disclosure. */
+const MORE_KEYS = ['plugin', 'category', 'keyword'] as const;
+
 /** 32 keywords across 15 components is a useful search vocabulary and a useless facet
  *  row, so the row shows the commonest and says how many it left out. The tail stays
  *  reachable by typing the word — keywords are a boosted field. */
@@ -91,6 +97,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
     type: new Set(), plugin: new Set(), category: new Set(), keyword: new Set(),
   });
   const [active, setActive] = useState(0);
+  const [showMore, setShowMore] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const started = useRef(false);
 
@@ -98,6 +105,7 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
     const initial = readUrl();
     setRaw(initial.q);
     setFacets(initial.facets);
+    if (MORE_KEYS.some((key) => initial.facets[key].size > 0)) setShowMore(true);
     started.current = true;
 
     fetch(docsUrl)
@@ -155,6 +163,8 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
 
   const ready = docs !== null;
   const chosen = FACET_KEYS.some((key) => facets[key].size > 0);
+  const activeTotal = FACET_KEYS.reduce((n, key) => n + facets[key].size, 0);
+  const hiddenActive = MORE_KEYS.reduce((n, key) => n + facets[key].size, 0);
   // Either a query or a facet puts the island in charge of what is on screen.
   const filtering = searching || chosen;
 
@@ -221,6 +231,10 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
     });
   }
 
+  function clearAll() {
+    setFacets({ type: new Set(), plugin: new Set(), category: new Set(), keyword: new Set() });
+  }
+
   return (
     <div class="search">
       <div class="search__box">
@@ -251,30 +265,88 @@ export default function Search({ docsUrl, base, issueUrl }: Props) {
       </div>
 
       {ready && counts.type.length > 0 && (
-        <div class="facets">
-          {FACET_KEYS.map((key) => {
-            // A facet with one value filters nothing — except when it is the one
-            // already chosen, which must stay on screen to be switched off again.
-            if (counts[key].length <= 1 && facets[key].size === 0) return null;
-            const shown = counts[key].slice(0, FACET_LIMIT);
-            const hidden = counts[key].length - shown.length;
-            return (
-              <fieldset key={key}>
-                <legend>{legend[key]}</legend>
-                {shown.map(([value, n]) => (
-                  <label class="facet" key={value} data-on={facets[key].has(value) ? 'true' : 'false'}>
-                    <input
-                      type="checkbox"
-                      checked={facets[key].has(value)}
-                      onChange={() => toggle(key, value)}
-                    />
-                    {value} <span class="n">{n}</span>
-                  </label>
-                ))}
-                {hidden > 0 && <span class="facet__more">{s.facetMore(hidden)}</span>}
-              </fieldset>
-            );
-          })}
+        <div class="filters">
+          <div class="filters__bar">
+            <div class="filters__seg" role="group" aria-label={s.facetAllLabel}>
+              {/* Not a checkbox: "all" is the absence of a type filter, so it clears
+                  rather than toggles, and it stays lit while nothing is chosen. */}
+              <button
+                type="button"
+                class="filters__opt"
+                data-on={facets.type.size === 0 ? 'true' : 'false'}
+                aria-pressed={facets.type.size === 0}
+                onClick={() => setFacets((current) => ({ ...current, type: new Set() }))}
+              >
+                {s.facetAll} <span class="n">{results.length}</span>
+              </button>
+              {counts.type.map(([value, n]) => (
+                <label class="filters__opt" key={value} data-on={facets.type.has(value) ? 'true' : 'false'}>
+                  {/* The checkbox stays in the DOM and keeps the keyboard and screen
+                      reader behaviour; only its own rendering is dropped. */}
+                  <input
+                    class="vh"
+                    type="checkbox"
+                    checked={facets.type.has(value)}
+                    onChange={() => toggle('type', value)}
+                  />
+                  {value} <span class="n">{n}</span>
+                </label>
+              ))}
+            </div>
+
+            <div class="filters__tools">
+              {chosen && <span class="filters__active">{s.activeCount(activeTotal)}</span>}
+              {chosen && (
+                <button type="button" class="filters__clear" onClick={clearAll}>
+                  {s.clearAll}<span aria-hidden="true"> ×</span>
+                </button>
+              )}
+              <button
+                type="button"
+                class="filters__more"
+                aria-expanded={showMore}
+                aria-controls="more-filters"
+                onClick={() => setShowMore((open) => !open)}
+              >
+                <span class="filters__chevron" data-open={showMore ? 'true' : 'false'} aria-hidden="true">›</span>
+                {showMore ? s.moreClose : s.moreOpen}
+                {/* Collapsed filters still filter. Without this the panel can hide the
+                    reason the result count is small. */}
+                {hiddenActive > 0 && <span class="filters__badge">{hiddenActive}</span>}
+              </button>
+            </div>
+          </div>
+
+          {showMore && (
+            <div class="filters__panel" id="more-filters">
+              {MORE_KEYS.map((key) => {
+                // A facet with one value filters nothing — except when it is the one
+                // already chosen, which must stay on screen to be switched off again.
+                if (counts[key].length <= 1 && facets[key].size === 0) return null;
+                const shown = counts[key].slice(0, FACET_LIMIT);
+                const hidden = counts[key].length - shown.length;
+                return (
+                  <div class="filters__row" key={key}>
+                    <span class="filters__label">{legend[key]}</span>
+                    <div class="filters__values">
+                      {shown.map(([value, n]) => (
+                        <label class="filters__tag" key={value} data-on={facets[key].has(value) ? 'true' : 'false'}>
+                          <input
+                            class="vh"
+                            type="checkbox"
+                            checked={facets[key].has(value)}
+                            onChange={() => toggle(key, value)}
+                          />
+                          {value} <span class="n">{n}</span>
+                        </label>
+                      ))}
+                      {hidden > 0 && <span class="filters__tail">{s.facetMore(hidden)}</span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

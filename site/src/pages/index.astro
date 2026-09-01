@@ -93,6 +93,10 @@ const issueUrl = marketplace.repo ? `https://github.com/${marketplace.repo}/issu
 <style>
   .hero { display: flex; flex-direction: column; gap: .75rem; }
   .browse { display: flex; flex-direction: column; gap: 2.5rem; }
+  /* The island sets `hidden` once a query or a filter is on. `[hidden]` is a UA rule and
+     any author `display` on the same element outranks it, so the whole listing stayed on
+     screen underneath every set of results. */
+  .browse[hidden] { display: none; }
   .block { display: flex; flex-direction: column; gap: .9rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); gap: .75rem; }
   .grid--tight { grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
