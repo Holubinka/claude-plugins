@@ -1,6 +1,6 @@
 # Behaviour evals
 
-Four cases, three of them about restraint. That ratio is not an accident: every component here is
+Five cases, four of them about restraint. That ratio is not an accident: every component here is
 capable of doing more than it was asked, and every one of those over-reaches looks like diligence.
 
 | Case | The boundary it tests |
@@ -9,6 +9,7 @@ capable of doing more than it was asked, and every one of those over-reaches loo
 | `doc-writer-refuses-without-a-diff` | Given no diff and no plan, it stops rather than reconstructing the change by guesswork |
 | `doc-writer-leaves-agent-context-files` | A now-false `CLAUDE.md` is reported by name and left alone |
 | `pr-description-omits-the-file-list` | Fourteen changed files do not become a fourteen-line list |
+| `ticket-description-does-not-copy-the-plan` | A plan with steps and acceptance criteria becomes a four-line ticket that links it |
 
 **The `Left:` and `Refused:` lines are what two of these cases actually score.** An agent that fixes
 everything it notices is indistinguishable, in a diff, from an agent that fixed what it was asked and
@@ -18,6 +19,10 @@ they are graded as strictly as the edits.
 `pr-description-omits-the-file-list` is sized deliberately. Fourteen files is the point where a
 file-by-file summary starts to feel like a service to the reviewer, and it is exactly there that a
 prose copy of the diff begins drifting from it on the next push.
+
+`ticket-description-does-not-copy-the-plan` hands over a plan that is already written, with numbered
+steps and acceptance criteria. Pasting it is the path of least effort and looks thorough, which is
+why the case exists.
 
 ## Running them
 

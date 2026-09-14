@@ -8,8 +8,9 @@
 //                              you only pass it explicitly to override.
 // __clearAnno()                Removes the layer. Call before handing the browser back.
 //
-// ANNO.color must be a 6-digit hex — the box shadow appends an alpha suffix (`${C}40`),
-// which only works on hex. Pick a colour that does not occur in the UI being shot.
+// ANNO.color is red on every screenshot, whatever the page looks like — do not change it
+// per page. It stays a 6-digit hex: the box shadow appends an alpha suffix (`${C}40`),
+// which only works on hex.
 
 const ANNO = { color: "#e5342a", chipW: 260, gap: 70 };
 
