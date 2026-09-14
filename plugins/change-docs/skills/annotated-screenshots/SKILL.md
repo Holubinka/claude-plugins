@@ -2,7 +2,7 @@
 name: annotated-screenshots
 description: "Produces screenshots with boxes, labels and arrows pointing at real elements on a running page, including before/after pairs. Use when a UI change has to be shown rather than described — for a ticket, a pull request, a release note or documentation — or when asked to point at a specific control in an image. It injects an overlay into the live page so the callouts land on actual element coordinates instead of being guessed at afterwards."
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 keywords: [screenshots, ui, annotation, documentation, browser]
 ---
 
@@ -59,12 +59,10 @@ are, by absolute path.
 
 ## The colour
 
-`ANNO.color` at the top of `assets/annotator.js` must be a **six-digit hex**. The box shadow appends
-an alpha suffix (`${C}40`), which is only valid on hex — a named colour or `rgb()` silently produces
-no shadow.
-
-Pick one that does not occur in the interface being photographed. A red arrow on a screen full of
-red error states points at nothing.
+**Red, every time.** Boxes, arrows and label chips use `ANNO.color` as shipped in
+`assets/annotator.js` — `#e5342a` — with white label text. Do not change it to suit the page being
+photographed: screenshots on one ticket, one PR and the next ticket should read as one set, not as a
+different palette per image.
 
 ## Rules
 

@@ -5,6 +5,29 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `change-docs--v<version>`.
 
+## [1.1.0] — 2026-09-14
+
+### Added
+
+- **`ticket-description`.** A ticket is written in two moments: when it is created it says what to do
+  in an imperative title and two to four lines, linking the plan rather than restating it; once the
+  PR is open, a comment adds the PR link, test steps with the starting state and expected results,
+  and screenshots taken with `annotated-screenshots` while walking those steps. Tickets were growing
+  into copies of the plan, which drift from it on the plan's first edit.
+
+### Changed
+
+- **`pr-description` is shorter.** What is two or three bullets, Why is one sentence for the whole
+  change, and the section is `Test` rather than `Testing`. About ten lines, fifteen at most — down
+  from fifteen normal and forty ceiling, which still produced descriptions nobody read to the end.
+  Test steps and screenshots moved out of the PR's remit and onto the ticket.
+- **`pr-description` no longer hard-wraps.** Descriptions were arriving broken at 80–90 characters,
+  which hosts render as ragged half-lines. One sentence or bullet is one line. `ticket-description`
+  carries the same rule.
+- **`annotated-screenshots` is always red.** The skill told the model to pick a colour absent from
+  the page, so every run chose a different one and screenshots on the same ticket did not match. The
+  shipped `#e5342a` with white label text is now fixed.
+
 ## [1.0.0] — 2026-08-29
 
 First release. Two skills and an agent, generalised from a private monorepo's `.claude/` set.

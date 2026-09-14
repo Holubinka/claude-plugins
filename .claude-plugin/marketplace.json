@@ -83,7 +83,7 @@
     {
       "name": "change-docs",
       "source": "./plugins/change-docs",
-      "description": "Everything a change needs after it works \u2014 annotated screenshots taken from the running page, a pull request description with a fixed shape and an explicit never-include list, and an agent that fixes the sentences a change made false rather than rewriting the documentation around them.",
+      "description": "Everything a change needs after it works \u2014 annotated screenshots taken from the running page, a short pull request description with a fixed shape and an explicit never-include list, a ticket that says what to do and gains test steps and screenshots once the PR is open, and an agent that fixes the sentences a change made false rather than rewriting the documentation around them.",
       "category": "development",
       "keywords": [
         "documentation",

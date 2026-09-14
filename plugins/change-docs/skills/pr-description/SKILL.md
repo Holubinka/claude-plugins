@@ -2,7 +2,7 @@
 name: pr-description
 description: "Writes the description on a pull request or merge request — what changed, why, how it was verified, and what the risk is — with hard length limits and an explicit list of what never goes in one. Use when opening a PR, updating an existing PR's body, or asked to summarise a branch for review. Vendor-neutral: it produces the text and the approval gate, whatever hosts the repository."
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 keywords: [pull-request, review, description, writing]
 ---
 
@@ -11,42 +11,72 @@ keywords: [pull-request, review, description, writing]
 A reviewer opens your description to answer one question: **what am I about to read, and what should
 I be suspicious of?** Everything that does not serve that is taking space from what does.
 
+## When not to use this
+
+| Situation | Instead |
+| :--- | :--- |
+| Filing the ticket for the work, or adding test steps and screenshots to it once the PR is open | `change-docs:ticket-description` |
+| Showing a UI change in an image | `change-docs:annotated-screenshots` |
+
 ## The shape
 
 Four labelled parts, in this order, as **bold labels rather than headings** — a PR body is already
 inside a page with its own heading hierarchy, and `##` inside it fights the page.
 
 ```
-**What** — the change, as numbered items. One line each.
+**What**
+- Two or three bullets. One line each.
 
-**Why** — the reason for each, pointing back by number.
+**Why** — one sentence.
 
-**Testing** — what was actually verified, and how.
+**Test** — what was actually verified, and how.
 
 **Risk** — what could go wrong, and what would show it first.
 ```
 
-**What comes before Why, and the numbering is what joins them.** A reviewer reads *what* to decide
-whether to read at all; a *why* that arrives first is context for something they cannot picture yet.
-Numbering lets Why say "2 is what makes 1 safe" instead of restating 1 to point at it.
+**What comes before Why.** A reviewer reads *what* to decide whether to read at all; a *why* that
+arrives first is context for something they cannot picture yet.
+
+**Why is one sentence for the whole change**, not one per bullet. If the bullets need separate
+reasons, they are separate changes.
 
 ## Length
 
-**Fifteen lines is normal. Forty is the ceiling.** A description longer than the diff is a signal
-that the diff should have been two.
+**About ten lines. Fifteen is the ceiling.** The description is a signpost to the diff, not a second
+copy of it.
 
-If you cannot get under forty lines, that is worth saying in the description itself: name the two or
-three separable pieces, so the reviewer can read them as separable even though they arrived
-together.
+If What will not fit in three bullets, do not add a fourth — the diff should have been two. Say that
+in one line instead, naming the separable pieces.
 
-## Testing is a report, not instructions
+**Do not hard-wrap.** One bullet or one sentence is one line, however long. Never insert a line break
+at 80 or 90 characters: several hosts render a single newline in a PR body as a visible break, so the
+wrapped text shows up as ragged half-lines in the middle of sentences.
 
-**Say what was verified and how, in the past tense.** "Ran the suite in `<package>`: 34 passing.
-Exercised the import path with a 12 MB file, confirmed the row count in the database." A reviewer
-uses this to decide what they still need to check themselves.
+## Example
 
-Reproduction steps belong in the ticket, or in a comment when someone asks. A `Testing` section that
-is a numbered how-to has answered a question nobody asked and hidden the one they did.
+```
+**What**
+- Order export streams rows to the response instead of building the whole file in memory.
+- Adds a `limit` query parameter, capped at 100 000 rows.
+
+**Why** — exports over roughly 50 000 rows ran the worker out of memory and returned a 502.
+
+**Test** — ran the export suite; exported 180 000 rows locally with memory flat at about 90 MB. Not tried against a production-sized replica.
+
+**Risk** — the streamed response has no `Content-Length`, so a client that relies on it shows a progress bar stuck at 0%.
+```
+
+Nine lines. The interesting part is the last sentence of Test: the one thing that was not checked is
+named, so the reviewer knows exactly what is left for them.
+
+## Test is a report, not instructions
+
+**Say what was verified and how, in the past tense**, in a line or two. A reviewer uses this to
+decide what they still need to check themselves.
+
+**Step-by-step test steps and screenshots do not go here.** They go on the ticket once the PR is
+open — see `change-docs:ticket-description`. A `Test` section that is a numbered how-to has answered
+a question the reviewer did not ask and hidden the one they did.
 
 **If something was not verified, say so.** "The scheduled path is unexercised — no way to trigger it
 locally" is the most useful line in most descriptions. An unqualified "tested" that turns out to
@@ -65,15 +95,12 @@ mean "the typecheck passed" costs the next reviewer their trust in every future 
 | A description of the codebase for context | The reviewer works here |
 | Anything about how the change was produced | Not part of what is being reviewed |
 
-The list is long because each of these makes a description *feel* thorough while making it worse,
-which is why they survive.
+Each of these makes a description *feel* thorough while making it worse, which is why they survive.
 
 ## Risk, honestly
 
-Name the failure mode and its first symptom, not a reassurance. "If the migration runs against a
-table larger than the staging copy it will hold a lock long enough to time out requests; the first
-sign is a spike in 504s on the orders endpoint" is risk. "Low risk, well tested" is not — it is the
-sentence people write when they have not thought about it.
+Name the failure mode and its first symptom, not a reassurance. "Low risk, well tested" is not risk —
+it is the sentence people write when they have not thought about it.
 
 **Where the honest answer is that the risk is low, say what makes it low.** One reason is enough:
 "behind a flag that is off everywhere", "additive column with a default, no read path yet".

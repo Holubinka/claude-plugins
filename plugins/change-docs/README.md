@@ -1,6 +1,6 @@
 # change-docs
 
-Everything a change needs after it works: a picture of it, a description of it, and the sentences elsewhere that it just made false.
+Everything a change needs after it works: a picture of it, a description of it, a ticket that says what to do and how to check it, and the sentences elsewhere that it just made false.
 
 ```sh
 /plugin install change-docs@dev-workbench
@@ -12,11 +12,12 @@ Installing this pulls in `engineering-paved-path`, for the diagram conventions `
 
 | Component | For | Always-on | On invoke |
 | :--- | :--- | ---: | ---: |
-| `annotated-screenshots` (skill) | Showing a UI change instead of describing it | 110 | 1 105 |
-| `pr-description` (skill) | The four-part body a reviewer actually needs | 96 | 1 206 |
-| `doc-writer` (agent) | Fixing the documentation a change falsified | 92 | 1 206 |
+| `annotated-screenshots` (skill) | Showing a UI change instead of describing it | ~150 | ~1.5k |
+| `pr-description` (skill) | The short four-part body a reviewer actually needs | ~130 | ~1.9k |
+| `ticket-description` (skill) | A ticket that says what to do, then test steps and screenshots once the PR is open | ~130 | ~1.5k |
+| `doc-writer` (agent) | Fixing the documentation a change falsified | ~120 | ~1.6k |
 
-They are independent. Nothing here requires the other two.
+Figures are the estimates from `claude plugin details`. The components are independent, with one exception: `ticket-description` takes its screenshots with `annotated-screenshots`.
 
 ## `annotated-screenshots` — the callouts land on real coordinates
 
@@ -35,18 +36,22 @@ Four traps have their own reference file, because each produces an image that lo
 
 Two rules do most of the work: **at most two or three callouts per image**, and **read the image back after writing it**. The second is the step that is easiest to skip and the one that catches everything.
 
-## `pr-description` — a fixed shape and a long list of what to leave out
+**The colour is always red** — boxes, arrows and label chips, with white label text. It is not picked per page, so every screenshot on a ticket or a PR reads as one set.
+
+## `pr-description` — a short fixed shape and a long list of what to leave out
 
 ```
-**What** — the change, as numbered items. One line each.
-**Why** — the reason for each, pointing back by number.
-**Testing** — what was actually verified, and how.
+**What** — two or three bullets, one line each.
+**Why** — one sentence.
+**Test** — what was actually verified, and how.
 **Risk** — what could go wrong, and what would show it first.
 ```
 
-**What comes before Why, and the numbering is what joins them.** A reviewer reads *what* to decide whether to read at all; a *why* that arrives first is context for something they cannot picture yet.
+**What comes before Why.** A reviewer reads *what* to decide whether to read at all; a *why* that arrives first is context for something they cannot picture yet.
 
-Fifteen lines is normal, forty is the ceiling. A description longer than the diff is a signal the diff should have been two.
+About ten lines, fifteen at most. If What needs a fourth bullet, the diff should have been two. **Nothing is hard-wrapped** — one sentence is one line, because hosts render a single newline as a visible break.
+
+Test steps and screenshots do not go in the PR. They go on the ticket, through `ticket-description`.
 
 The never-include list is the longer half of the skill — a file-by-file summary, the commit log, diff statistics, per-suite test counts, raw tool output, narration of the process. **Each of these makes a description feel thorough while making it worse**, which is why they survive everywhere.
 
@@ -56,6 +61,16 @@ Two operational rules that came from real failures, and are vendor-neutral becau
 - **Read the description back after sending it.** A successful-looking response can come back with an empty or truncated body, and from the outside it is indistinguishable from success. On an update, fetch first and send every other field back verbatim — most update APIs replace the whole object, so an omitted field is cleared, not left alone. Reviewers and labels have been lost by an update that only meant to fix a typo.
 
 The skill produces the text and holds the approval gate. It does not talk to a host, so it works with `gh`, with a self-hosted server's REST API, or with you pasting it.
+
+## `ticket-description` — what to do, then how to check it
+
+A ticket is written in two moments.
+
+**When it is created**, it says what to do: an imperative title and two to four lines, plus a one-line link to the plan if there is one. The plan carries the detail, so the ticket never restates its steps, file names or acceptance criteria — two copies drift, and nobody updates both.
+
+**Once the PR is open**, a comment adds the PR link, numbered test steps with the starting state first and `Expected:` where the result shows, and screenshots taken with `annotated-screenshots` while walking those steps. A change with nothing on screen says "No UI change" instead of photographing a terminal.
+
+It shares `pr-description`'s write rules — show the draft first, send the text from a file, read it back — and, like it, does not talk to any tracker itself.
 
 ## `doc-writer` — Drift is the default
 
@@ -78,19 +93,20 @@ Three boundaries make it safe to point at a repository you care about:
 | Draw boxes onto a saved image | Estimated coordinates are wrong by a row, and look right while you author them |
 | Seed data to make a screen look fuller | A screenshot is evidence. Invented rows get quoted back at you |
 | Photograph something that is not working yet | An annotated screenshot reads as proof |
-| Publish a PR description without showing it first | It is published, quotable, and often mailed to a team the moment it lands |
+| Publish a PR description or a ticket without showing it first | It is published, quotable, and often mailed to a team the moment it lands |
+| Copy the plan into a ticket | The ticket says what to do; the plan already says how, and two copies drift |
 | Introduce a documentation convention the repository lacks | No new decision-record scheme, no new directory, no new template, as a side effect of documenting a feature |
 | Edit source, tests or configuration | `doc-writer`'s write scope is documentation paths, and it has no Bash to route around that |
 | Commit, push, or open a pull request | Ending a run with a commit nobody asked for makes it irreversible before it has been read |
 
 ## Evals
 
-Four behaviour cases under `evals/`. See [evals/README.md](evals/README.md), including the note that `claude plugin eval` is currently early access.
+Five behaviour cases under `evals/`. See [evals/README.md](evals/README.md), including the note that `claude plugin eval` is currently early access.
 
 ## Dependencies
 
 ```
-change-docs@1.0.0
+change-docs@1.1.0
 └── engineering-paved-path@^1.0.0     mermaid-diagram, for doc-writer's diagrams
 ```
 
@@ -100,4 +116,4 @@ change-docs@1.0.0
 
 Claude Code >= 2.1.110 — the floor for version-constrained plugin dependencies.
 
-`annotated-screenshots` additionally needs browser automation that can evaluate a script in the page and save a screenshot to a file. It names no particular one, and works with whatever the session has.
+`annotated-screenshots` — and `ticket-description` when it takes screenshots — additionally needs browser automation that can evaluate a script in the page and save a screenshot to a file. It names no particular one, and works with whatever the session has.
