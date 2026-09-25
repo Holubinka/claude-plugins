@@ -67,14 +67,22 @@ Cost comes from **not duplicating work**, not from making agents cheaper. In ord
    dispatch — parallel contexts cannot see each other.
 2. **Point them at a map before they search.** A tracer that reads an existing architecture document
    and then verifies one fact costs a fraction of one that rediscovers the structure by grepping.
+   **When every lane sits in the same package, carry the map instead of pointing at it** — put the
+   three or four lines of that package's conventions file that matter into the brief itself. A
+   pointer still buys one full read per agent, and N agents buy the same file N times.
 3. **Ask for a compact, structured return.** An agent's output is data. A fixed table costs a fraction
    of an essay and is more useful to the caller.
 4. **Do not fan out when one agent suffices.** Three agents on a two-file diff cost three context
    loads to produce one small answer. Size the fan-out to the change.
 5. **Choose the lanes from the change, never from a fixed roster.** A roster that always runs
    everything is a roster nobody reads the output of.
-6. **Send a follow-up to a running agent rather than spawning a fresh one.** A new context re-reads
-   everything the first one already had.
+6. **Send one follow-up to a running agent rather than spawning a fresh one.** A new context re-reads
+   everything the first one already had. **The arithmetic inverts with repetition:** every resume
+   replays the whole accumulated context, so the ninth pays for everything the first eight
+   accumulated. One measured run had a single agent, resumed nine times over nineteen hours, take 43%
+   of a seventeen-agent bill. If an agent needs a third resume, stop resuming — the brief is the
+   thing to fix, and a fresh dispatch with the corrected brief costs one context instead of a growing
+   one.
 
 ## Two things that do not save money
 

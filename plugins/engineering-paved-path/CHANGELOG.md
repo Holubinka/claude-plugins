@@ -5,6 +5,28 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `engineering-paved-path--v<version>`.
 
+## [1.5.0] — 2026-09-25
+
+Two descriptions widened to the moments they were observed missing. Neither fired, in the main
+session or in any subagent, over thirty days in which both moments happened more than once.
+
+### Changed
+
+- **`verification-before-completion`** now names a claim about what a tool, hook or build will do
+  that was reasoned out instead of run, and a fix reported done after changing one of several places
+  that render the same thing. Both happened; the first was overturned by a pre-commit hook, the
+  second found by the user a day later.
+- **`systematic-debugging`** now names the moment before a cause is offered, not only before a fix —
+  after a first cause turned out wrong, or when a layout, style or config explanation is about to be
+  given before a single value has been measured. Three wrong causes were offered in a row that way;
+  the first `getComputedStyle` found the right one.
+
+### Added
+
+- **Two eval cases from those runs**, sharing `fixtures/two-variant-attachments`:
+  `debugging-measures-before-a-second-cause` and `verification-covers-every-variant`. Both are
+  refusals, scored `pass^k`.
+
 ## [1.4.0] — 2026-08-29
 
 Backward compatible: a skill arrives, and the largest existing one gets smaller while covering more

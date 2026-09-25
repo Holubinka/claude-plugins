@@ -39,3 +39,4 @@ engineering-paved-path:backend-architecture	Where should this constant live? It 
 engineering-paved-path:onion-architecture	Can my repository import the HTTP client directly, or does that break the dependency direction?
 !engineering-paved-path:backend-architecture	Where does this React component go — colocated with the route or in the shared folder?
 -	What is the difference between CommonJS and ESM?
+engineering-paved-path:systematic-debugging	The gap between the attachments is still too big after your margin fix. Is it the button height now?

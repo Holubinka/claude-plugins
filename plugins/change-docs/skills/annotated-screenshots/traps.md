@@ -1,4 +1,4 @@
-# Four ways a capture comes out wrong
+# Five ways a capture comes out wrong
 
 Reference for `annotated-screenshots`. Each of these produces an image that looks plausible and is
 wrong, which is the only kind worth writing down.
@@ -51,3 +51,15 @@ a loading indicator, wait for its absence rather than for a fixed delay.
 
 A related case: a tooltip or a hover state opened by the pointer being where the automation left it.
 Move the pointer somewhere neutral before capturing, unless the hover state is the subject.
+
+## 5 — A click issued from a script does nothing on a library component
+
+`el.click()` inside an evaluated script dispatches a bare `click` event. Component libraries — Element
+Plus, and others built the same way — open dropdowns, selects and dialogs on `pointerdown` or
+`mousedown`, or ignore events that are not trusted. The script returns success, nothing opens, and the
+next capture is taken of the wrong state.
+
+**Open things with the automation's own click** — the tool that sends real input events at the
+element's coordinates — and reserve scripted clicks for plain native controls. Before capturing,
+confirm the state actually changed: query for the opened panel, rather than trusting that the call
+returned.

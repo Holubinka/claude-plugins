@@ -5,6 +5,42 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `agent-authoring--v<version>`.
 
+## [1.1.0] — 2026-09-25
+
+The usage count was reporting a floor and calling it a total. Over thirty real days it found 138
+invocations; the same transcripts hold 271.
+
+### Fixed
+
+- **`collect` reads subagent transcripts.** A skill an agent calls, or has preloaded by its
+  `skills:` frontmatter, is written to `<session>/subagents/*.jsonl`, never to the main file. Eight
+  skills that reported zero were firing there, some of them twenty times.
+- **`collect` counts `/plugin:skill` typed by hand.** A slash command is a user record, not a tool
+  call, so a skill run only that way read as never used.
+- **A skill called by its bare name is credited** when exactly one installed plugin ships it and no
+  project or personal skill of that name shadows it. The rest are counted under the table rather
+  than dropped, so a large unattributed number is visible next to the zero it might explain.
+
+### Added
+
+- **`scripts/selftest.sh`** — the collector against a synthetic transcript tree, one assertion per
+  place a component can load from and one per record that must not count. CI already runs every
+  `plugins/*/scripts/selftest.sh`; this one fails on 1.0.0.
+
+### Changed
+
+- **`usage` splits every row by where it loaded** — `model`, `slash`, `subagent`. A component that
+  fires only inside subagents is reached through an agent that names it, not through its own
+  description, and that is a different finding from one that fires nowhere. Collections written by
+  1.0.0 still report, with every count under `model`.
+- **`model-routing` bounds the follow-up rule.** "Send a follow-up rather than spawn a fresh agent"
+  held for one follow-up and was followed nine times: one agent, resumed across nineteen hours, took
+  43% of a seventeen-agent run, because each resume replays everything accumulated before it. A
+  third resume now means the brief gets fixed and the agent is dispatched fresh.
+- **`model-routing` says when to carry a map rather than point at it** — when every lane of a
+  fan-out sits in one package, the lines of its conventions file that matter go into the brief, so
+  N agents do not each buy the same file.
+
 ## [1.0.0] — 2026-08-29
 
 First release. Three skills and two scripts. The authoring conventions and the audit are generalised from a private monorepo's `.claude/` set; the feedback log is new.

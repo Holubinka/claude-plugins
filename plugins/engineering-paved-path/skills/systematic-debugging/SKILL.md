@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: "Finds the cause of a defect before changing anything. Use when there is an observed symptom to point at — a crash, a test failing for a reason you do not understand, output that disagrees with the code, a slowdown, a build that breaks on one machine and not another. Consult it before proposing a fix, especially under time pressure or after a first fix did not work. Not for reading code to judge whether it looks correct when nothing has actually gone wrong: that is a review."
+description: "Finds the cause of a defect before changing anything. Use when there is an observed symptom to point at — a crash, a test failing for a reason you do not understand, output that disagrees with the code, a slowdown, a build that breaks on one machine and not another. Consult it before proposing a fix or naming a cause — especially under time pressure, after a first cause turned out wrong, or when a layout, style or config explanation is about to be offered before a single value has been measured. Not for reading code to judge whether it looks correct when nothing has actually gone wrong: that is a review."
 metadata:
   version: "1.0.0"
 keywords: [debugging, root-cause, defects, investigation]

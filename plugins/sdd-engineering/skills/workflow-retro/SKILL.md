@@ -21,6 +21,8 @@ Run when: a run that dispatched **three or more subagents** has finished; a work
 
 Do **not** run it after a single-agent task — the fixed cost of the retrospective exceeds anything it could find. Do not run it *during* a run: half-written transcripts give half-true numbers, and the agents you would want to ask are still working.
 
+**Run it while the agents can still be resumed.** Step 4 is the half no log can give, and it needs the agents alive: once they can no longer be resumed — `ListAgents` returns nothing for them — the answers are gone, and so is the chance to ask what the resumes were covering for. The deadline is the end of the session that ran the workflow, not "some time after". A late retrospective still produces the measured half; say in the report that step 4 was skipped and why, rather than filling it with guesses about what the agents would have said.
+
 **It reviews the run, not the code.** A defect in what the agents built belongs to `/code-review` and to whatever review the repository runs before a pull request. If this skill finds one, it hands it over and says so.
 
 ## 2. Two halves, and the split is the point
@@ -62,7 +64,7 @@ jq '.totals' <scratchDir>/stats.json
 
 **3 — Reconstruct the order, and compare it to the intent.** `agents[]` is sorted by first timestamp; overlapping `first_ts`/`last_ts` windows are agents that genuinely ran concurrently. A "parallel" wave whose windows do not overlap did not run in parallel, and the plan that asked for it was wrong about something. Say which.
 
-**4 — Ask the agents.** This is the half no log can give, and the reason this skill is worth its cost. A finished subagent can be resumed with `SendMessage` and still has its context, so it can answer a question its report never covered:
+**4 — Ask the agents.** This is the half no log can give, and the reason this skill is worth its cost. A finished subagent can be resumed with `SendMessage` and still has its context, so it can answer a question its report never covered — **for as long as it can still be resumed**; check `ListAgents` first, and see section 1 when it comes back empty:
 
 > Looking back at the brief you were given: what did you have to establish for yourself that the brief should have carried? What did you spend turns on that turned out not to matter? Answer in three sentences; do not re-do any work.
 
@@ -121,6 +123,7 @@ This skill **feeds** `engineering-insights` rather than replacing it: the retros
 |---|---|
 | "I'll read the agent transcripts to see what happened" | §2 — one transcript costs more context than the retrospective saves. Run the script |
 | "Ten agents read the plan, that's just how it works" | §3 step 2 — that is the finding, not the background |
+| "The run finished yesterday; I'll do the retro now and ask the agents then" | §1 — if `ListAgents` no longer lists them, step 4 is gone. Run the measured half and say step 4 was skipped |
 | "I'll ask all 27 agents what went wrong" | §3 step 4 — three to five, chosen by the numbers |
 | "The agent says the brief was unclear, so it was" | §3 step 4 — evidence from an interested party |
 | "`reread_ratio` is 300, that seems bad" | §3 step 2 — it is normal; the comparison is between agents in this run |

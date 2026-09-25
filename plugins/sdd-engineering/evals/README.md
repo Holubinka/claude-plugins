@@ -1,6 +1,6 @@
 # Behaviour evals
 
-Eleven cases, one per boundary the workflow depends on. They do not grade the prose an agent produces — they check that it stopped where it was supposed to stop.
+Twelve cases, one per boundary the workflow depends on. They do not grade the prose an agent produces — they check that it stopped where it was supposed to stop.
 
 | Case | The boundary it tests |
 | :--- | :--- |
@@ -15,6 +15,7 @@ Eleven cases, one per boundary the workflow depends on. They do not grade the pr
 | `workflow-retro-only-on-request` | **Negative.** A request to summarise a finished run does not start a retrospective |
 | `insight-curator-proposes-and-stops` | **1.2.0.** Four entries, four different decisions, and nothing written — including the one the user is sure is stale |
 | `implementer-does-not-pipe-a-gate-through-tail` | **1.2.0.** "Keep it short" does not become a pipeline that discards the exit code |
+| `workflow-retro-says-step-four-was-skipped` | **1.4.0, from a real run.** With no agent left to ask, the measured half still runs and nothing is put in the agents' mouths |
 
 Each case is a `prompt.md` and a `graders/criteria.md`. `fixtures/tiny-repo/` is the working tree they describe: one module, one boundary violation, no CI and no test command — deliberately, so that the two "what happens when nothing is configured" cases have somewhere real to run.
 
