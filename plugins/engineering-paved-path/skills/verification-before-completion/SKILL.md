@@ -1,6 +1,6 @@
 ---
 name: verification-before-completion
-description: "Requires fresh evidence before any claim that work is done, fixed, passing or ready. Use before saying a task is complete, before reporting a gate green, before opening a pull request, and whenever about to write that something works. Also use when a check was skipped, could not run, or scanned nothing — because a check that did not run is not a check that passed, and the two look identical in a report."
+description: "Requires fresh evidence before any claim that work is done, fixed, passing or ready. Use before saying a task is complete, before reporting a gate green, before opening a pull request, and whenever about to write that something works — including what a tool, hook or build will do, reasoned out instead of run, and a fix reported done after changing one of several places that render or handle the same thing. Also use when a check was skipped, could not run, or scanned nothing — because a check that did not run is not a check that passed, and the two look identical in a report."
 metadata:
   version: "1.0.0"
 keywords: [verification, evidence, completion, gates, honesty]
