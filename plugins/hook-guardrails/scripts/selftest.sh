@@ -9,6 +9,11 @@
 # status is 1 if any case behaved differently from what is asserted here.
 set -uo pipefail
 
+# Run from a git hook, this inherits GIT_DIR — absolute when the hook fires in a linked worktree —
+# and every `git` call below would then act on the repository being pushed instead of the throwaway
+# one: reinitialise it as bare, set its identity, commit to its current branch.
+unset $(git rev-parse --local-env-vars)
+
 here=$(cd "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 push_hook="$here/block-protected-push.sh"
 lint_hook="$here/scoped-lint-fix.sh"

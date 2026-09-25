@@ -5,6 +5,17 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `hook-guardrails--v<version>`.
 
+## [1.0.1] — 2026-09-25
+
+### Fixed
+
+- **`selftest.sh` could act on the repository it was testing from.** Run by a `pre-push` hook in
+  a linked worktree, it inherited an absolute `GIT_DIR`, and its throwaway-repository setup ran
+  against the real one instead: `core.bare=true`, a local `selftest` identity, a commit on the
+  current branch that deleted every tracked file, and a stray `feature` branch. It now unsets the
+  variables `git rev-parse --local-env-vars` lists before its first `git` call. The hooks
+  themselves are unchanged.
+
 ## [1.0.0] — 2026-08-29
 
 First release. Two hooks, generalised from a private monorepo's `.claude/` set.
