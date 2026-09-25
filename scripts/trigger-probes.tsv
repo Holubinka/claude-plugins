@@ -40,3 +40,7 @@ engineering-paved-path:onion-architecture	Can my repository import the HTTP clie
 !engineering-paved-path:backend-architecture	Where does this React component go — colocated with the route or in the shared folder?
 -	What is the difference between CommonJS and ESM?
 engineering-paved-path:systematic-debugging	The gap between the attachments is still too big after your margin fix. Is it the button height now?
+# --- agile-delivery: backlog-planning sits next to change-docs:ticket-description.
+agile-delivery:backlog-planning	This story came out at 13 points in refinement. Can we still take it into the sprint, or what do we do with it?
+agile-delivery:backlog-planning	QA found a bug in a story we closed last sprint. Should it be a defect sub-task on that story or a separate bug?
+!agile-delivery:backlog-planning	Create the ticket for the export streaming work in docs/plans/export-streaming.md.

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "agile-delivery",
+  "description": "Delivery planning for a team that works in sprints — how work breaks down from initiative to sub-task, when an item is a story, a task, a bug or a defect, how to split what will not fit a sprint, what a story point measures and who sets it, what ready and done mean, and which sprint habits keep velocity and completion rate honest.",
+  "version": "1.0.0",
+  "author": { "name": "Vitalii Holubinka" },
+  "license": "MIT",
+  "keywords": ["agile", "scrum", "backlog", "estimation", "story-points", "sprint", "definition-of-ready"]
+}

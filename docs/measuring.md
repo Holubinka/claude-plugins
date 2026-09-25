@@ -101,6 +101,7 @@ For each, the single observable worth watching, and the failure that would matte
 | `sdd-engineering` | Every acceptance criterion becomes a numbered requirement or is named under out-of-scope | A plan-verifier report of all-`MET` rows for a feature missing something a human approved |
 | `agent-authoring` | The audit fails on a set that has drifted | It passing a set with a backticked cross-plugin name that resolves to nothing |
 | `hook-guardrails` | `selftest.sh` stays green, and the push guard has blocked at least one real push | It blocking a harmless command — the first false refusal is when people disable it |
+| `agile-delivery` | An item estimated at 13 is split rather than committed, and a problem in closed work becomes a linked bug | A defect sub-task hung on a closed story — on no board, in no sprint, and reported by nothing |
 
 **The right-hand column is the more useful one.** A component that has never exhibited its worst
 failure has either not been used enough or is working; a component that exhibits it once has a

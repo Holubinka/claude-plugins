@@ -15,7 +15,7 @@ body:
     id: plugin
     attributes:
       label: Which plugin
-      options: [agent-authoring, architecture-review, change-docs, engineering-paved-path, hook-guardrails, refactor-safely, research-tools, review-lenses, sdd-engineering, test-discipline, "not sure"]
+      options: [agent-authoring, agile-delivery, architecture-review, change-docs, engineering-paved-path, hook-guardrails, refactor-safely, research-tools, review-lenses, sdd-engineering, test-discipline, "not sure"]
     validations: { required: true }
   - type: input
     id: component

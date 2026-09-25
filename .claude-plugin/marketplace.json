@@ -145,6 +145,21 @@
         "cleanup",
         "agents"
       ]
+    },
+    {
+      "name": "agile-delivery",
+      "source": "./plugins/agile-delivery",
+      "description": "Delivery planning for a team that works in sprints \u2014 how work breaks down from initiative to sub-task, when an item is a story, a task, a bug or a defect, how to split what will not fit a sprint, what a story point measures and who sets it, what ready and done mean, and which sprint habits keep velocity and completion rate honest.",
+      "category": "development",
+      "keywords": [
+        "agile",
+        "scrum",
+        "backlog",
+        "estimation",
+        "story-points",
+        "sprint",
+        "definition-of-ready"
+      ]
     }
   ],
   "renames": {}
