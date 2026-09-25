@@ -103,7 +103,9 @@ It also produces the number that is unavailable without telemetry: **how often a
 
 **For the general version of that question, use `session-report` in the official marketplace instead** — same source, wider window, richer breakdowns, an explorable HTML report. `collect` here is narrower on purpose: it writes into this log, so usage sits beside the failures recorded by hand, and *"this fired twelve times and here are the three entries where it went wrong"* is a sentence neither half produces alone. If you are not using the manual half, you do not need this one.
 
-**A component at 0% is the finding**, and nothing else can see it: it is charging its description on every turn and returning nothing. An empty report is a finding too — either nothing is installed, or the descriptions are not matching the work being done.
+It counts a component wherever it loads — a model call in the main session, a slash command typed by hand, or a call or preload inside a subagent's own transcript — and `usage` shows the three separately. A component that fires only inside subagents is reached through an agent that names it, not through its own description.
+
+**A component at 0% is the finding**, and nothing else can see it: it is charging its description on every turn and returning nothing. Check the line under the table first — skills called by a bare name that could not be pinned to one plugin are counted there, not in the table. An empty report is a finding too — either nothing is installed, or the descriptions are not matching the work being done.
 
 Two of the three manual verdicts exist for reasons that are easy to miss:
 

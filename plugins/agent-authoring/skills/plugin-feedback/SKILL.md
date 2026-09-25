@@ -35,7 +35,18 @@ sessions actually run.**
 
 `--all-projects` widens it beyond the current repository; `--days N` sets the window.
 
-**A component sitting at 0% is the finding.** It is charging its description on every turn and
+It counts three ways a component loads, and `usage` shows them in separate columns: a Skill or
+Agent call in the main session, a slash command the person typed, and anything called or
+preloaded inside a subagent's own transcript. **Read the split before reading the total.** A
+component that fires only inside subagents is reached through an agent that names it, not through
+its own description — a different finding from one that fires nowhere.
+
+A skill called by its bare name is credited to a plugin only when exactly one installed plugin
+ships it and no project or personal skill of that name shadows it. The rest are counted on a line
+below the table and left unattributed; a large number there means a zero above it is not yet
+evidence.
+
+**A component sitting at 0% is the finding** — once the lines above say nothing is hiding it. It is charging its description on every turn and
 returning nothing, and nothing else in the toolchain can see that. An empty report — nothing fired
 at all — is a finding too, not an empty result: either nothing is installed, or the descriptions are
 not matching the work being done.
@@ -53,8 +64,8 @@ using*, reach for that.
 `collect` here is deliberately narrower and exists for one reason: **it writes into this log, so the
 usage numbers sit beside the failures somebody recorded by hand.** "This fired twelve times and here
 are the three entries where it went wrong" is a sentence neither half can produce alone. It also
-counts only namespaced plugin components, because a built-in agent firing is not evidence about a
-plugin.
+counts only plugin components — namespaced, or a bare name it can pin to one plugin — because a
+built-in agent firing is not evidence about a plugin.
 
 If you are not using the manual half, you do not need this half either.
 
