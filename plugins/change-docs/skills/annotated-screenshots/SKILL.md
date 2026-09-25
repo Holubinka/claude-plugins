@@ -25,6 +25,10 @@ the after is enough and the before is noise.
 `1-orders-list-before.png`, `2-orders-list-after.png`. Whoever pastes them into a document will do it
 in filename order, and the prefix is the only thing keeping that order.
 
+Save them **inside the project directory**. A browser automation server may refuse to write outside
+its configured workspace roots — `Access denied: … is not within any of the configured workspace
+roots` — and that refusal costs the first capture of every session that forgets it.
+
 **3 — Get the page into the state you want, and note what you changed.** A filter set, a row
 selected, a dialog opened. You will need to put it back.
 
@@ -43,6 +47,10 @@ __clearAnno()                 Removes the overlay layer entirely.
 **5 — Annotate.** **At most two or three callouts per image.** Past that the reader is decoding a
 diagram instead of seeing a screen, and each extra arrow costs the others their weight.
 
+**Annotate the narrowest element that carries the meaning** — the text span, not the row; the
+button, not its wrapper. The label chip needs free space beside its target. A target as wide as its
+container leaves none on either side, and the chip is clamped on top of the thing it names.
+
 **6 — Capture the viewport, not the full page.** A fixed-position overlay does not survive
 full-page stitching: the browser scrolls, the overlay stays put, and the boxes appear repeatedly at
 the wrong offsets. If the subject does not fit in the viewport, take two images rather than one
@@ -55,7 +63,7 @@ tooltip that opened over the subject, a label covering the value it points at.
 **8 — Clear the overlay and restore the UI state** you changed in step 3. Then say where the files
 are, by absolute path.
 
-`traps.md` carries the four cases where a naive capture produces a wrong image.
+`traps.md` carries the five cases where a naive capture produces a wrong image.
 
 ## The colour
 
@@ -87,3 +95,4 @@ red error states points at nothing.
 | Not reading the image back | Open it. Half of all bad callouts are visible immediately and invisible in the code |
 | Leaving the overlay in place | `__clearAnno()` before handing the browser back, or the next screenshot has your boxes on it |
 | Re-annotating after a reload without re-injecting | Navigation wipes `window`. The call silently does nothing |
+| Boxing a full-width row or container | Box the text or control inside it, so the chip has room beside it |

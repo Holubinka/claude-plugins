@@ -5,6 +5,23 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `change-docs--v<version>`.
 
+## [1.1.0] — 2026-09-25
+
+### Changed
+
+- **`annotated-screenshots` says which element to box.** The narrowest one that carries the meaning
+  — the text span, not the row. A target as wide as its container leaves the label chip no room on
+  either side, and the chip is clamped on top of the thing it names.
+- **It says where to save.** Inside the project directory: a browser automation server may refuse a
+  path outside its workspace roots, and the refusal costs the first capture of the session.
+
+### Added
+
+- **A fifth trap: a scripted click does nothing on a library component.** `el.click()` from an
+  evaluated script sends a bare `click`; a dropdown or dialog that opens on `pointerdown`, or ignores
+  untrusted events, stays shut, the script reports success, and the next frame is of the wrong state.
+  Use the automation's own click and confirm the state changed before capturing.
+
 ## [1.0.0] — 2026-08-29
 
 First release. Two skills and an agent, generalised from a private monorepo's `.claude/` set.
