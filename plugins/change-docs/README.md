@@ -25,7 +25,7 @@ It injects a small overlay into the **running page** and asks the browser for th
 
 Works with any browser automation that can evaluate a script and save a screenshot: a DevTools MCP server, Playwright, Puppeteer. Nothing in it is specific to one.
 
-Four traps have their own reference file, because each produces an image that looks plausible and is wrong:
+Five traps have their own reference file, because each produces an image that looks plausible and is wrong:
 
 | Trap | What happens |
 | :--- | :--- |
@@ -33,6 +33,7 @@ Four traps have their own reference file, because each produces an image that lo
 | A native `<dialog>` | It lives in the browser's top layer, above `z-index: 2147483647`. There is no value that wins, and an hour disappears into finding that out |
 | Full-page capture | A fixed overlay does not survive stitching — the boxes repeat at the wrong offsets |
 | A page still moving | A capture during a transition catches the element mid-flight. Wait for settled, not for present |
+| A scripted click on a library component | `el.click()` from a script opens nothing on a dropdown or dialog that listens for pointer events. The script reports success and the next frame is of the wrong state |
 
 Two rules do most of the work: **at most two or three callouts per image**, and **read the image back after writing it**. The second is the step that is easiest to skip and the one that catches everything.
 
