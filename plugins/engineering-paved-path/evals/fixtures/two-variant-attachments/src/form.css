@@ -1,0 +1,4 @@
+/* Mirrors the relevant rule of the component library's form-item theme. */
+.el-form-item__content {
+  line-height: 32px;
+}

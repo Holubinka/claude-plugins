@@ -1,6 +1,6 @@
 # Behaviour evals
 
-Eight cases, one per boundary this plugin's shared rules depend on. Four are refusals, and they are the ones that matter most.
+Ten cases, one per boundary this plugin's shared rules depend on. Six are refusals, and they are the ones that matter most.
 
 | Case | The boundary it tests |
 | :--- | :--- |
@@ -12,11 +12,17 @@ Eight cases, one per boundary this plugin's shared rules depend on. Four are ref
 | `backend-architecture-reads-before-proposing` | A consistent tree is followed, even where the skill would have chosen differently |
 | `scoped-change-refuses-unrequested-flexibility` | A request that asks for flexibility gets one question, not an architecture |
 | `debugging-refuses-without-a-symptom` | **From a routing probe.** No observed failure means review, not a root-cause investigation |
+| `debugging-measures-before-a-second-cause` | **1.5.0, from a real run.** After a first fix failed, a suggested cause is measured, not agreed with |
+| `verification-covers-every-variant` | **1.5.0, from a real run.** A change to one of two rendering branches is not reported done |
 
 The last two are a pair. `severity-scale` and `project-commands` both exist to make one thing
 impossible — **a green result that was never earned** — and each does it at a different point:
 one when a finding is graded, the other when a command is chosen. A suite that only checked the
 positive direction would pass a plugin that had lost both.
+
+The two 1.5.0 cases share `fixtures/two-variant-attachments`: a component with two rendering
+branches, each with its own gap, inside a wrapper whose inherited `line-height` no rule on the
+component mentions. Each shape is the one a real session got wrong.
 
 `ts-diagnostic-reports-not-scanned` runs against `fixtures/no-src-repo`, whose TypeScript lives
 in `packages/api/src/` and `app/`. That shape is not incidental — it is the exact layout that
