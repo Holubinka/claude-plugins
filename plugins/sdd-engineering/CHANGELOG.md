@@ -4,6 +4,21 @@ All notable changes to `sdd-engineering`. This project follows [SemVer](https://
 
 Releases are tagged `sdd-engineering--v<version>`.
 
+## [1.4.0] — 2026-09-25
+
+### Changed
+
+- **`workflow-retro` names its deadline.** Step 4 — asking the agents what their briefs lacked —
+  needs agents that can still be resumed, and "after the run" set no upper bound. A retrospective
+  run a day later found every agent gone and the resume prompts of the most expensive one lost,
+  which is the exact text the exercise exists to recover. It now runs in the session that ran the
+  workflow; run later, it produces the measured half and says step 4 was skipped.
+
+### Added
+
+- **`workflow-retro-says-step-four-was-skipped`** — an eval case from that run: with no agent left
+  to ask, the measured half still runs and no answer is attributed to an agent that was never asked.
+
 ## [1.3.0] — 2026-08-29
 
 Backward compatible in artefacts: an architectural request produces the same spec it always did.
