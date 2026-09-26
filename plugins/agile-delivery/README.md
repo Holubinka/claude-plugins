@@ -16,7 +16,7 @@ Figures are estimates. Two reference files load only when the skill reads them: 
 
 ## `backlog-planning` — the parts that are easy to get wrong
 
-**Bug or defect is decided by the state of the parent, not by severity.** A problem in work still open in this sprint is a defect sub-task that blocks the parent's Done. A problem in closed or released work is a standalone bug, linked back. A sub-task hung on a closed story is on no board and in no sprint, and nothing reports it missing.
+**Bug or defect is decided by the state of the parent and the release, not by severity.** A problem in work still open in this sprint, or one that blocks the release, is a defect sub-task that blocks the parent's Done. A problem in closed or released work that holds nothing back is a standalone bug in the backlog, linked back when the broken item is known. A sub-task hung on a closed story is on no board and in no sprint, and nothing reports it missing.
 
 **13 is not an estimate.** It is the point at which an item gets split — by workflow step, by business rule, by integration boundary, or with a timeboxed spike — and splitting into "backend", "frontend" and "tests" is not one of the options.
 
