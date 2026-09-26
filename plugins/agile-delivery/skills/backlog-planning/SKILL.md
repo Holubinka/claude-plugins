@@ -33,18 +33,20 @@ the only place they will live, they go on the item. One copy, never two.
 | Epic | A large deliverable under **one** initiative | T-shirt | Several sprints |
 | Story | A user-visible slice — testable, with acceptance criteria | Story points | One sprint |
 | Task | Technical or operational work nobody outside the team sees — refactor, config, investigation, environment setup | Story points | One sprint |
-| Bug | A standalone item for a defect in **released or already-closed** work — an incident, a monitoring alert, a support report | Story points | One sprint |
+| Bug | A standalone item for a defect in **released or already-closed** work — an incident, a monitoring alert, a support report — or one that does not block a release | Story points, when it needs development effort | Hours to a couple of days |
 | Sub-task | An execution step under a story, task or bug | **Never** | A day or two |
-| Defect | A sub-task for a problem found in a parent **still open in the current sprint**. Blocks that parent's Done | **Never** | Inside the parent |
+| Defect | A sub-task for a problem found in a parent **still open in the current sprint**, or one that **blocks the release**. Blocks that parent's Done | **Never** | Inside the parent |
 
-**Every item has a parent**, and every epic has children. An orphan story disappears from every
-roadmap and plan view; an empty epic is a promise nobody is working on.
+**Every story and task has a parent**, and every epic has children. An orphan story disappears
+from every roadmap and plan view; an empty epic is a promise nobody is working on. A bug is the
+exception: link it to what it breaks when that is known, but it does not need a parent to exist.
 
-**Bug or defect is decided by the state of the work it breaks, not by severity.** Parent still open
-in this sprint: defect sub-task, and the parent cannot close until it is fixed. Parent closed —
-released, or done in an earlier sprint: a standalone bug, linked to the original item. A closed item
-cannot take new sub-tasks in most trackers, and where it can, the defect is orphaned: nothing on any
-board shows it.
+**Bug or defect is decided by two questions, not by severity.** Is the problem in an item still
+open in this sprint, or does it block the release? Either yes: defect sub-task on that item, and
+the item cannot close until it is fixed. Both no — the work was released or closed in an earlier
+sprint, and nothing is held back: a standalone bug in the backlog, fixed in the current sprint only
+if it is urgent. A closed item cannot take new sub-tasks in most trackers, and where it can, the
+defect is orphaned: nothing on any board shows it.
 
 ## 2 — Splitting
 
