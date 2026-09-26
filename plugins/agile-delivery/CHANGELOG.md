@@ -5,6 +5,15 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `agile-delivery--v<version>`.
 
+## [1.1.0] — 2026-09-26
+
+### Changed
+
+- **`backlog-planning`** — a problem that blocks the release is a defect even when its parent is not
+  in the current sprint; a bug is estimated only when it needs development effort, is sized in hours
+  to a couple of days, and needs no parent — it links to the broken item when that is known and goes
+  to the backlog unless it is urgent.
+
 ## [1.0.0] — 2026-09-25
 
 First release. One skill, generalised from three internal delivery-process courses.
