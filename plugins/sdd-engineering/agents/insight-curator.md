@@ -2,8 +2,8 @@
 name: insight-curator
 description: Periodic prune of an insights store — finds duplicates, entries that contradict the current code, and lessons that have outgrown the file and belong in a skill or the repository's own conventions. Proposes and stops; it writes nothing until a human approves the proposal. Run it monthly, or when a file gets long enough that nobody reads to the end.
 tools: Read, Grep, Glob, Bash, Skill
-model: sonnet
-effort: medium
+model: haiku
+effort: low
 color: green
 keywords: [insights, knowledge, pruning, maintenance]
 ---

@@ -85,8 +85,8 @@ Known duplication to work from, found while writing these plugins:
 - Every agent restates the same clarification-block format. It is short, but it is in six files.
 
 **Do not touch the model tiers in the same experiment.** They are a cost decision already made
-on different grounds — `implementer` and `plan-verifier` stay on `opus` because their failures
-are silent — and moving them would make the prompt change unmeasurable.
+on different grounds — the tiers were set by a separate decision (`sonnet` by default, escalated per dispatch with
+`model: opus` where a failure is silent) — and moving them would make the prompt change unmeasurable.
 
 ## The gate the optimisation must pass
 

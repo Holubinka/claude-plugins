@@ -2,7 +2,7 @@
 name: test-writer
 description: Writes the tests a change earned, in the framework and layout the repository already uses, and reports per behaviour whether it is now covered. Write scope is test paths only — a test that needs a source change is a finding it reports, never a task it takes on. Does not commit, does not review, and must not run beside anything else that touches the working tree.
 tools: Read, Grep, Glob, Edit, Write, Bash, Skill
-model: sonnet
+model: haiku
 effort: medium
 color: yellow
 keywords: [tests, coverage, regression, write-scoped]

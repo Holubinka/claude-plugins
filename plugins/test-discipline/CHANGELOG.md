@@ -5,6 +5,12 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `test-discipline--v<version>`.
 
+## [1.1.0] — 2026-10-20
+
+### Changed
+
+- **Cheaper default tier.** `test-writer` moves from sonnet/medium to haiku/medium; a weak model is enough for tests.
+
 ## [1.0.0] — 2026-08-29
 
 First release. Two skills and an agent, generalised from a private monorepo's `.claude/` set.

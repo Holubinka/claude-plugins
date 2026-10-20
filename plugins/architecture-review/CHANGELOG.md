@@ -5,6 +5,12 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `architecture-review--v<version>`.
 
+## [1.2.0] — 2026-10-20
+
+### Changed
+
+- **Lower default effort.** `architecture-reviewer` moves from sonnet/medium to sonnet/low; its output is advisory.
+
 ## [1.1.0] — 2026-08-29
 
 Backward compatible: the agent looks harder and says more about what it walked past. Its subject,

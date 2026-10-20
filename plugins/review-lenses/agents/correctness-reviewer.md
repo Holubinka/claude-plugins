@@ -2,8 +2,8 @@
 name: correctness-reviewer
 description: Reviews a diff for logic bugs, type-safety holes and performance shapes — does the code do what it says, on the inputs it will actually get? Read-only, grades on the shared four-level severity scale, and every finding names a concrete input that breaks it. Fixes nothing. Safe to run in parallel with other read-only reviewers.
 tools: Read, Grep, Glob, Bash, Skill
-model: opus
-effort: high
+model: sonnet
+effort: medium
 color: orange
 keywords: [review, correctness, logic, read-only]
 ---

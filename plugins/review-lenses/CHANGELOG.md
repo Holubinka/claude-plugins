@@ -5,6 +5,12 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `review-lenses--v<version>`.
 
+## [1.1.0] — 2026-10-20
+
+### Changed
+
+- **Cheaper default tiers.** `correctness-reviewer` moves from opus/high to sonnet/medium and `dependency-auditor` to haiku/low; escalate per dispatch with `model: opus` where a silent failure is costly. `finding-verifier` stays on opus.
+
 ## [1.0.0] — 2026-08-29
 
 First release. One skill and three agents, generalised from a private monorepo's `.claude/` set.

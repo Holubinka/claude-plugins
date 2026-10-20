@@ -81,7 +81,7 @@ The header names the plan the branch was executing, and says whether the finding
 
 Dispatch **one `implementer` against the brief path, with `model: sonnet` on the `Agent` call.**
 
-That override beats the agent's `opus` frontmatter for this one dispatch, and a brief built to the shape above is what makes it safe: the address, the rule, the quote and the target shape are all decided already, so the round is an edit rather than a design. **Downgrade the *round*, never the agent file** — a build implementer starting from a plan is not this, and [SKILL.md](SKILL.md) §11 says why it stays on `opus`. Note the override in your report.
+That override is explicit for this one dispatch, even though the agent's own frontmatter is already `sonnet`, so the round stays cheap if the default ever moves, and a brief built to the shape above is what makes it safe: the address, the rule, the quote and the target shape are all decided already, so the round is an edit rather than a design. **Downgrade the *round*, never the agent file** — a build implementer starting from a plan is not this, and [SKILL.md](SKILL.md) §11 says when a build dispatch escalates to `model: opus`. Note the override in your report.
 
 If a finding turns out to need a decision rather than an edit, it was filter 3's and does not belong in the brief at all.
 
@@ -89,7 +89,9 @@ The implementer opens only that plan's `## Out of scope`, `## Constraints` and `
 
 **The brief is that agent's boundary exactly as a plan's steps are.** A defect it notices in passing and which the brief does not carry is reported, not fixed.
 
-## Two rounds, and then stop
+## One round by default, two at most
+
+The default is **one round**. Run a second only if the first round's re-review returns a `major` or `critical` finding; otherwise stop and print what is left. The hard cap stays at two.
 
 **Round 2 re-reviews only the files round 1 touched**, not the whole diff. Then the loop ends, whatever round 2 returned. Anything still open is printed in the final report with its `path:line` and handed to the human.
 

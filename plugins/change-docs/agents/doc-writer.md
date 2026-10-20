@@ -2,8 +2,8 @@
 name: doc-writer
 description: Documents a change that landed — either authoring a feature document from the diff and the plan, or correcting only the sentences an existing document no longer tells the truth about. Write scope is documentation paths only; it cannot touch source, and it has no Bash, so it must be handed a diff rather than computing one. Defaults to the smaller of its two modes.
 tools: Read, Grep, Glob, Edit, Write, Skill
-model: sonnet
-effort: medium
+model: haiku
+effort: low
 color: blue
 keywords: [documentation, drift, readme, write-scoped]
 ---
