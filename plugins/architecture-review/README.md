@@ -60,7 +60,7 @@ Use the architecture-review:architecture-reviewer agent to review the boundaries
 
 Give it a diff, a module or a path. If the target resolves to no files, or "this change" has no base to diff against, it returns a `## Clarification needed` block as its whole output and stops — ending with what it would assume if you just say "go ahead".
 
-`sdd-engineering`'s `run-plan` skill dispatches it at stage 4, in parallel with `/code-review`. It works equally well on its own against a branch or a PR.
+`sdd-engineering`'s `run-plan` skill dispatches it at stage 4, beside `review-diff`; `/code-review` is an opt-in extra. It works equally well on its own against a branch or a PR.
 
 ## What it returns
 

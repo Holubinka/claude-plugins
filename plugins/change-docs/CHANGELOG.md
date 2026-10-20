@@ -5,6 +5,12 @@ the bump rules this repository uses are in [docs/releasing.md](../../docs/releas
 
 Releases are tagged `change-docs--v<version>`.
 
+## [1.3.0] — 2026-10-20
+
+### Changed
+
+- **Cheaper default tier.** `doc-writer` moves from sonnet/medium to haiku/low.
+
 ## [1.2.0] — 2026-09-25
 
 ### Changed

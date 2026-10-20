@@ -86,9 +86,9 @@ A defect caught here costs one command. The same defect caught after review cost
 
 ## 5. Stage 3 — verify against the plan
 
-Dispatch `plan-verifier` with the plan path.
+Dispatch `plan-verifier` with the plan path, **once, after the last package lands.** That is the default, in `single` and in `multi-agent` alike: each run re-reads the whole plan and the diff, so every extra run is paid in full.
 
-In `multi-agent`, dispatch it **per package as that package lands**, not once at the end: a package's `**Contract:**` block is what every later package was told it may assume, so verifying it late turns one package's divergence into three packages of rework. When the packages are genuinely independent and consume nothing from each other, one run at the end is enough — say which you chose and why.
+Verify **per package as it lands** only as an opt-in, and only for a `multi-agent` plan whose packages consume each other's `**Contract:**` blocks: that block is what every later package was told it may assume, so verifying it late turns one package's divergence into three packages of rework. Say in your report if you chose it and why.
 
 `NOT_MET` and `PARTIAL` rows **skip the triage in [fix-rounds.md](fix-rounds.md) entirely**: the plan asked for them, so they are unfinished work rather than findings to weigh.
 
@@ -104,7 +104,7 @@ In `multi-agent`, dispatch it **per package as that package lands**, not once at
 
 **Below two files and thirty lines it does not fan out at all**, which is the ordinary outcome on a work package and is not a stage that was skipped.
 
-**`/code-review` is still worth running beside it on a feature**, at `high`. It is built into Claude Code, it is a different reader, and two independent passes over the same diff disagree usefully. Dispatch it in the same message.
+**`/code-review` beside it is opt-in**, not a default: run it only when the user asks, or on a feature whose diff is large and risky enough to want a second, independent reader. It is built into Claude Code and a different reader, but it is a second full pass over the same diff and is paid for as one. If you run it, dispatch it in the same message.
 
 Read a severity as *"look at this"* rather than as a grade. That axis is the least reproducible thing a reviewer produces — the same finding scored `major` on one run and `minor` on the next — which is why nothing here is allowed to threshold on it. What `review-diff` adds is that a `critical` has to survive an adversary that tries to refute it, where **uncertain counts as refuted**, before it blocks.
 
@@ -140,7 +140,7 @@ Where the repository has its own pre-PR review or gate command, that is the huma
 ## 10. Never
 
 - **Never write or edit the plan**, and never write a spec. Both are records by the time you run. A divergence is a line in your report, not a correction you apply.
-- **Never run more than two fix rounds**, and never start a third because the second returned something new.
+- **Never run more than two fix rounds**, and never start a third because the second returned something new. The default is one round; a second runs only if the first round's re-review returns a `major` or `critical` finding.
 - **Never fix a `pre-existing` finding inside a round.**
 - **Never dispatch a test-writing agent from here** — see §11. If one is ever added, it runs **alone**: its *prove the test can fail* rule leaves a deliberate defect in the tree between mutating a file and reverting it, and any sibling that reads those files or shells out to a gate measures the mutation rather than the branch.
 - **Never commit or push.** Ending a run with a commit nobody asked for makes a stage's output irreversible before it has been read.
@@ -153,8 +153,8 @@ There is a plugin in this marketplace for that gap-coverage pass, with an agent 
 
 **`spec-creator` and `implementation-planner`.** Dispatched by hand, before this skill runs.
 
-**The model tiers are a cost decision, not a ranking.** `architecture-reviewer` runs on `sonnet` because its output is advisory — a human reads every row and decides. `implementer` and `plan-verifier` stay on `opus` because their failures are silent: code that compiles and is wrong, and a `MET` row for something that never happened.
+**The model tiers are a cost decision, not a ranking.** Cheap model and low effort for anything that is not correctness-critical. `architecture-reviewer` runs on `sonnet` at `low` because its output is advisory — a human reads every row and decides. `implementer`, `plan-verifier` and `correctness-reviewer` default to `sonnet` at `medium`; `test-writer` runs on `haiku`, since a weak model is fine for tests. `spec-creator`, `implementation-planner` and `finding-verifier` stay on `opus` at `high`: they are rare and decisive. Where a failure is silent — code that compiles and is wrong, a `MET` row for something that never happened — **escalate per dispatch with `model: opus`** on the `Agent` call: for the `implementer` on migrations, authorization and money; for `plan-verifier` and `correctness-reviewer` on the same packages.
 
-**`effort` is that decision one notch finer, and every agent states it** — `medium` on the advisory ones, `high` on those that produce code, a plan, a spec or a verdict. `high` there is a **ceiling, not a raise**: without the field an agent inherits the session, and one measured run sent **20 of its 23 agents at `xhigh`** for exactly that reason — not one of them declared an effort. Do not lower the producing agents hoping to save tokens. Effort prices *thinking*, and thinking is not where a run's money goes: one run produced 386 k output tokens against 477 M re-read. The model tier prices both; effort only the first.
+**`effort` is that decision one notch finer, and every agent states it** — `medium` on the advisory ones, `high` only on the three that decide what is built (spec, plan, adversarial verdict). `high` there is a **ceiling, not a raise**: without the field an agent inherits the session, and one measured run sent **20 of its 23 agents at `xhigh`** for exactly that reason — not one of them declared an effort. Effort prices *thinking*, and thinking is not where most of a run's money goes: one run produced 386 k output tokens against 477 M re-read. The model tier prices both, so it is the main lever; lower effort helps by producing fewer, more consolidated tool calls and so fewer turns that re-read the cache.
 
 **The per-dispatch override is the cut that costs nothing.** The `Agent` tool's `model` parameter beats the frontmatter for one call, so mechanical work can drop a tier without touching the file — a fix round whose brief already carries `path:line`, the rule and the shape that satisfies it leaves little to reason about. Say in your report which dispatches you downgraded.

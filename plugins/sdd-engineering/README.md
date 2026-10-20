@@ -26,7 +26,7 @@ That is the design, not a limitation. A plan step that only makes sense to someo
 | 6 | `implementer` | the plan, or one work package | code, and gate output it pastes |
 | 7 | `plan-verifier` | the plan and the branch | item-by-item verdicts with evidence |
 | 8 | `review-lenses:review-diff` | the diff | one merged, verified findings table |
-| 9 | fix rounds | the findings, triaged | at most two rounds, then stop |
+| 9 | fix rounds | the findings, triaged | one round by default, at most two |
 
 **Not every request needs stage 1.** `spec-creator` classifies first and says so out loud: a
 feasibility question gets a Spike answer, a well-scoped change to a flow that already exists gets a
@@ -71,7 +71,7 @@ Its rule is *verify before calling anything stale*, and it exists because the al
 Two of its rules are worth knowing before you use it:
 
 - **Stage 2 exercises the feature through its real entry point** — a `curl`, the page, the CLI command. Gates prove the code compiles and the fakes returned their fixtures. They prove nothing about a real provider, a real database or a real browser, and that is exactly where the defects that survive review live.
-- **At most two fix rounds.** Not caution — measurement. One session ran eleven review rounds; the feature stopped producing findings at round seven, and rounds 8–10 were reviewing the fixes to rounds 7–9. That was 2.8M subagent tokens, 42 % of the session, for six minor findings.
+- **One fix round by default, at most two** (the second only if the first round's re-review returns a `major` or `critical`). Not caution — measurement. One session ran eleven review rounds; the feature stopped producing findings at round seven, and rounds 8–10 were reviewing the fixes to rounds 7–9. That was 2.8M subagent tokens, 42 % of the session, for six minor findings.
 
 **`/sdd-engineering:workflow-retro`** — what the orchestration cost, from the transcripts it left. A bundled script reads the billed `usage` figures; the judgement is yours. Its most useful output is not a number but a sentence: **what a resume said**, because that sentence belonged in the first brief.
 

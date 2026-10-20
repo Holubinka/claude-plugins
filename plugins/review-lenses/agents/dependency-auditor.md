@@ -2,8 +2,8 @@
 name: dependency-auditor
 description: Supply-chain review of a lockfile or manifest change — advisories weighted by whether the path ships, what actually entered the dependency tree, whether the repository already has something that does this, and licence surprises. Read-only, grades on the shared four-level severity scale, and never runs a fix. Dispatch it only when a lockfile or a dependency block is in the diff.
 tools: Read, Grep, Glob, Bash, Skill
-model: sonnet
-effort: medium
+model: haiku
+effort: low
 color: purple
 keywords: [dependencies, supply-chain, advisories, lockfile, read-only]
 ---

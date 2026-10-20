@@ -4,6 +4,12 @@ All notable changes to `sdd-engineering`. This project follows [SemVer](https://
 
 Releases are tagged `sdd-engineering--v<version>`.
 
+## [1.5.0] — 2026-10-20
+
+### Changed
+
+- **Cheaper default tiers and run-plan defaults.** `implementer` and `plan-verifier` move from opus/high to sonnet/medium and `insight-curator` to haiku/low; escalate per dispatch with `model: opus` for migrations, authorization and money. `run-plan` now verifies once after the last package, runs one fix round by default (a second only after a `major` or `critical`), and makes `/code-review` opt-in.
+
 ## [1.4.0] — 2026-09-25
 
 ### Changed
